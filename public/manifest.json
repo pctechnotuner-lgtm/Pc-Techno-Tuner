@@ -1,0 +1,27 @@
+{
+  "id": "/",
+  "name": "PC TECHNO TUNER Business Manager",
+  "short_name": "PC Techno",
+  "description": "IT products, customer complaint management, WhatsApp integration, and business accounts for PC TECHNO TUNER, Ahmedabad.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "theme_color": "#030712",
+  "background_color": "#030712",
+  "orientation": "portrait-primary",
+  "categories": ["business", "productivity", "utilities"],
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

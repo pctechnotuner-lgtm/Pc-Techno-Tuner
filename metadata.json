@@ -1,0 +1,6 @@
+{
+  "name": "PC TECHNO TUNER Business Manager",
+  "description": "Complete IT products catalog, customer complaint ticketing, direct WhatsApp integration, GST billing, customer ledger, and accounting system for PC TECHNO TUNER in Ahmedabad, Gujarat.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
