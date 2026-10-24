@@ -59,6 +59,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   const [newPass, setNewPass] = useState('');
   const [confirmPass, setConfirmPass] = useState('');
   const [passMessage, setPassMessage] = useState<{ text: string; isError: boolean } | null>(null);
+  const [newUsername, setNewUsername] = useState(storage.getAdminUsername());
 
   // File restore state
   const [restoreStatus, setRestoreStatus] = useState<string | null>(null);
@@ -88,6 +89,16 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
     alert('Company configurations saved successfully.');
   };
 
+  const handleChangeUsername = (e: React.FormEvent) => {
+    e.preventDefault();
+    const clean = newUsername.trim();
+    if (clean.length < 3) {
+      setPassMessage({ text: 'Username kam se kam 3 character ka hona chahiye.', isError: true });
+      return;
+    }
+    storage.setAdminUsername(clean);
+    setPassMessage({ text: `Login user ID "${clean}" set ho gaya.`, isError: false });
+  };
   const handleChangePassword = (e: React.FormEvent) => {
     e.preventDefault();
     const actualPass = storage.getAdminPassword();
@@ -345,6 +356,25 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           <span>Admin Security & Password</span>
         </h2>
 
+        <form onSubmit={handleChangeUsername} className="space-y-3 text-xs max-w-md pb-3 border-b border-gray-800">
+          <div>
+            <label className="block text-gray-400 mb-1">Login User ID</label>
+            <input
+              type="text"
+              required
+              autoCapitalize="none"
+              value={newUsername}
+              onChange={(e) => setNewUsername(e.target.value)}
+              className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-white"
+            />
+          </div>
+          <button
+            type="submit"
+            className="py-2 px-4 rounded-xl bg-gray-800 hover:bg-gray-700 text-white font-bold text-xs transition"
+          >
+            Update User ID
+          </button>
+        </form>
         <form onSubmit={handleChangePassword} className="space-y-3 text-xs max-w-md">
           <div>
             <label className="block text-gray-400 mb-1">Current Admin Password</label>
