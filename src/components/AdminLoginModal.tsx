@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Shield, Lock, X } from 'lucide-react';
+import { Shield, Lock, X, User } from 'lucide-react';
 import { storage } from '../storage';
 
 interface AdminLoginModalProps {
@@ -13,6 +13,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
   onClose,
   onLoginSuccess,
 }) => {
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(false);
 
@@ -20,10 +21,13 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const actualUser = storage.getAdminUsername().trim().toLowerCase();
     const actualPass = storage.getAdminPassword();
-    if (password === actualPass || password === 'admin123') {
+
+    if (username.trim().toLowerCase() === actualUser && password === actualPass) {
       storage.setAdminLoggedIn(true);
       setError(false);
+      setUsername('');
       setPassword('');
       onLoginSuccess();
       onClose();
@@ -53,12 +57,31 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
         <form onSubmit={handleSubmit} className="space-y-3.5 text-xs">
           <div>
             <label className="block text-gray-400 mb-1 font-semibold flex items-center gap-1">
+              <User className="w-3.5 h-3.5 text-blue-400" />
+              <span>User ID</span>
+            </label>
+            <input
+              type="text"
+              autoFocus
+              required
+              autoCapitalize="none"
+              value={username}
+              onChange={(e) => {
+                setUsername(e.target.value);
+                setError(false);
+              }}
+              placeholder="Default: admin"
+              className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-gray-400 mb-1 font-semibold flex items-center gap-1">
               <Lock className="w-3.5 h-3.5 text-blue-400" />
-              <span>Admin Security Password</span>
+              <span>Password</span>
             </label>
             <input
               type="password"
-              autoFocus
               required
               value={password}
               onChange={(e) => {
@@ -70,7 +93,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
             />
             {error && (
               <p className="text-rose-400 text-[11px] mt-1 font-medium">
-                Incorrect admin password. Default is <span className="font-mono">admin123</span>.
+                User ID ya password galat hai. Default: <span className="font-mono">admin / admin123</span>
               </p>
             )}
           </div>
