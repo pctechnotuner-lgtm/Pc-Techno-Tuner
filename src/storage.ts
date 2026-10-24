@@ -15,6 +15,7 @@ const STORAGE_KEYS = {
   INVOICES: 'pctechno_invoices_v1',
   TRANSACTIONS: 'pctechno_transactions_v1',
   AUTH: 'pctechno_auth_session_v1',
+  ADMIN_USERNAME: 'pctechno_admin_user_v1',
   ADMIN_PASSWORD: 'pctechno_admin_pass_v1',
   LANGUAGE: 'pctechno_lang_v1',
 };
@@ -533,6 +534,12 @@ export const storage = {
     localStorage.setItem(STORAGE_KEYS.AUTH, status ? 'true' : 'false');
   },
 
+  getAdminUsername: (): string => {
+    return localStorage.getItem(STORAGE_KEYS.ADMIN_USERNAME) || 'admin';
+  },
+  setAdminUsername: (newUser: string) => {
+    localStorage.setItem(STORAGE_KEYS.ADMIN_USERNAME, newUser.trim());
+  },
   getAdminPassword: (): string => {
     return localStorage.getItem(STORAGE_KEYS.ADMIN_PASSWORD) || 'admin123';
   },
