@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import {
   AppTab,
@@ -18,6 +19,7 @@ import {
   INITIAL_INVOICES,
   INITIAL_TRANSACTIONS,
 } from './storage';
+import { supabase } from './lib/supabaseClient';
 import { Header } from './components/Header';
 import { CatalogueView } from './components/CatalogueView';
 import { ComplaintFormView } from './components/ComplaintFormView';
@@ -32,7 +34,6 @@ import { SettingsView } from './components/SettingsView';
 import { AdminLoginModal } from './components/AdminLoginModal';
 
 export default function App() {
-  // Application State
   const [profile, setProfile] = useState<CompanyProfile>(storage.getProfile);
   const [products, setProducts] = useState<Product[]>(storage.getProducts);
   const [complaints, setComplaints] = useState<Complaint[]>(storage.getComplaints);
@@ -41,35 +42,96 @@ export default function App() {
   const [transactions, setTransactions] = useState<Transaction[]>(storage.getTransactions);
 
   const [lang, setLang] = useState<Language>(storage.getLanguage);
-  const [isAdmin, setIsAdmin] = useState<boolean>(storage.isAdminLoggedIn);
-  const [activeTab, setActiveTab] = useState<AppTab>(storage.isAdminLoggedIn() ? 'dashboard' : 'catalogue');
-  const [loginModalOpen, setLoginModalOpen] = useState<boolean>(false);
-  const [selectedComplaintForEdit, setSelectedComplaintForEdit] = useState<Complaint | null>(null);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const [activeTab, setActiveTab] = useState<AppTab>('catalogue');
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const [selectedComplaintForEdit, setSelectedComplaintForEdit] =
+    useState<Complaint | null>(null);
 
-  // Sync language selection to storage
+  // Use the real Supabase session for login state.
+  useEffect(() => {
+    let mounted = true;
+
+    const checkSession = async () => {
+      const { data, error } = await supabase.auth.getSession();
+
+      if (!mounted) return;
+
+      if (error || !data.session) {
+        setIsAdmin(false);
+        setActiveTab('catalogue');
+        return;
+      }
+
+      setIsAdmin(true);
+      setActiveTab('dashboard');
+    };
+
+    void checkSession();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!mounted) return;
+
+      const loggedIn = Boolean(session);
+      setIsAdmin(loggedIn);
+
+      if (!loggedIn) {
+        setActiveTab('catalogue');
+        setSelectedComplaintForEdit(null);
+      } else {
+        setActiveTab((current) =>
+          current === 'catalogue' ? 'dashboard' : current
+        );
+      }
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
+
   const handleSetLang = (newLang: Language) => {
     setLang(newLang);
     storage.setLanguage(newLang);
   };
 
-  // Sync admin state
-  const handleSetIsAdmin = (status: boolean) => {
-    setIsAdmin(status);
-    storage.setAdminLoggedIn(status);
-    if (!status && activeTab !== 'catalogue' && activeTab !== 'complaint') {
+  // Logout through Supabase, not a localStorage flag.
+  const handleSetIsAdmin = async (status: boolean) => {
+    if (!status) {
+      const { error } = await supabase.auth.signOut();
+
+      if (error) {
+        alert('Logout nahi hua. Internet connection check karein.');
+        return;
+      }
+
+      setIsAdmin(false);
       setActiveTab('catalogue');
+      return;
+    }
+
+    // Do not grant admin access just by setting a local flag.
+    const { data, error } = await supabase.auth.getSession();
+
+    if (!error && data.session) {
+      setIsAdmin(true);
+      setActiveTab('dashboard');
+    } else {
+      setIsAdmin(false);
+      setActiveTab('catalogue');
+      setLoginModalOpen(true);
     }
   };
 
-  // --- Handlers ---
   const handleSaveProduct = (product: Product) => {
-    let updated: Product[];
     const exists = products.some((p) => p.id === product.id);
-    if (exists) {
-      updated = products.map((p) => (p.id === product.id ? product : p));
-    } else {
-      updated = [product, ...products];
-    }
+    const updated = exists
+      ? products.map((p) => (p.id === product.id ? product : p))
+      : [product, ...products];
+
     setProducts(updated);
     storage.setProducts(updated);
   };
@@ -81,25 +143,26 @@ export default function App() {
   };
 
   const handleQuickUpdateStock = (productId: string, delta: number) => {
-    const updated = products.map((p) => {
-      if (p.id === productId) {
-        const newQty = Math.max(0, p.stockQuantity + delta);
-        return { ...p, stockQuantity: newQty };
-      }
-      return p;
-    });
+    const updated = products.map((p) =>
+      p.id === productId
+        ? { ...p, stockQuantity: Math.max(0, p.stockQuantity + delta) }
+        : p
+    );
+
     setProducts(updated);
     storage.setProducts(updated);
   };
 
-  // Complaint Submission (Public)
+  // Public complaint submission. This still uses local storage for now.
   const handleComplaintSubmitted = (newComplaint: Complaint) => {
     const updatedComplaints = [newComplaint, ...complaints];
     setComplaints(updatedComplaints);
     storage.setComplaints(updatedComplaints);
 
-    // Auto-create or ensure customer exists in customer directory
-    const existingCust = customers.find((c) => c.mobile === newComplaint.mobile);
+    const existingCust = customers.find(
+      (c) => c.mobile === newComplaint.mobile
+    );
+
     if (!existingCust) {
       const newCust: Customer = {
         id: `cust-${Date.now()}`,
@@ -110,28 +173,34 @@ export default function App() {
         notes: `Registered via complaint ticket ${newComplaint.id}`,
         createdAt: new Date().toISOString(),
       };
+
       const updatedCustomers = [newCust, ...customers];
       setCustomers(updatedCustomers);
       storage.setCustomers(updatedCustomers);
     }
   };
 
-  // Complaint Update (Admin)
   const handleUpdateComplaint = (updatedComplaint: Complaint) => {
-    const oldComplaint = complaints.find((c) => c.id === updatedComplaint.id);
-    const updated = complaints.map((c) => (c.id === updatedComplaint.id ? updatedComplaint : c));
+    const oldComplaint = complaints.find(
+      (c) => c.id === updatedComplaint.id
+    );
+    const updated = complaints.map((c) =>
+      c.id === updatedComplaint.id ? updatedComplaint : c
+    );
+
     setComplaints(updated);
     storage.setComplaints(updated);
 
-    // If marked Resolved with service charges > 0, auto record income entry if not already logged
     if (
       updatedComplaint.status === 'Resolved' &&
       updatedComplaint.serviceCharges > 0 &&
       (!oldComplaint || oldComplaint.status !== 'Resolved')
     ) {
       const isAlreadyRecorded = transactions.some(
-        (t) => t.referenceId === updatedComplaint.id && t.type === 'INCOME'
+        (t) =>
+          t.referenceId === updatedComplaint.id && t.type === 'INCOME'
       );
+
       if (!isAlreadyRecorded) {
         const incomeCategory =
           updatedComplaint.category === 'CCTV Cameras and DVR/NVR'
@@ -143,13 +212,16 @@ export default function App() {
           type: 'INCOME',
           category: incomeCategory,
           amount: updatedComplaint.serviceCharges,
-          date: updatedComplaint.visitDate || new Date().toISOString().split('T')[0],
+          date:
+            updatedComplaint.visitDate ||
+            new Date().toISOString().split('T')[0],
           paymentMethod: 'Cash',
           partyName: updatedComplaint.customerName,
           referenceId: updatedComplaint.id,
           notes: `Service charges collected for ticket ${updatedComplaint.id}`,
           createdAt: new Date().toISOString(),
         };
+
         const updatedTx = [serviceTx, ...transactions];
         setTransactions(updatedTx);
         storage.setTransactions(updatedTx);
@@ -157,44 +229,42 @@ export default function App() {
     }
   };
 
-  // Customer Save / Edit
   const handleSaveCustomer = (customer: Customer) => {
-    let updated: Customer[];
     const exists = customers.some((c) => c.id === customer.id);
-    if (exists) {
-      updated = customers.map((c) => (c.id === customer.id ? customer : c));
-    } else {
-      updated = [customer, ...customers];
-    }
+    const updated = exists
+      ? customers.map((c) => (c.id === customer.id ? customer : c))
+      : [customer, ...customers];
+
     setCustomers(updated);
     storage.setCustomers(updated);
   };
 
-  // Invoicing & Sales
   const handleSaveInvoice = (invoice: Invoice) => {
     const updatedInvoices = [invoice, ...invoices];
     setInvoices(updatedInvoices);
     storage.setInvoices(updatedInvoices);
 
-    // Auto-deduct inventory stock for products sold
     let currentProducts = [...products];
+
     invoice.items.forEach((item) => {
       if (item.productId) {
-        currentProducts = currentProducts.map((p) => {
-          if (p.id === item.productId) {
-            return {
-              ...p,
-              stockQuantity: Math.max(0, p.stockQuantity - item.quantity),
-            };
-          }
-          return p;
-        });
+        currentProducts = currentProducts.map((p) =>
+          p.id === item.productId
+            ? {
+                ...p,
+                stockQuantity: Math.max(
+                  0,
+                  p.stockQuantity - item.quantity
+                ),
+              }
+            : p
+        );
       }
     });
+
     setProducts(currentProducts);
     storage.setProducts(currentProducts);
 
-    // If amount paid today > 0, auto record cash inflow
     if (invoice.amountPaid > 0) {
       const salesTx: Transaction = {
         id: `tr-${Date.now()}`,
@@ -208,15 +278,18 @@ export default function App() {
         notes: `Payment received for Invoice ${invoice.invoiceNo}`,
         createdAt: new Date().toISOString(),
       };
+
       const updatedTx = [salesTx, ...transactions];
       setTransactions(updatedTx);
       storage.setTransactions(updatedTx);
     }
 
-    // Auto-create customer if does not exist
     const custExists = customers.some(
-      (c) => c.mobile === invoice.customerMobile || c.name.toLowerCase() === invoice.customerName.toLowerCase()
+      (c) =>
+        c.mobile === invoice.customerMobile ||
+        c.name.toLowerCase() === invoice.customerName.toLowerCase()
     );
+
     if (!custExists) {
       const newCust: Customer = {
         id: `cust-${Date.now()}`,
@@ -228,13 +301,13 @@ export default function App() {
         notes: `Created via invoice ${invoice.invoiceNo}`,
         createdAt: new Date().toISOString(),
       };
+
       const updatedCustomers = [newCust, ...customers];
       setCustomers(updatedCustomers);
       storage.setCustomers(updatedCustomers);
     }
   };
 
-  // Accounting Transactions
   const handleSaveTransaction = (transaction: Transaction) => {
     const updated = [transaction, ...transactions];
     setTransactions(updated);
@@ -247,19 +320,18 @@ export default function App() {
     storage.setTransactions(updated);
   };
 
-  // Settings & Profile
   const handleSaveProfile = (newProfile: CompanyProfile) => {
     setProfile(newProfile);
     storage.setProfile(newProfile);
   };
 
-  // Backups and Exports
   const handleExportBackup = () => {
     storage.exportBackupJson();
   };
 
   const handleRestoreBackup = (jsonData: any) => {
     const success = storage.restoreBackupJson(jsonData);
+
     if (success) {
       setProfile(storage.getProfile());
       setProducts(storage.getProducts());
@@ -268,6 +340,7 @@ export default function App() {
       setInvoices(storage.getInvoices());
       setTransactions(storage.getTransactions());
     }
+
     return success;
   };
 
@@ -278,112 +351,121 @@ export default function App() {
     storage.setCustomers(INITIAL_CUSTOMERS);
     storage.setInvoices(INITIAL_INVOICES);
     storage.setTransactions(INITIAL_TRANSACTIONS);
+
     setProfile(DEFAULT_PROFILE);
     setProducts(INITIAL_PRODUCTS);
     setComplaints(INITIAL_COMPLAINTS);
     setCustomers(INITIAL_CUSTOMERS);
     setInvoices(INITIAL_INVOICES);
     setTransactions(INITIAL_TRANSACTIONS);
+
     alert('System reloaded with default PC TECHNO TUNER seed data.');
   };
 
-  // CSV Exporters
   const exportProductsCsv = () => {
-    const headers = ['ID', 'Name', 'Category', 'Brand', 'Model', 'Cost Price', 'Selling Price', 'Stock Qty', 'Min Alert', 'Warranty (Mo)', 'Specifications'];
+    const headers = [
+      'ID', 'Name', 'Category', 'Brand', 'Model', 'Cost Price',
+      'Selling Price', 'Stock Qty', 'Min Alert', 'Warranty (Mo)',
+      'Specifications',
+    ];
+
     const rows = products.map((p) => [
-      p.id,
-      p.name,
-      p.category,
-      p.brand,
-      p.model,
-      p.purchasePrice,
-      p.sellingPrice,
-      p.stockQuantity,
-      p.minStockAlert,
-      p.warrantyMonths,
-      p.specifications,
+      p.id, p.name, p.category, p.brand, p.model, p.purchasePrice,
+      p.sellingPrice, p.stockQuantity, p.minStockAlert,
+      p.warrantyMonths, p.specifications,
     ]);
-    storage.exportToCSV(`PC_TECHNO_PRODUCTS_${new Date().toISOString().split('T')[0]}.csv`, [headers, ...rows]);
+
+    storage.exportToCSV(
+      `PC_TECHNO_PRODUCTS_${new Date().toISOString().split('T')[0]}.csv`,
+      [headers, ...rows]
+    );
   };
 
   const exportComplaintsCsv = () => {
-    const headers = ['Ticket ID', 'Customer', 'Mobile', 'Business', 'Category', 'Brand/Model', 'Serial No', 'Warranty Status', 'Complaint Type', 'Status', 'Technician', 'Visit Date', 'Service Charge', 'Location', 'Date Filed'];
+    const headers = [
+      'Ticket ID', 'Customer', 'Mobile', 'Business', 'Category',
+      'Brand/Model', 'Serial No', 'Warranty Status', 'Complaint Type',
+      'Status', 'Technician', 'Visit Date', 'Service Charge',
+      'Location', 'Date Filed',
+    ];
+
     const rows = complaints.map((c) => [
-      c.id,
-      c.customerName,
-      c.mobile,
-      c.businessName || '',
-      c.category,
-      c.brandModel || '',
-      c.serialNo || '',
-      c.warrantyStatus,
-      c.complaintType,
-      c.status,
-      c.assignedTechnician || '',
-      c.visitDate || '',
-      c.serviceCharges,
-      c.serviceLocation,
-      c.createdAt,
+      c.id, c.customerName, c.mobile, c.businessName || '',
+      c.category, c.brandModel || '', c.serialNo || '',
+      c.warrantyStatus, c.complaintType, c.status,
+      c.assignedTechnician || '', c.visitDate || '',
+      c.serviceCharges, c.serviceLocation, c.createdAt,
     ]);
-    storage.exportToCSV(`PC_TECHNO_COMPLAINTS_${new Date().toISOString().split('T')[0]}.csv`, [headers, ...rows]);
+
+    storage.exportToCSV(
+      `PC_TECHNO_COMPLAINTS_${new Date().toISOString().split('T')[0]}.csv`,
+      [headers, ...rows]
+    );
   };
 
   const exportCustomersCsv = () => {
-    const headers = ['Customer Name', 'Mobile', 'Business', 'Email', 'Address', 'GSTIN', 'Created At'];
+    const headers = [
+      'Customer Name', 'Mobile', 'Business', 'Email',
+      'Address', 'GSTIN', 'Created At',
+    ];
+
     const rows = customers.map((c) => [
-      c.name,
-      c.mobile,
-      c.businessName || '',
-      c.email || '',
-      c.address,
-      c.gstin || '',
-      c.createdAt,
+      c.name, c.mobile, c.businessName || '', c.email || '',
+      c.address, c.gstin || '', c.createdAt,
     ]);
-    storage.exportToCSV(`PC_TECHNO_CUSTOMERS_${new Date().toISOString().split('T')[0]}.csv`, [headers, ...rows]);
+
+    storage.exportToCSV(
+      `PC_TECHNO_CUSTOMERS_${new Date().toISOString().split('T')[0]}.csv`,
+      [headers, ...rows]
+    );
   };
 
   const exportInvoicesCsv = () => {
-    const headers = ['Invoice No', 'Date', 'Customer Name', 'Mobile', 'Subtotal', 'Tax Rate %', 'Tax Amount', 'Discount', 'Total Amount', 'Amount Paid', 'Balance Due', 'Payment Status', 'Method'];
+    const headers = [
+      'Invoice No', 'Date', 'Customer Name', 'Mobile', 'Subtotal',
+      'Tax Rate %', 'Tax Amount', 'Discount', 'Total Amount',
+      'Amount Paid', 'Balance Due', 'Payment Status', 'Method',
+    ];
+
     const rows = invoices.map((i) => [
-      i.invoiceNo,
-      i.invoiceDate,
-      i.customerName,
-      i.customerMobile,
-      i.subtotal,
-      i.taxRate,
-      i.taxAmount,
-      i.discount,
-      i.totalAmount,
-      i.amountPaid,
-      i.balanceDue,
-      i.paymentStatus,
-      i.paymentMethod,
+      i.invoiceNo, i.invoiceDate, i.customerName, i.customerMobile,
+      i.subtotal, i.taxRate, i.taxAmount, i.discount, i.totalAmount,
+      i.amountPaid, i.balanceDue, i.paymentStatus, i.paymentMethod,
     ]);
-    storage.exportToCSV(`PC_TECHNO_INVOICES_${new Date().toISOString().split('T')[0]}.csv`, [headers, ...rows]);
+
+    storage.exportToCSV(
+      `PC_TECHNO_INVOICES_${new Date().toISOString().split('T')[0]}.csv`,
+      [headers, ...rows]
+    );
   };
 
   const exportAccountingCsv = () => {
-    const headers = ['Date', 'Type', 'Category', 'Amount', 'Payment Method', 'Party', 'Reference ID', 'Notes'];
+    const headers = [
+      'Date', 'Type', 'Category', 'Amount', 'Payment Method',
+      'Party', 'Reference ID', 'Notes',
+    ];
+
     const rows = transactions.map((t) => [
-      t.date,
-      t.type,
-      t.category,
-      t.amount,
-      t.paymentMethod,
-      t.partyName,
-      t.referenceId || '',
-      t.notes || '',
+      t.date, t.type, t.category, t.amount, t.paymentMethod,
+      t.partyName, t.referenceId || '', t.notes || '',
     ]);
-    storage.exportToCSV(`PC_TECHNO_ACCOUNTING_${new Date().toISOString().split('T')[0]}.csv`, [headers, ...rows]);
+
+    storage.exportToCSV(
+      `PC_TECHNO_ACCOUNTING_${new Date().toISOString().split('T')[0]}.csv`,
+      [headers, ...rows]
+    );
   };
 
-  // Metrics for badges
-  const newComplaintsCount = complaints.filter((c) => c.status === 'New').length;
-  const lowStockCount = products.filter((p) => p.stockQuantity <= p.minStockAlert).length;
+  const newComplaintsCount = complaints.filter(
+    (c) => c.status === 'New'
+  ).length;
+
+  const lowStockCount = products.filter(
+    (p) => p.stockQuantity <= p.minStockAlert
+  ).length;
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-950 text-gray-100 selection:bg-blue-600 selection:text-white">
-      {/* Primary Header */}
       <Header
         profile={profile}
         lang={lang}
@@ -397,7 +479,6 @@ export default function App() {
         lowStockCount={lowStockCount}
       />
 
-      {/* Main Viewport Container */}
       <main className="max-w-7xl mx-auto w-full p-4 sm:p-6 lg:p-8 flex-1">
         {activeTab === 'catalogue' && (
           <CatalogueView
@@ -515,7 +596,6 @@ export default function App() {
         )}
       </main>
 
-      {/* Admin Login Modal */}
       <AdminLoginModal
         isOpen={loginModalOpen}
         onClose={() => setLoginModalOpen(false)}
