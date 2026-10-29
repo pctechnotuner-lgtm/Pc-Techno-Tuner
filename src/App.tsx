@@ -1,5 +1,6 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { loadCloudData, saveCloudData } from './lib/cloudStorage';
 import { supabase } from './lib/supabaseClient';
 import {
   AppTab,
@@ -20,7 +21,6 @@ import {
   INITIAL_INVOICES,
   INITIAL_TRANSACTIONS,
 } from './storage';
-import { supabase } from './lib/supabaseClient';
 import { Header } from './components/Header';
 import { CatalogueView } from './components/CatalogueView';
 import { ComplaintFormView } from './components/ComplaintFormView';
@@ -35,21 +35,40 @@ import { SettingsView } from './components/SettingsView';
 import { AdminLoginModal } from './components/AdminLoginModal';
 
 export default function App() {
-  const [profile, setProfile] = useState<CompanyProfile>(storage.getProfile);
-  const [products, setProducts] = useState<Product[]>(storage.getProducts);
-  const [complaints, setComplaints] = useState<Complaint[]>(storage.getComplaints);
-  const [customers, setCustomers] = useState<Customer[]>(storage.getCustomers);
-  const [invoices, setInvoices] = useState<Invoice[]>(storage.getInvoices);
-  const [transactions, setTransactions] = useState<Transaction[]>(storage.getTransactions);
+  const [profile, setProfile] = useState<CompanyProfile>(
+    storage.getProfile
+  );
+  const [products, setProducts] = useState<Product[]>(
+    storage.getProducts
+  );
+  const [complaints, setComplaints] = useState<Complaint[]>(
+    storage.getComplaints
+  );
+  const [customers, setCustomers] = useState<Customer[]>(
+    storage.getCustomers
+  );
+  const [invoices, setInvoices] = useState<Invoice[]>(
+    storage.getInvoices
+  );
+  const [transactions, setTransactions] = useState<Transaction[]>(
+    storage.getTransactions
+  );
 
   const [lang, setLang] = useState<Language>(storage.getLanguage);
-  const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [activeTab, setActiveTab] = useState<AppTab>('catalogue');
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [selectedComplaintForEdit, setSelectedComplaintForEdit] =
     useState<Complaint | null>(null);
 
-  // Use the real Supabase session for login state.
+  const [syncReady, setSyncReady] = useState(false);
+  const [syncStatus, setSyncStatus] = useState('Login required');
+
+  // Prevent saving local data while the cloud is still loading.
+  const loadingCloudRef = useRef(false);
+  const saveQueueRef = useRef<Promise<void>>(Promise.resolve());
+
+  // Check the actual Supabase login session.
   useEffect(() => {
     let mounted = true;
 
@@ -79,6 +98,8 @@ export default function App() {
       setIsAdmin(loggedIn);
 
       if (!loggedIn) {
+        setSyncReady(false);
+        setSyncStatus('Login required');
         setActiveTab('catalogue');
         setSelectedComplaintForEdit(null);
       } else {
@@ -94,12 +115,235 @@ export default function App() {
     };
   }, []);
 
+  // Load cloud data after login.
+  // If a cloud record does not exist yet, migrate local data once.
+  useEffect(() => {
+    if (!isAdmin) {
+      loadingCloudRef.current = false;
+      setSyncReady(false);
+      setSyncStatus('Login required');
+      return;
+    }
+
+    let cancelled = false;
+    loadingCloudRef.current = true;
+
+    const loadAllData = async () => {
+      setSyncReady(false);
+      setSyncStatus('Cloud data loading...');
+
+      try {
+        const {
+          data: authData,
+          error: authError,
+        } = await supabase.auth.getUser();
+
+        if (authError) throw authError;
+        if (!authData.user) {
+          throw new Error('Please log in again.');
+        }
+
+        const localProfile = storage.getProfile();
+        const localProducts = storage.getProducts();
+        const localComplaints = storage.getComplaints();
+        const localCustomers = storage.getCustomers();
+        const localInvoices = storage.getInvoices();
+        const localTransactions = storage.getTransactions();
+        const localLanguage = storage.getLanguage();
+
+        const [
+          cloudProfile,
+          cloudProducts,
+          cloudComplaints,
+          cloudCustomers,
+          cloudInvoices,
+          cloudTransactions,
+          cloudLanguage,
+        ] = await Promise.all([
+          loadCloudData<CompanyProfile>('profile'),
+          loadCloudData<Product[]>('products'),
+          loadCloudData<Complaint[]>('complaints'),
+          loadCloudData<Customer[]>('customers'),
+          loadCloudData<Invoice[]>('invoices'),
+          loadCloudData<Transaction[]>('transactions'),
+          loadCloudData<Language>('language'),
+        ]);
+
+        if (cancelled) return;
+
+        // Profile
+        if (cloudProfile !== null) {
+          setProfile(cloudProfile);
+          storage.setProfile(cloudProfile);
+        } else {
+          await saveCloudData('profile', localProfile);
+        }
+
+        // Products
+        if (cloudProducts !== null) {
+          setProducts(cloudProducts);
+          storage.setProducts(cloudProducts);
+        } else {
+          await saveCloudData('products', localProducts);
+        }
+
+        // Complaints: preserve local complaints not already in cloud.
+        if (cloudComplaints !== null) {
+          const mergedComplaints = [
+            ...cloudComplaints,
+            ...localComplaints.filter(
+              (local) =>
+                !cloudComplaints.some(
+                  (cloud) => cloud.id === local.id
+                )
+            ),
+          ];
+
+          setComplaints(mergedComplaints);
+          storage.setComplaints(mergedComplaints);
+
+          if (mergedComplaints.length !== cloudComplaints.length) {
+            await saveCloudData('complaints', mergedComplaints);
+          }
+        } else {
+          await saveCloudData('complaints', localComplaints);
+        }
+
+        // Customers
+        if (cloudCustomers !== null) {
+          setCustomers(cloudCustomers);
+          storage.setCustomers(cloudCustomers);
+        } else {
+          await saveCloudData('customers', localCustomers);
+        }
+
+        // Invoices
+        if (cloudInvoices !== null) {
+          setInvoices(cloudInvoices);
+          storage.setInvoices(cloudInvoices);
+        } else {
+          await saveCloudData('invoices', localInvoices);
+        }
+
+        // Transactions
+        if (cloudTransactions !== null) {
+          setTransactions(cloudTransactions);
+          storage.setTransactions(cloudTransactions);
+        } else {
+          await saveCloudData('transactions', localTransactions);
+        }
+
+        // Language
+        if (cloudLanguage !== null) {
+          setLang(cloudLanguage);
+          storage.setLanguage(cloudLanguage);
+        } else {
+          await saveCloudData('language', localLanguage);
+        }
+
+        if (!cancelled) {
+          setSyncStatus('Cloud data loaded');
+          setSyncReady(true);
+        }
+      } catch (error) {
+        console.error('Cloud load failed:', error);
+
+        if (!cancelled) {
+          setSyncReady(false);
+          setSyncStatus('Cloud sync failed');
+
+          alert(
+            'Cloud data load nahi hua. Internet, login aur Supabase settings check karein. Abhi Reset Defaults mat karein.'
+          );
+        }
+      } finally {
+        if (!cancelled) {
+          loadingCloudRef.current = false;
+        }
+      }
+    };
+
+    void loadAllData();
+
+    return () => {
+      cancelled = true;
+      loadingCloudRef.current = false;
+    };
+  }, [isAdmin]);
+
+  // Save changes to Supabase after cloud loading is complete.
+  // Saves are queued so they do not intentionally overlap.
+  useEffect(() => {
+    if (
+      !isAdmin ||
+      !syncReady ||
+      loadingCloudRef.current
+    ) {
+      return;
+    }
+
+    let cancelled = false;
+
+    const saveSnapshot = async () => {
+      if (loadingCloudRef.current || cancelled) return;
+
+      setSyncStatus('Saving to cloud...');
+
+      const task = async () => {
+        if (cancelled || loadingCloudRef.current) return;
+
+        await Promise.all([
+          saveCloudData('profile', profile),
+          saveCloudData('products', products),
+          saveCloudData('complaints', complaints),
+          saveCloudData('customers', customers),
+          saveCloudData('invoices', invoices),
+          saveCloudData('transactions', transactions),
+          saveCloudData('language', lang),
+        ]);
+      };
+
+      const nextSave = saveQueueRef.current.then(task);
+      saveQueueRef.current = nextSave.catch(() => {});
+
+      try {
+        await nextSave;
+
+        if (!cancelled) {
+          setSyncStatus('Cloud sync successful');
+        }
+      } catch (error) {
+        console.error('Cloud save failed:', error);
+
+        if (!cancelled) {
+          setSyncStatus('Cloud save failed');
+        }
+      }
+    };
+
+    void saveSnapshot();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    isAdmin,
+    syncReady,
+    profile,
+    products,
+    complaints,
+    customers,
+    invoices,
+    transactions,
+    lang,
+  ]);
+
   const handleSetLang = (newLang: Language) => {
     setLang(newLang);
     storage.setLanguage(newLang);
   };
 
-  // Logout through Supabase, not a localStorage flag.
+  // Logout using Supabase authentication.
   const handleSetIsAdmin = async (status: boolean) => {
     if (!status) {
       const { error } = await supabase.auth.signOut();
@@ -110,11 +354,11 @@ export default function App() {
       }
 
       setIsAdmin(false);
+      setSyncReady(false);
       setActiveTab('catalogue');
       return;
     }
 
-    // Do not grant admin access just by setting a local flag.
     const { data, error } = await supabase.auth.getSession();
 
     if (!error && data.session) {
@@ -129,6 +373,7 @@ export default function App() {
 
   const handleSaveProduct = (product: Product) => {
     const exists = products.some((p) => p.id === product.id);
+
     const updated = exists
       ? products.map((p) => (p.id === product.id ? product : p))
       : [product, ...products];
@@ -139,14 +384,21 @@ export default function App() {
 
   const handleDeleteProduct = (productId: string) => {
     const updated = products.filter((p) => p.id !== productId);
+
     setProducts(updated);
     storage.setProducts(updated);
   };
 
-  const handleQuickUpdateStock = (productId: string, delta: number) => {
+  const handleQuickUpdateStock = (
+    productId: string,
+    delta: number
+  ) => {
     const updated = products.map((p) =>
       p.id === productId
-        ? { ...p, stockQuantity: Math.max(0, p.stockQuantity + delta) }
+        ? {
+            ...p,
+            stockQuantity: Math.max(0, p.stockQuantity + delta),
+          }
         : p
     );
 
@@ -154,9 +406,11 @@ export default function App() {
     storage.setProducts(updated);
   };
 
-  // Public complaint submission. This still uses local storage for now.
+  // Public complaint submission is still saved locally.
+  // Public submissions need a separate secure server-side write policy.
   const handleComplaintSubmitted = (newComplaint: Complaint) => {
     const updatedComplaints = [newComplaint, ...complaints];
+
     setComplaints(updatedComplaints);
     storage.setComplaints(updatedComplaints);
 
@@ -176,15 +430,19 @@ export default function App() {
       };
 
       const updatedCustomers = [newCust, ...customers];
+
       setCustomers(updatedCustomers);
       storage.setCustomers(updatedCustomers);
     }
   };
 
-  const handleUpdateComplaint = (updatedComplaint: Complaint) => {
+  const handleUpdateComplaint = (
+    updatedComplaint: Complaint
+  ) => {
     const oldComplaint = complaints.find(
       (c) => c.id === updatedComplaint.id
     );
+
     const updated = complaints.map((c) =>
       c.id === updatedComplaint.id ? updatedComplaint : c
     );
@@ -199,7 +457,8 @@ export default function App() {
     ) {
       const isAlreadyRecorded = transactions.some(
         (t) =>
-          t.referenceId === updatedComplaint.id && t.type === 'INCOME'
+          t.referenceId === updatedComplaint.id &&
+          t.type === 'INCOME'
       );
 
       if (!isAlreadyRecorded) {
@@ -224,6 +483,7 @@ export default function App() {
         };
 
         const updatedTx = [serviceTx, ...transactions];
+
         setTransactions(updatedTx);
         storage.setTransactions(updatedTx);
       }
@@ -232,6 +492,7 @@ export default function App() {
 
   const handleSaveCustomer = (customer: Customer) => {
     const exists = customers.some((c) => c.id === customer.id);
+
     const updated = exists
       ? customers.map((c) => (c.id === customer.id ? customer : c))
       : [customer, ...customers];
@@ -242,6 +503,7 @@ export default function App() {
 
   const handleSaveInvoice = (invoice: Invoice) => {
     const updatedInvoices = [invoice, ...invoices];
+
     setInvoices(updatedInvoices);
     storage.setInvoices(updatedInvoices);
 
@@ -281,6 +543,7 @@ export default function App() {
       };
 
       const updatedTx = [salesTx, ...transactions];
+
       setTransactions(updatedTx);
       storage.setTransactions(updatedTx);
     }
@@ -304,6 +567,7 @@ export default function App() {
       };
 
       const updatedCustomers = [newCust, ...customers];
+
       setCustomers(updatedCustomers);
       storage.setCustomers(updatedCustomers);
     }
@@ -311,12 +575,14 @@ export default function App() {
 
   const handleSaveTransaction = (transaction: Transaction) => {
     const updated = [transaction, ...transactions];
+
     setTransactions(updated);
     storage.setTransactions(updated);
   };
 
   const handleDeleteTransaction = (id: string) => {
     const updated = transactions.filter((t) => t.id !== id);
+
     setTransactions(updated);
     storage.setTransactions(updated);
   };
@@ -346,6 +612,12 @@ export default function App() {
   };
 
   const handleResetDefaults = () => {
+    const confirmed = window.confirm(
+      'Kya aap sach mein default data restore karna chahte hain? Isse current data replace ho sakta hai.'
+    );
+
+    if (!confirmed) return;
+
     storage.setProfile(DEFAULT_PROFILE);
     storage.setProducts(INITIAL_PRODUCTS);
     storage.setComplaints(INITIAL_COMPLAINTS);
@@ -360,7 +632,7 @@ export default function App() {
     setInvoices(INITIAL_INVOICES);
     setTransactions(INITIAL_TRANSACTIONS);
 
-    alert('System reloaded with default PC TECHNO TUNER seed data.');
+    alert('Default data restored.');
   };
 
   const exportProductsCsv = () => {
@@ -467,6 +739,12 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-950 text-gray-100 selection:bg-blue-600 selection:text-white">
+      {isAdmin && (
+        <div className="px-4 py-2 text-center text-sm bg-gray-900 border-b border-gray-800">
+          Cloud status: {syncStatus}
+        </div>
+      )}
+
       <Header
         profile={profile}
         lang={lang}
