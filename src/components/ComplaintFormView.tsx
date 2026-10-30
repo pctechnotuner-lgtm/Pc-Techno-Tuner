@@ -27,6 +27,7 @@ import {
   WarrantyStatus,
 } from '../types';
 import { getT } from '../i18n';
+import { supabase } from '../lib/supabaseClient';
 
 interface ComplaintFormViewProps {
   profile: CompanyProfile;
@@ -54,6 +55,8 @@ export const ComplaintFormView: React.FC<ComplaintFormViewProps> = ({
   const [description, setDescription] = useState('');
   const [serviceLocation, setServiceLocation] = useState('');
   const [preferredDate, setPreferredDate] = useState('');
+  const [whatsappConsent, setWhatsappConsent] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [attachmentPreview, setAttachmentPreview] = useState<string | null>(null);
 
   // Success State
@@ -71,7 +74,7 @@ export const ComplaintFormView: React.FC<ComplaintFormViewProps> = ({
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!customerName.trim() || !mobile.trim() || !description.trim() || !serviceLocation.trim()) {
@@ -79,7 +82,13 @@ export const ComplaintFormView: React.FC<ComplaintFormViewProps> = ({
       return;
     }
 
-    const complaintId = `PCT-COMP-${new Date().getFullYear()}-${Math.floor(100 + Math.random() * 900)}`;
+    if (!whatsappConsent) {
+      alert('Please agree to receive complaint updates on WhatsApp.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    const complaintId = `PCT-COMP-${new Date().getFullYear()}-${Date.now().toString().slice(-6)}`;
     const now = new Date().toISOString();
 
     const newComplaint: Complaint = {
@@ -103,8 +112,19 @@ export const ComplaintFormView: React.FC<ComplaintFormViewProps> = ({
       updatedAt: now,
     };
 
-    onComplaintSubmitted(newComplaint);
-    setSubmittedComplaint(newComplaint);
+    try {
+      const { error } = await supabase.functions.invoke('submit-complaint', {
+        body: { ...newComplaint, whatsappConsent },
+      });
+      if (error) throw error;
+      onComplaintSubmitted(newComplaint);
+      setSubmittedComplaint(newComplaint);
+    } catch (error) {
+      console.error('Complaint submission failed:', error);
+      alert('Complaint cloud par save nahi hui. Kripya internet check karke dobara try karein.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const getWhatsAppMessageText = (c: Complaint) => {
@@ -149,6 +169,7 @@ Preferred Date: ${c.preferredDate || 'Earliest available visit'}`;
     setDescription('');
     setServiceLocation('');
     setPreferredDate('');
+    setWhatsappConsent(false);
     setAttachmentPreview(null);
   };
 
@@ -461,12 +482,18 @@ Preferred Date: ${c.preferredDate || 'Earliest available visit'}`;
             </div>
           </div>
 
+          <label className="flex items-start gap-2 text-xs text-gray-300">
+            <input type="checkbox" required checked={whatsappConsent} onChange={(e) => setWhatsappConsent(e.target.checked)} className="mt-0.5" />
+            <span>I agree to receive WhatsApp updates about this complaint on the mobile number provided.</span>
+          </label>
+
           <button
             type="submit"
-            className="w-full py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm shadow-lg shadow-blue-500/25 transition flex items-center justify-center gap-2"
+            disabled={isSubmitting}
+            className="w-full disabled:opacity-60 py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm shadow-lg shadow-blue-500/25 transition flex items-center justify-center gap-2"
           >
             <CheckCircle className="w-4 h-4" />
-            <span>{t.submitTicket}</span>
+            <span>{isSubmitting ? 'Submitting...' : t.submitTicket}</span>
           </button>
         </form>
       )}
