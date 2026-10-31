@@ -54,6 +54,7 @@ export const SalesBillingView: React.FC<SalesBillingViewProps> = ({
   const t = getT(lang);
   const [search, setSearch] = useState('');
   const [printInvoiceData, setPrintInvoiceData] = useState<Invoice | null>(null);
+  const [editingInvoiceId, setEditingInvoiceId] = useState<string | null>(null);
 
   // New Invoice Modal State
   const [createModalOpen, setCreateModalOpen] = useState(false);
@@ -83,6 +84,7 @@ export const SalesBillingView: React.FC<SalesBillingViewProps> = ({
   ]);
 
   const handleOpenCreateModal = () => {
+    setEditingInvoiceId(null);
     setCustName('');
     setCustMobile('');
     setCustBusiness('');
@@ -95,6 +97,23 @@ export const SalesBillingView: React.FC<SalesBillingViewProps> = ({
     setPaymentMethod('UPI');
     setNotes('');
     setItems([{ productId: '', description: '', quantity: 1, unitPrice: 0, lineTotal: 0 }]);
+    setCreateModalOpen(true);
+  };
+
+  const handleEditInvoice = (inv: Invoice) => {
+    setEditingInvoiceId(inv.id);
+    setCustName(inv.customerName || '');
+    setCustMobile(inv.customerMobile || '');
+    setCustBusiness(inv.customerBusiness || '');
+    setCustAddress(inv.customerAddress || '');
+    setCustGstin(inv.customerGstin || '');
+    setInvoiceDate(inv.invoiceDate);
+    setTaxRate(inv.taxRate);
+    setDiscount(inv.discount || 0);
+    setAmountPaid(inv.amountPaid || 0);
+    setPaymentMethod(inv.paymentMethod);
+    setNotes(inv.notes || '');
+    setItems(inv.items.map((item) => ({ ...item })));
     setCreateModalOpen(true);
   };
 
@@ -215,10 +234,11 @@ export const SalesBillingView: React.FC<SalesBillingViewProps> = ({
       return;
     }
 
-    const invoiceNo = `PCT-INV-${new Date().getFullYear()}-${Math.floor(100 + Math.random() * 900)}`;
+    const existingInvoice = editingInvoiceId ? invoices.find((inv) => inv.id === editingInvoiceId) : undefined;
+    const invoiceNo = existingInvoice?.invoiceNo || `PCT-INV-${new Date().getFullYear()}-${Math.floor(100 + Math.random() * 900)}`;
 
     const newInvoice: Invoice = {
-      id: `inv-${Date.now()}`,
+      id: existingInvoice?.id || `inv-${Date.now()}`,
       invoiceNo,
       invoiceDate,
       customerName: custName.trim(),
@@ -242,6 +262,7 @@ export const SalesBillingView: React.FC<SalesBillingViewProps> = ({
 
     onSaveInvoice(newInvoice);
     setCreateModalOpen(false);
+    setEditingInvoiceId(null);
   };
 
   const handleShareInvoiceWhatsApp = (inv: Invoice) => {
@@ -382,6 +403,13 @@ For support call: 7383871195`;
                   </td>
                   <td className="py-3 px-4 text-right space-x-1.5 whitespace-nowrap">
                     <button
+                      onClick={() => handleEditInvoice(inv)}
+                      className="px-2.5 py-1 bg-blue-950 hover:bg-blue-900 border border-blue-800 text-blue-300 rounded text-xs inline-flex items-center gap-1 transition"
+                      title="Edit GST invoice"
+                    >
+                      <span>Edit</span>
+                    </button>
+                    <button
                       onClick={() => handleTriggerPrint(inv)}
                       className="px-2.5 py-1 bg-gray-800 hover:bg-gray-700 text-gray-200 rounded text-xs inline-flex items-center gap-1 transition"
                       title="Print A4 GST invoice"
@@ -412,7 +440,7 @@ For support call: 7383871195`;
             <div className="flex items-center justify-between border-b border-gray-800 pb-3">
               <h3 className="text-base font-bold text-white flex items-center gap-2">
                 <Receipt className="w-4 h-4 text-emerald-400" />
-                <span>Create GST Sales Tax Invoice</span>
+                <span>{editingInvoiceId ? 'Edit GST Sales Tax Invoice' : 'Create GST Sales Tax Invoice'}</span>
               </h3>
               <button onClick={() => setCreateModalOpen(false)} className="text-gray-400 hover:text-white">
                 <X className="w-5 h-5" />
