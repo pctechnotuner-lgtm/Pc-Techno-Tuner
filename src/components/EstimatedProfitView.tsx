@@ -9,12 +9,13 @@ interface Props {
   customers: Customer[];
   profile: CompanyProfile;
   onSaveEstimate: (estimate: Estimate) => void;
+  onSaveCustomer: (customer: Customer) => void;
 }
 
 const money = (value: number) => '₹' + (Number(value) || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const escapeHtml = (value: string) => value.replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char] || char));
 
-export const EstimatedProfitView: React.FC<Props> = ({ invoices, products, estimates, customers, profile, onSaveEstimate }) => {
+export const EstimatedProfitView: React.FC<Props> = ({ invoices, products, estimates, customers, profile, onSaveEstimate, onSaveCustomer }) => {
   const [search, setSearch] = useState('');
   const [expandedParty, setExpandedParty] = useState<string | null>(null);
   const [builderOpen, setBuilderOpen] = useState(false);
@@ -118,6 +119,20 @@ export const EstimatedProfitView: React.FC<Props> = ({ invoices, products, estim
       notes: notes.trim() || undefined,
       createdAt: new Date().toISOString(),
     };
+    const matchedCustomer = customers.find((customer) =>
+      (mobile.trim() && customer.mobile === mobile.trim()) ||
+      customer.name.toLowerCase() === customerName.trim().toLowerCase()
+    );
+    onSaveCustomer({
+      id: matchedCustomer?.id || 'cust-' + Date.now(),
+      name: customerName.trim(),
+      mobile: mobile.trim(),
+      businessName: business.trim() || undefined,
+      address: address.trim() || 'Ahmedabad',
+      gstin: gstin.trim() || undefined,
+      notes: matchedCustomer?.notes || 'Added automatically from estimate / quotation',
+      createdAt: matchedCustomer?.createdAt || new Date().toISOString(),
+    });
     onSaveEstimate(estimate);
     setBuilderOpen(false);
     resetBuilder();
