@@ -52,6 +52,25 @@ jobs:
       - name: Generate Android project
         run: npx cap add android
 
+      - name: Apply PC TECHNO TUNER branding
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y librsvg2-bin
+          mkdir -p android/app/src/main/res/drawable
+          for spec in "mdpi:48" "hdpi:72" "xhdpi:96" "xxhdpi:144" "xxxhdpi:192"; do
+            density="${spec%%:*}"
+            size="${spec##*:}"
+            mkdir -p "android/app/src/main/res/mipmap-${density}"
+            rsvg-convert -w "${size}" -h "${size}" public/pc-techno-icon.svg > "/tmp/icon-${density}.png"
+            cp "/tmp/icon-${density}.png" "android/app/src/main/res/mipmap-${density}/ic_launcher.png"
+            cp "/tmp/icon-${density}.png" "android/app/src/main/res/mipmap-${density}/ic_launcher_round.png"
+            cp "/tmp/icon-${density}.png" "android/app/src/main/res/mipmap-${density}/ic_launcher_foreground.png"
+          done
+          rsvg-convert -w 1200 -h 1200 public/pc-techno-splash.svg > android/app/src/main/res/drawable/splash.png
+          if [ -d android/app/src/main/res/drawable-port ]; then
+            cp android/app/src/main/res/drawable/splash.png android/app/src/main/res/drawable-port/splash.png
+          fi
+
       - name: Sync app assets
         run: npx cap sync android
 
