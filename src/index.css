@@ -126,3 +126,52 @@
   .no-print { display:none !important; }
   * { -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
 }
+
+
+/* PC TECHNO TUNER — premium midnight dashboard theme */
+:root {
+  color-scheme: dark;
+  --pt-bg: #070b18;
+  --pt-panel: #10182b;
+  --pt-panel-deep: #0b1222;
+  --pt-border: rgba(126, 145, 190, .18);
+  --pt-purple: #a78bfa;
+  --pt-blue: #38bdf8;
+}
+html {
+  background: var(--pt-bg);
+  scrollbar-color: #51417f #090f1e;
+}
+body {
+  min-height: 100vh;
+  color: #eef2ff;
+  background:
+    radial-gradient(ellipse at 12% 0%, rgba(91, 58, 160, .16), transparent 36rem),
+    radial-gradient(ellipse at 92% 12%, rgba(30, 100, 170, .12), transparent 34rem),
+    var(--pt-bg);
+}
+::selection { background: rgba(139, 92, 246, .38); color: #fff; }
+::-webkit-scrollbar-track { background: #090f1e; }
+::-webkit-scrollbar-thumb { background: #51417f; }
+::-webkit-scrollbar-thumb:hover { background: #7860b8; }
+
+/* Bring existing dashboard panels into the same soft navy/glass language. */
+[class*="from-[#111c30]"] {
+  background-image: linear-gradient(145deg, rgba(20, 29, 53, .97), rgba(10, 17, 33, .98)) !important;
+  border-color: var(--pt-border) !important;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, .22), inset 0 1px 0 rgba(255,255,255,.025);
+}
+[class*="bg-[#080f1d]"] { background-color: #0a1224 !important; }
+[class*="text-blue-400"] { color: #a78bfa !important; }
+[class*="hover:text-blue-300"]:hover { color: #c4b5fd !important; }
+[class*="border-blue-800"], [class*="border-blue-900"] { border-color: rgba(139, 92, 246, .34) !important; }
+[class*="bg-blue-950"] { background-color: rgba(91, 54, 150, .22) !important; }
+button, input, select, textarea {
+  accent-color: #8b5cf6;
+}
+input:focus, select:focus, textarea:focus {
+  outline-color: rgba(167, 139, 250, .7);
+}
+@media (max-width: 767px) {
+  body { background-attachment: scroll; }
+}
