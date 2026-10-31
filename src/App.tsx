@@ -886,7 +886,7 @@ export default function App() {
         )}
 
         {activeTab === 'profit' && isAdmin && (
-          <EstimatedProfitView invoices={invoices} products={products} estimates={estimates} customers={customers} profile={profile} onSaveEstimate={(estimate) => { const updated = [estimate, ...estimates]; setEstimates(updated); storage.setEstimates(updated); }} />
+          <EstimatedProfitView invoices={invoices} products={products} estimates={estimates} customers={customers} profile={profile} onSaveEstimate={(estimate) => { const exists = estimates.some((item) => item.id === estimate.id); const updated = exists ? estimates.map((item) => item.id === estimate.id ? estimate : item) : [estimate, ...estimates]; setEstimates(updated); storage.setEstimates(updated); }} />
         )}
 
         {activeTab === 'accounts' && isAdmin && (
