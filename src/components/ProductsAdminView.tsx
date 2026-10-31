@@ -222,7 +222,7 @@ export const ProductsAdminView: React.FC<ProductsAdminViewProps> = ({
                 const margin = p.sellingPrice - p.purchasePrice;
                 const isLow = p.stockQuantity <= p.minStockAlert;
                 return (
-                  <tr key={p.id} className="hover:bg-gray-800/40 transition">
+                  <tr key={p.id} onClick={() => openEditModal(p)} className="hover:bg-gray-800/40 transition cursor-pointer" title="Click to open full product details">
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-3">
                         <img
@@ -260,7 +260,7 @@ export const ProductsAdminView: React.FC<ProductsAdminViewProps> = ({
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-2">
                         <button
-                          onClick={() => onQuickUpdateStock(p.id, -1)}
+                          onClick={(e) => { e.stopPropagation(); onQuickUpdateStock(p.id, -1); }}
                           className="p-1 hover:text-white text-gray-400 disabled:opacity-30"
                           disabled={p.stockQuantity <= 0}
                           title="Reduce stock by 1"
@@ -277,7 +277,7 @@ export const ProductsAdminView: React.FC<ProductsAdminViewProps> = ({
                           {p.stockQuantity}
                         </span>
                         <button
-                          onClick={() => onQuickUpdateStock(p.id, 1)}
+                          onClick={(e) => { e.stopPropagation(); onQuickUpdateStock(p.id, 1); }}
                           className="p-1 hover:text-white text-gray-400"
                           title="Increase stock by 1"
                         >
@@ -292,14 +292,15 @@ export const ProductsAdminView: React.FC<ProductsAdminViewProps> = ({
 
                     <td className="py-3 px-4 text-right space-x-1">
                       <button
-                        onClick={() => openEditModal(p)}
+                        onClick={(e) => { e.stopPropagation(); openEditModal(p); }}
                         className="p-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-blue-400 transition"
                         title="Edit product"
                       >
                         <Edit2 className="w-3.5 h-3.5" />
                       </button>
                       <button
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation();
                           if (confirm(`Delete ${p.name}?`)) onDeleteProduct(p.id);
                         }}
                         className="p-1.5 rounded-lg bg-gray-800 hover:bg-rose-950 text-rose-400 transition"
