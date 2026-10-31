@@ -511,16 +511,32 @@ export default function App() {
     }
   };
 
-  const handleDeleteComplaint = (complaintId: string) => {
-    const updatedComplaints = complaints.filter((complaint) => complaint.id !== complaintId);
-    setComplaints(updatedComplaints);
-    storage.setComplaints(updatedComplaints);
+  const handleDeleteComplaint = async (complaintId: string) => {
+    try {
+      // Public customer tickets live in their own table as well as the cloud sync list.
+      // Remove the source row first so it cannot reappear on the next cloud refresh.
+      const { error: publicDeleteError } = await supabase
+        .from('public_complaints')
+        .delete()
+        .eq('id', complaintId);
 
-    const updatedTransactions = transactions.filter(
-      (transaction) => transaction.referenceId !== complaintId
-    );
-    setTransactions(updatedTransactions);
-    storage.setTransactions(updatedTransactions);
+      if (publicDeleteError) throw publicDeleteError;
+
+      const updatedComplaints = complaints.filter((complaint) => complaint.id !== complaintId);
+      setComplaints(updatedComplaints);
+      storage.setComplaints(updatedComplaints);
+
+      const updatedTransactions = transactions.filter(
+        (transaction) => transaction.referenceId !== complaintId
+      );
+      setTransactions(updatedTransactions);
+      storage.setTransactions(updatedTransactions);
+      setSyncStatus('Complaint deleted and cloud synced');
+    } catch (error) {
+      console.error('Complaint delete failed:', error);
+      setSyncStatus('Complaint delete failed');
+      alert('Complaint delete nahi hua. Cloud permission ya internet connection check karein, phir dobara try karein.');
+    }
   };
 
   const handleSaveCustomer = (customer: Customer) => {
