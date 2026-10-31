@@ -236,7 +236,7 @@ export const EstimatedProfitView: React.FC<Props> = ({ invoices, products, estim
         <div className="bg-gray-950 rounded-lg p-4 space-y-1 text-sm">
           <div className="flex justify-between"><span>Taxable Subtotal</span><b>{money(subtotal)}</b></div><div className="flex justify-between"><span>GST ({taxRate}%)</span><b>{money(taxAmount)}</b></div><div className="flex justify-between"><span>Discount</span><b>{money(discount)}</b></div><div className="flex justify-between text-lg text-emerald-400 font-bold border-t border-gray-700 pt-2"><span>Quotation Total</span><span>{money(total)}</span></div><div className="flex justify-between text-emerald-300"><span>Internal Estimated Profit (not printed)</span><b>{money(estimatedProfit)}</b></div>
         </div>
-        <div className="flex flex-wrap gap-2"><button onClick={saveEstimate} className="bg-emerald-600 hover:bg-emerald-500 rounded-lg px-5 py-2 font-bold"{editingEstimateId ? 'Update Estimate' : 'Save Estimate'}</button><span className="text-xs text-gray-400 self-center">Estimate save karne se stock, invoice aur accounts change nahi honge.</span></div>
+        <div className="flex flex-wrap gap-2"><button onClick={saveEstimate} className="bg-emerald-600 hover:bg-emerald-500 rounded-lg px-5 py-2 font-bold">{editingEstimateId ? 'Update Estimate' : 'Save Estimate'}</button><span className="text-xs text-gray-400 self-center">Estimate save karne se stock, invoice aur accounts change nahi honge.</span></div>
       </section>}
 
       <section className="bg-gray-900 border border-gray-800 rounded-xl p-4 space-y-3">
