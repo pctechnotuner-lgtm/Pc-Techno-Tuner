@@ -128,18 +128,37 @@ export const ComplaintFormView: React.FC<ComplaintFormViewProps> = ({
   };
 
   const getWhatsAppMessageText = (c: Complaint) => {
-    return `PC TECHNO TUNER — NEW CUSTOMER COMPLAINT
+    return `━━━━━━━━━━━━━━━━━━━━
+🏢 PC TECHNO TUNER
+📋 NEW CUSTOMER COMPLAINT
+━━━━━━━━━━━━━━━━━━━━
 
-Complaint ID: ${c.id}
-Customer Name: ${c.customerName}
-Mobile Number: ${c.mobile}
-Product Category: ${c.category}
-Product Model: ${c.brandModel || 'N/A'}
-Serial Number: ${c.serialNo || 'N/A'}
-Warranty Status: ${c.warrantyStatus}
-Complaint Description: ${c.description}
-Service Location: ${c.serviceLocation}
-Preferred Date: ${c.preferredDate || 'Earliest available visit'}`;
+🆔 COMPLAINT DETAILS
+• Complaint ID: ${c.id}
+• Date: ${c.createdAt ? new Date(c.createdAt).toLocaleDateString('en-IN') : 'N/A'}
+
+👤 CUSTOMER DETAILS
+• Customer Name: ${c.customerName}
+• Mobile Number: +91 ${c.mobile}
+
+🖥️ PRODUCT DETAILS
+• Product Category: ${c.category}
+• Product Model: ${c.brandModel || 'N/A'}
+• Serial Number: ${c.serialNo || 'N/A'}
+• Warranty Status: ${c.warrantyStatus || 'N/A'}
+
+🛠️ COMPLAINT DETAILS
+• Complaint Type: ${c.complaintType || 'N/A'}
+• Description: ${c.description}
+
+📍 SERVICE DETAILS
+• Service Location: ${c.serviceLocation}
+• Preferred Date: ${c.preferredDate || 'Earliest available visit'}
+
+━━━━━━━━━━━━━━━━━━━━
+Please contact the customer and update the complaint status.
+PC TECHNO TUNER | Ahmedabad
+━━━━━━━━━━━━━━━━━━━━`;
   };
 
   const handleOpenWhatsApp = (c: Complaint) => {
