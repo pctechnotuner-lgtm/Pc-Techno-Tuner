@@ -860,6 +860,7 @@ export default function App() {
             customers={customers}
             profile={profile}
             lang={lang}
+            onSaveProduct={handleSaveProduct}
             onSaveInvoice={handleSaveInvoice}
             onExportCsv={exportInvoicesCsv}
           />
