@@ -12,6 +12,7 @@ import {
   Language,
   Product,
   Transaction,
+  AntivirusLicense,
 } from './types';
 import {
   storage,
@@ -35,6 +36,7 @@ import { ReportsView } from './components/ReportsView';
 import { EstimatedProfitView } from './components/EstimatedProfitView';
 import { SettingsView } from './components/SettingsView';
 import { AdminLoginModal } from './components/AdminLoginModal';
+import { AntivirusView } from './components/AntivirusView';
 
 export default function App() {
   const [profile, setProfile] = useState<CompanyProfile>(
@@ -56,6 +58,7 @@ export default function App() {
   const [transactions, setTransactions] = useState<Transaction[]>(
     storage.getTransactions
   );
+  const [antivirusLicenses, setAntivirusLicenses] = useState<AntivirusLicense[]>(storage.getAntivirusLicenses);
 
   const [lang, setLang] = useState<Language>(storage.getLanguage);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -158,6 +161,7 @@ export default function App() {
         const localInvoices = storage.getInvoices();
         const localEstimates = storage.getEstimates();
         const localTransactions = storage.getTransactions();
+        const localAntivirusLicenses = storage.getAntivirusLicenses();
         const localLanguage = storage.getLanguage();
 
         const [
@@ -168,6 +172,7 @@ export default function App() {
           cloudInvoices,
           cloudEstimates,
           cloudTransactions,
+          cloudAntivirusLicenses,
           cloudLanguage,
         ] = await Promise.all([
           loadCloudData<CompanyProfile>('profile'),
@@ -177,6 +182,7 @@ export default function App() {
           loadCloudData<Invoice[]>('invoices'),
           loadCloudData<Estimate[]>('estimates'),
           loadCloudData<Transaction[]>('transactions'),
+          loadCloudData<AntivirusLicense[]>('antivirus_licenses'),
           loadCloudData<Language>('language'),
         ]);
 
@@ -251,6 +257,14 @@ export default function App() {
           await saveCloudData('transactions', localTransactions);
         }
 
+        // Antivirus licenses
+        if (cloudAntivirusLicenses !== null) {
+          setAntivirusLicenses(cloudAntivirusLicenses);
+          storage.setAntivirusLicenses(cloudAntivirusLicenses);
+        } else {
+          await saveCloudData('antivirus_licenses', localAntivirusLicenses);
+        }
+
         // Language
         if (cloudLanguage !== null) {
           setLang(cloudLanguage);
@@ -319,6 +333,7 @@ export default function App() {
           saveCloudData('invoices', invoices),
           saveCloudData('estimates', estimates),
           saveCloudData('transactions', transactions),
+          saveCloudData('antivirus_licenses', antivirusLicenses),
           saveCloudData('language', lang),
         ]);
       };
@@ -655,6 +670,14 @@ export default function App() {
     storage.setTransactions(updatedTransactions);
   };
 
+  const handleSaveAntivirusLicense = (item: AntivirusLicense) => {
+    const updated = antivirusLicenses.some(x => x.id === item.id) ? antivirusLicenses.map(x => x.id === item.id ? item : x) : [item, ...antivirusLicenses];
+    setAntivirusLicenses(updated); storage.setAntivirusLicenses(updated);
+  };
+  const handleDeleteAntivirusLicense = (id: string) => {
+    const updated = antivirusLicenses.filter(x => x.id !== id); setAntivirusLicenses(updated); storage.setAntivirusLicenses(updated);
+  };
+
   const handleSaveTransaction = (transaction: Transaction) => {
     const updated = [transaction, ...transactions];
 
@@ -950,6 +973,10 @@ export default function App() {
 
         {activeTab === 'profit' && isAdmin && (
           <EstimatedProfitView invoices={invoices} products={products} estimates={estimates} customers={customers} profile={profile} onSaveCustomer={handleSaveCustomer} onDeleteEstimate={(estimateId) => { const updated = estimates.filter((item) => item.id !== estimateId); setEstimates(updated); storage.setEstimates(updated); }} onSaveEstimate={(estimate) => { const exists = estimates.some((item) => item.id === estimate.id); const updated = exists ? estimates.map((item) => item.id === estimate.id ? estimate : item) : [estimate, ...estimates]; setEstimates(updated); storage.setEstimates(updated); }} />
+        )}
+
+        {activeTab === 'antivirus' && isAdmin && (
+          <AntivirusView licenses={antivirusLicenses} onSave={handleSaveAntivirusLicense} onDelete={handleDeleteAntivirusLicense} />
         )}
 
         {activeTab === 'accounts' && isAdmin && (
