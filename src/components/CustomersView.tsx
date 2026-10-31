@@ -58,6 +58,24 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
   const [formAddress, setFormAddress] = useState('');
   const [formGstin, setFormGstin] = useState('');
   const [formNotes, setFormNotes] = useState('');
+  const [addressResults, setAddressResults] = useState<any[]>([]);
+  const [addressSearching, setAddressSearching] = useState(false);
+  const searchCompanyAddress = async () => {
+    if (!formBusiness.trim()) return;
+    setAddressSearching(true);
+    try {
+      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=5&q=${encodeURIComponent(formBusiness + ', India')}`);
+      const results = await response.json();
+      setAddressResults(Array.isArray(results) ? results : []);
+      if (!results?.length) alert('Company address not found. Please enter it manually.');
+    } catch { alert('Online address search failed. Please try again or enter manually.'); }
+    finally { setAddressSearching(false); }
+  };
+  const chooseCompanyAddress = (place: any) => {
+    const a = place.address || {};
+    setFormAddress([place.name || a.amenity || a.office || a.shop || a.building, a.road, a.suburb || a.neighbourhood, a.city || a.town || a.village, a.state, a.postcode].filter(Boolean).filter((v, i, arr) => arr.indexOf(v) === i).join(', '));
+    setAddressResults([]);
+  };
 
   const openAddModal = () => {
     setEditingCustomer(null);
@@ -522,14 +540,13 @@ Thank you for your business!`;
               </div>
 
               <div>
-                <label className="block text-gray-400 mb-1 font-semibold">Address in Ahmedabad</label>
-                <input
-                  type="text"
-                  value={formAddress}
-                  onChange={(e) => setFormAddress(e.target.value)}
-                  placeholder="Area, Street, Ahmedabad — 380009"
-                  className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-blue-500"
-                />
+                <label className="block text-gray-400 mb-1 font-semibold">Company Address</label>
+                <div className="flex gap-2">
+                  <input type="text" value={formAddress} onChange={(e) => setFormAddress(e.target.value)} placeholder="Company address" className="min-w-0 flex-1 bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-blue-500" />
+                  <button type="button" onClick={searchCompanyAddress} disabled={addressSearching || !formBusiness.trim()} className="shrink-0 px-3 rounded-xl bg-blue-600 text-white font-bold disabled:opacity-50">{addressSearching ? 'Searching…' : 'Search Online'}</button>
+                </div>
+                {addressResults.length > 0 && <div className="mt-2 max-h-40 overflow-y-auto rounded-lg border border-gray-700 bg-gray-950">{addressResults.map((place: any) => <button type="button" key={place.place_id} onClick={() => chooseCompanyAddress(place)} className="block w-full text-left p-2 text-xs text-gray-200 border-b border-gray-800 hover:bg-gray-800">{place.display_name}</button>)}</div>}
+                <p className="text-[10px] text-gray-500 mt-1">Search company name online, then select the correct match. Verify the address before saving.</p>
               </div>
 
               <div>
