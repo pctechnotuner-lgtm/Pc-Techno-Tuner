@@ -378,6 +378,7 @@ PC TECHNO TUNER | Ahmedabad
               </label>
               <input
                 type="date"
+                onClick={(e) => e.currentTarget.showPicker?.()}
                 value={preferredDate}
                 onChange={(e) => setPreferredDate(e.target.value)}
                 className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500"
