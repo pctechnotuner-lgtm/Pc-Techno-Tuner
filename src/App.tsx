@@ -204,24 +204,11 @@ export default function App() {
           await saveCloudData('products', localProducts);
         }
 
-        // Complaints: preserve local complaints not already in cloud.
+        // Cloud complaints are authoritative. Do not merge stale browser
+        // complaints into an intentionally cleared cloud list.
         if (cloudComplaintsWithPublic !== null) {
-          const mergedComplaints = [
-            ...cloudComplaintsWithPublic,
-            ...localComplaints.filter(
-              (local) =>
-                !cloudComplaintsWithPublic.some(
-                  (cloud) => cloud.id === local.id
-                )
-            ),
-          ];
-
-          setComplaints(mergedComplaints);
-          storage.setComplaints(mergedComplaints);
-
-          if (mergedComplaints.length !== cloudComplaintsWithPublic.length) {
-            await saveCloudData('complaints', mergedComplaints);
-          }
+          setComplaints(cloudComplaintsWithPublic);
+          storage.setComplaints(cloudComplaintsWithPublic);
         } else {
           await saveCloudData('complaints', localComplaints);
         }
