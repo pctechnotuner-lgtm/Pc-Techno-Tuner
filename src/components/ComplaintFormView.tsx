@@ -342,7 +342,6 @@ PC TECHNO TUNER | Ahmedabad
                 value={category}
                 onChange={(e) => setCategory(e.target.value as ProductCategory)}
                 className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500"
-              >
                 required
               >
                 <option value="">Select Product Category</option>
