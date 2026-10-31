@@ -838,7 +838,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-950 text-gray-100 selection:bg-blue-600 selection:text-white">
+    <div className="min-h-screen flex flex-col bg-[#07111f] md:bg-[#0b1220] text-gray-100 selection:bg-blue-600 selection:text-white">
       {isAdmin && (
         <div className="px-4 py-2 text-center text-sm bg-gray-900 border-b border-gray-800 md:ml-64">
           Cloud status: {syncStatus}
@@ -858,7 +858,7 @@ export default function App() {
         lowStockCount={lowStockCount}
       />
 
-      <main className={`max-w-7xl mx-auto w-full p-4 sm:p-6 lg:p-8 flex-1 ${isAdmin ? "md:ml-64 md:max-w-[calc(100%-16rem)]" : ""}`}>
+      <main className={`max-w-7xl mx-auto w-full p-3 sm:p-6 lg:p-8 pb-24 md:pb-8 flex-1 ${isAdmin ? "md:ml-64 md:max-w-[calc(100%-16rem)]" : ""}`}>
         {activeTab === 'catalogue' && (
           <CatalogueView
             products={products}
@@ -983,6 +983,24 @@ export default function App() {
           />
         )}
       </main>
+
+      {isAdmin && (
+        <nav aria-label="Mobile admin navigation" className="md:hidden fixed bottom-0 inset-x-0 z-50 border-t border-blue-900/70 bg-[#081426]/95 backdrop-blur-xl shadow-[0_-8px_30px_rgba(0,0,0,0.35)] safe-area-bottom">
+          <div className="grid grid-cols-4 max-w-xl mx-auto px-2 py-2">
+            {([
+              ['dashboard', 'Home'],
+              ['products', 'Products'],
+              ['sales', 'Sales'],
+              ['profit', 'Estimate']
+            ] as [AppTab, string][]).map(([tab, label]) => (
+              <button key={tab} onClick={() => setActiveTab(tab)} className={`flex flex-col items-center justify-center gap-1 rounded-xl py-2 text-[10px] font-semibold transition ${activeTab === tab ? 'bg-blue-600/20 text-blue-300' : 'text-slate-400 hover:text-white'}`} aria-current={activeTab === tab ? 'page' : undefined}>
+                <span className="text-base leading-none">{tab === 'dashboard' ? '⌂' : tab === 'products' ? '▦' : tab === 'sales' ? '▤' : '↗'}</span>
+                <span>{label}</span>
+              </button>
+            ))}
+          </div>
+        </nav>
+      )}
 
       <AdminLoginModal
         isOpen={loginModalOpen}
