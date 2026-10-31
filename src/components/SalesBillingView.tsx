@@ -778,6 +778,11 @@ For support call: 7383871195`;
                     <div><b>Due Date</b><span>{dueDate}</span></div>
                   </div>
                 </div>
+                <div className="invoice-extra-info">
+                  <span><b>Place of Supply:</b> Gujarat (24)</span>
+                  <span><b>Reverse Charge:</b> No</span>
+                  <span><b>Payment Terms:</b> Immediate</span>
+                </div>
                 <div className="invoice-parties">
                   <section><h3>BILL TO</h3><b>{inv.customerBusiness || inv.customerName}</b>
                     {inv.customerBusiness && <p>{inv.customerName}</p>}
