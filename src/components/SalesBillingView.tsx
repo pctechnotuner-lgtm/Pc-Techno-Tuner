@@ -438,7 +438,7 @@ For support call: 7383871195`;
                       <Trash2 className="w-3.5 h-3.5" /><span>Delete</span>
                     </button>
                     <button
-                      onClick={() => handleTriggerPrint(inv)
+                      onClick={() => handleTriggerPrint(inv)}
                       className="px-2.5 py-1 bg-gray-800 hover:bg-gray-700 text-gray-200 rounded text-xs inline-flex items-center gap-1 transition"
                       title="Print A4 GST invoice"
                     >
