@@ -24,6 +24,8 @@ import {
   PaymentMethod,
   PaymentStatus,
   Product,
+  ProductCategory,
+  PRODUCT_CATEGORIES,
 } from '../types';
 import { getT } from '../i18n';
 
@@ -34,6 +36,7 @@ interface SalesBillingViewProps {
   profile: CompanyProfile;
   lang: Language;
   onSaveInvoice: (invoice: Invoice) => void;
+  onSaveProduct: (product: Product) => void;
   onExportCsv: () => void;
   activeInvoiceForModal?: Invoice | null;
 }
@@ -45,6 +48,7 @@ export const SalesBillingView: React.FC<SalesBillingViewProps> = ({
   profile,
   lang,
   onSaveInvoice,
+  onSaveProduct,
   onExportCsv,
 }) => {
   const t = getT(lang);
@@ -64,6 +68,14 @@ export const SalesBillingView: React.FC<SalesBillingViewProps> = ({
   const [amountPaid, setAmountPaid] = useState<number>(0);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('UPI');
   const [notes, setNotes] = useState('');
+  const [quickAddOpen, setQuickAddOpen] = useState(false);
+  const [quickName, setQuickName] = useState('');
+  const [quickCategory, setQuickCategory] = useState<ProductCategory>('Computer Accessories');
+  const [quickBrand, setQuickBrand] = useState('');
+  const [quickModel, setQuickModel] = useState('');
+  const [quickPurchase, setQuickPurchase] = useState(0);
+  const [quickSelling, setQuickSelling] = useState(0);
+  const [quickStock, setQuickStock] = useState(1);
 
   // Line Items
   const [items, setItems] = useState<InvoiceItem[]>([
@@ -127,6 +139,46 @@ export const SalesBillingView: React.FC<SalesBillingViewProps> = ({
       updated[index].lineTotal = Math.round(q * u * 100) / 100;
     }
     setItems(updated);
+  };
+
+  const handleQuickAddProduct = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!quickName.trim() || quickSelling <= 0) {
+      alert('Please enter item name and selling price.');
+      return;
+    }
+    const product: Product = {
+      id: 'prod-' + Date.now(),
+      name: quickName.trim(),
+      category: quickCategory,
+      brand: quickBrand.trim(),
+      model: quickModel.trim(),
+      specifications: '',
+      purchasePrice: Number(quickPurchase) || 0,
+      sellingPrice: Number(quickSelling) || 0,
+      stockQuantity: Math.max(0, Number(quickStock) || 0),
+      minStockAlert: 2,
+      warrantyMonths: 0,
+      imageUrl: '',
+      createdAt: new Date().toISOString(),
+    };
+    onSaveProduct(product);
+    const basePrice = Math.round((product.sellingPrice / (1 + taxRate / 100)) * 100) / 100;
+    setItems((current) => [...current, {
+      productId: product.id,
+      description: product.name + (product.brand || product.model ? ' (' + [product.brand, product.model].filter(Boolean).join(' ') + ')' : ''),
+      category: product.category,
+      quantity: 1,
+      unitPrice: basePrice,
+      lineTotal: basePrice,
+    }]);
+    setQuickAddOpen(false);
+    setQuickName('');
+    setQuickBrand('');
+    setQuickModel('');
+    setQuickPurchase(0);
+    setQuickSelling(0);
+    setQuickStock(1);
   };
 
   const addItemRow = () => {
@@ -444,14 +496,14 @@ For support call: 7383871195`;
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="font-bold text-white text-xs">2. Hardware Line Items</span>
-                  <button
-                    type="button"
-                    onClick={addItemRow}
-                    className="text-blue-400 hover:text-blue-300 font-semibold flex items-center gap-1 text-[11px]"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    <span>Add Item</span>
-                  </button>
+                  <div className="flex items-center gap-3">
+                    <button type="button" onClick={() => setQuickAddOpen(true)} className="text-emerald-400 hover:text-emerald-300 font-semibold flex items-center gap-1 text-[11px]">
+                      <PlusCircle className="w-3.5 h-3.5" /><span>New Item + Save to Stock</span>
+                    </button>
+                    <button type="button" onClick={addItemRow} className="text-blue-400 hover:text-blue-300 font-semibold flex items-center gap-1 text-[11px]">
+                      <Plus className="w-3.5 h-3.5" /><span>Add Item</span>
+                    </button>
+                  </div>
                 </div>
 
                 <div className="space-y-2">
@@ -522,6 +574,28 @@ For support call: 7383871195`;
                   ))}
                 </div>
               </div>
+
+              {quickAddOpen && (
+                <div className="bg-gray-950 border border-emerald-700 rounded-xl p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <strong className="text-emerald-400">Add New Item — Invoice + Product Stock</strong>
+                    <button type="button" onClick={() => setQuickAddOpen(false)} className="text-gray-400"><X className="w-4 h-4" /></button>
+                  </div>
+                  <form onSubmit={handleQuickAddProduct} className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <input required value={quickName} onChange={e => setQuickName(e.target.value)} placeholder="Item / Product name *" className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white" />
+                    <select value={quickCategory} onChange={e => setQuickCategory(e.target.value as ProductCategory)} className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white">
+                      {PRODUCT_CATEGORIES.map(category => <option key={category} value={category}>{category}</option>)}
+                    </select>
+                    <input value={quickBrand} onChange={e => setQuickBrand(e.target.value)} placeholder="Brand (optional)" className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white" />
+                    <input value={quickModel} onChange={e => setQuickModel(e.target.value)} placeholder="Model (optional)" className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white" />
+                    <input type="number" min="0" step="0.01" value={quickPurchase} onChange={e => setQuickPurchase(Number(e.target.value))} placeholder="Purchase price" className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white" />
+                    <input required type="number" min="0.01" step="0.01" value={quickSelling} onChange={e => setQuickSelling(Number(e.target.value))} placeholder="Selling price (GST included) *" className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white" />
+                    <input type="number" min="0" value={quickStock} onChange={e => setQuickStock(Number(e.target.value))} placeholder="Opening stock quantity" className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white" />
+                    <button type="submit" className="bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg px-3 py-2 font-bold">Save Item & Add to Invoice</button>
+                  </form>
+                  <p className="text-[10px] text-gray-400">Item Products/Stock list mein bhi save hoga aur is invoice mein bhi add ho jayega.</p>
+                </div>
+              )}
 
               {/* Taxes & Settlement */}
               <div className="bg-gray-950 p-4 rounded-xl border border-gray-800 grid grid-cols-1 sm:grid-cols-3 gap-4">
