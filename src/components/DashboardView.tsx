@@ -204,7 +204,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         {/* Estimated Profit */}
         <div className="bg-gradient-to-br from-[#111c30] to-[#0b1220] border border-slate-700/70 rounded-2xl shadow-lg shadow-black/20 p-4 sm:p-5 relative overflow-hidden">
           <div className="flex items-center justify-between text-xs text-gray-400 mb-1">
-            <span>{t.estimatedProfit}</span>
+            <span>Net Cash Flow</span>
             <div className="p-1.5 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20">
               <DollarSign className="w-4 h-4" />
             </div>
@@ -213,7 +213,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             ₹{netOperatingProfit.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
           </div>
           <p className="text-[10px] text-gray-500 mt-1">
-            Cash Net Margin (Inflow - Outflow)
+            Cash In minus Cash Out; not accounting profit
           </p>
         </div>
       </div>
