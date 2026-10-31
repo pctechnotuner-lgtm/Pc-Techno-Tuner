@@ -182,6 +182,26 @@ export interface Invoice {
   createdAt: string;
 }
 
+export interface Estimate {
+  id: string;
+  estimateNo: string;
+  estimateDate: string;
+  validUntil: string;
+  customerName: string;
+  customerMobile: string;
+  customerBusiness?: string;
+  customerAddress: string;
+  customerGstin?: string;
+  items: InvoiceItem[];
+  subtotal: number;
+  taxRate: number;
+  taxAmount: number;
+  discount: number;
+  totalAmount: number;
+  notes?: string;
+  createdAt: string;
+}
+
 export interface Customer {
   id: string;
   name: string;
