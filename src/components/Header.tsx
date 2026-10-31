@@ -77,14 +77,8 @@ export const Header: React.FC<HeaderProps> = ({
               <span className="text-base sm:text-lg font-extrabold text-white tracking-tight flex items-center gap-1.5">
                 {profile.name}
               </span>
-              <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-blue-950/80 text-blue-400 border border-blue-800/60">
-                Ahmedabad • 382418
-              </span>
-            </div>
-            <p className="text-[11px] text-gray-400 line-clamp-1 hidden sm:block">
-              {profile.tagline}
-            </p>
-          </div>
+</div>
+</div>
         </div>
 
         {/* Right Actions: WhatsApp direct, Language, PWA install, Admin Auth */}
@@ -100,86 +94,6 @@ export const Header: React.FC<HeaderProps> = ({
             <MessageCircle className="w-4 h-4 text-emerald-400" />
             <span>{profile.mobile}</span>
           </a>
-
-          {/* Language Switcher */}
-          <div className="flex items-center bg-gray-900 border border-gray-800 rounded-lg p-0.5 text-xs">
-            <button
-              onClick={() => setLang('en')}
-              className={`px-2 py-1 rounded font-medium transition ${
-                lang === 'en'
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-400 hover:text-white'
-              }`}
-            >
-              EN
-            </button>
-            <button
-              onClick={() => setLang('gu')}
-              className={`px-2 py-1 rounded font-medium transition ${
-                lang === 'gu'
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-400 hover:text-white'
-              }`}
-            >
-              ગુજ
-            </button>
-            <button
-              onClick={() => setLang('hi')}
-              className={`px-2 py-1 rounded font-medium transition ${
-                lang === 'hi'
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-400 hover:text-white'
-              }`}
-            >
-              हिन्दी
-            </button>
-          </div>
-
-          {/* PWA Install Button (if installable or on iOS) */}
-          {!isInstalled && isInstallable && (
-            <button
-              onClick={install}
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-lg shadow-blue-500/20 transition"
-              title="Install PC TECHNO TUNER app on device"
-            >
-              <Download className="w-3.5 h-3.5" />
-              <span>Install App</span>
-            </button>
-          )}
-
-          {!isInstalled && isIOS && (
-            <button
-              onClick={() => setShowIOSGuide(true)}
-              className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs font-semibold border border-gray-700 transition"
-            >
-              <Download className="w-3.5 h-3.5 text-blue-400" />
-              <span>iOS Install</span>
-            </button>
-          )}
-
-          {/* Admin Toggle Button */}
-          {isAdmin ? (
-            <div className="flex items-center gap-1.5">
-              <span className="hidden lg:inline-flex items-center gap-1 px-2 py-1 rounded text-[11px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/30">
-                <Shield className="w-3.5 h-3.5" />
-                Admin Active
-              </span>
-              <button
-                onClick={() => setIsAdmin(false)}
-                className="px-3 py-1.5 rounded-lg bg-rose-950/80 hover:bg-rose-900 border border-rose-800 text-rose-300 text-xs font-semibold transition"
-              >
-                {t.adminLogout}
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={onOpenLoginModal}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-900 hover:bg-gray-800 border border-gray-700 text-gray-200 text-xs font-semibold transition shadow-sm"
-            >
-              <ShieldAlert className="w-3.5 h-3.5 text-blue-400" />
-              <span>{t.adminLogin}</span>
-            </button>
-          )}
 
           {/* Mobile hamburger menu toggle */}
           <button
@@ -364,6 +278,13 @@ export const Header: React.FC<HeaderProps> = ({
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
         <div className="md:hidden bg-gray-950 border-b border-gray-800 px-4 py-3 space-y-1">
+          <div className="flex items-center gap-2 px-3 py-2 border-b border-gray-800 mb-2">
+            <Languages className="w-4 h-4 text-gray-400" />
+            <span className="text-xs text-gray-400 mr-2">Language</span>
+            <button onClick={() => setLang('en')} className={`px-3 py-1 rounded-lg text-xs font-semibold ${lang === 'en' ? 'bg-blue-600 text-white' : 'bg-gray-900 text-gray-300'}`}>EN</button>
+            <button onClick={() => setLang('gu')} className={`px-3 py-1 rounded-lg text-xs font-semibold ${lang === 'gu' ? 'bg-blue-600 text-white' : 'bg-gray-900 text-gray-300'}`}>ગુજરાતી</button>
+            <button onClick={() => setLang('hi')} className={`px-3 py-1 rounded-lg text-xs font-semibold ${lang === 'hi' ? 'bg-blue-600 text-white' : 'bg-gray-900 text-gray-300'}`}>हिन्दी</button>
+          </div>
           <button
             onClick={() => handleNavClick('catalogue')}
             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold transition ${
@@ -391,6 +312,13 @@ export const Header: React.FC<HeaderProps> = ({
                   Admin Administration
                 </span>
               </div>
+              <button
+                onClick={() => { setMobileMenuOpen(false); setIsAdmin(false); }}
+                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-semibold text-rose-300 hover:bg-gray-900"
+              >
+                <ShieldAlert className="w-4 h-4" />
+                <span>{t.adminLogout}</span>
+              </button>
               <button
                 onClick={() => handleNavClick('dashboard')}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-semibold transition ${
