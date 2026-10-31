@@ -10,12 +10,13 @@ interface Props {
   profile: CompanyProfile;
   onSaveEstimate: (estimate: Estimate) => void;
   onSaveCustomer: (customer: Customer) => void;
+  onDeleteEstimate: (estimateId: string) => void;
 }
 
 const money = (value: number) => '₹' + (Number(value) || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const escapeHtml = (value: string) => value.replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char] || char));
 
-export const EstimatedProfitView: React.FC<Props> = ({ invoices, products, estimates, customers, profile, onSaveEstimate, onSaveCustomer }) => {
+export const EstimatedProfitView: React.FC<Props> = ({ invoices, products, estimates, customers, profile, onSaveEstimate, onSaveCustomer, onDeleteEstimate }) => {
   const [search, setSearch] = useState('');
   const [expandedParty, setExpandedParty] = useState<string | null>(null);
   const [builderOpen, setBuilderOpen] = useState(false);
@@ -256,7 +257,7 @@ export const EstimatedProfitView: React.FC<Props> = ({ invoices, products, estim
 
       <section className="bg-gray-900 border border-gray-800 rounded-xl p-4 space-y-3">
         <h2 className="font-bold">Saved Estimates / Quotations</h2>
-        {estimates.length === 0 ? <p className="text-sm text-gray-400">No estimates created yet.</p> : estimates.map((estimate) => <div key={estimate.id} className="flex flex-wrap items-center justify-between gap-3 border-t border-gray-800 pt-3"><div><b className="text-sm">{estimate.estimateNo}</b><p className="text-xs text-gray-400">{estimate.customerName} · {estimate.customerMobile} · {estimate.estimateDate}</p></div><div className="flex items-center gap-3"><b className="text-emerald-400">{money(estimate.totalAmount)}</b><button onClick={() => editEstimate(estimate)} className="text-amber-300 text-sm font-semibold">Edit</button><button onClick={() => printEstimate(estimate)} className="text-blue-400 text-sm flex items-center gap-1"><Printer className="w-4 h-4" /> Print / PDF</button></div></div>)}
+        {estimates.length === 0 ? <p className="text-sm text-gray-400">No estimates created yet.</p> : estimates.map((estimate) => <div key={estimate.id} className="flex flex-wrap items-center justify-between gap-3 border-t border-gray-800 pt-3"><div><b className="text-sm">{estimate.estimateNo}</b><p className="text-xs text-gray-400">{estimate.customerName} · {estimate.customerMobile} · {estimate.estimateDate}</p></div><div className="flex items-center gap-3"><b className="text-emerald-400">{money(estimate.totalAmount)}</b><button onClick={() => editEstimate(estimate)} className="text-amber-300 text-sm font-semibold">Edit</button><button onClick={() => { if (window.confirm(`Delete estimate ${estimate.estimateNo}?`)) onDeleteEstimate(estimate.id); }} className="text-rose-400 hover:text-rose-300 text-sm flex items-center gap-1"><Trash2 className="w-4 h-4" /> Delete</button><button onClick={() => printEstimate(estimate)} className="text-blue-400 text-sm flex items-center gap-1"><Printer className="w-4 h-4" /> Print / PDF</button></div></div>)}
       </section>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
