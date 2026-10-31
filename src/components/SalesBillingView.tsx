@@ -382,7 +382,7 @@ For support call: 7383871195`;
             </thead>
             <tbody className="divide-y divide-gray-800">
               {filteredInvoices.map((inv) => (
-                <tr key={inv.id} className="hover:bg-gray-800/40 transition">
+                <tr key={inv.id} onClick={() => handleEditInvoice(inv)} className="hover:bg-gray-800/40 transition cursor-pointer" title="Click to open full invoice details">
                   <td className="py-3 px-4 font-mono font-bold text-blue-400">{inv.invoiceNo}</td>
                   <td className="py-3 px-4 text-gray-400">{inv.invoiceDate}</td>
                   <td className="py-3 px-4">
@@ -422,14 +422,15 @@ For support call: 7383871195`;
                   </td>
                   <td className="py-3 px-4 text-right space-x-1.5 whitespace-nowrap">
                     <button
-                      onClick={() => handleEditInvoice(inv)}
+                      onClick={(e) => { e.stopPropagation(); handleEditInvoice(inv); }}
                       className="px-2.5 py-1 bg-blue-950 hover:bg-blue-900 border border-blue-800 text-blue-300 rounded text-xs inline-flex items-center gap-1 transition"
                       title="Edit GST invoice"
                     >
                       <span>Edit</span>
                     </button>
                     <button
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.stopPropagation();
                         if (window.confirm(`Delete invoice ${inv.invoiceNo}? This will restore its stock quantity and remove its linked payment entry.`)) onDeleteInvoice(inv.id);
                       }}
                       className="px-2.5 py-1 bg-rose-950 hover:bg-rose-900 border border-rose-800 text-rose-300 rounded text-xs inline-flex items-center gap-1 transition"
@@ -438,7 +439,7 @@ For support call: 7383871195`;
                       <Trash2 className="w-3.5 h-3.5" /><span>Delete</span>
                     </button>
                     <button
-                      onClick={() => handleTriggerPrint(inv)}
+                      onClick={(e) => { e.stopPropagation(); handleTriggerPrint(inv); }}
                       className="px-2.5 py-1 bg-gray-800 hover:bg-gray-700 text-gray-200 rounded text-xs inline-flex items-center gap-1 transition"
                       title="Print A4 GST invoice"
                     >
@@ -446,7 +447,7 @@ For support call: 7383871195`;
                       <span>Print</span>
                     </button>
                     <button
-                      onClick={() => handleShareInvoiceWhatsApp(inv)}
+                      onClick={(e) => { e.stopPropagation(); handleShareInvoiceWhatsApp(inv); }}
                       className="px-2.5 py-1 bg-emerald-950 hover:bg-emerald-900 border border-emerald-800 text-emerald-400 rounded text-xs inline-flex items-center gap-1 transition"
                       title="Share bill details on WhatsApp"
                     >
