@@ -1,20 +1,19 @@
-
 {
   "id": "./",
   "name": "PC TECHNO TUNER Business Manager",
-  "short_name": "PC Techno",
+  "short_name": "PC TECHNO",
   "description": "IT products, customer complaints, WhatsApp integration and business accounts for PC TECHNO TUNER.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "theme_color": "#030712",
-  "background_color": "#030712",
+  "theme_color": "#020817",
+  "background_color": "#020817",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "./icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
+      "src": "./pc-techno-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
       "purpose": "any"
     }
   ]
