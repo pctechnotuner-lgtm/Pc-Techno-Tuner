@@ -15,6 +15,7 @@ import {
   Receipt,
   Wallet,
   BarChart3,
+  TrendingUp,
   Settings,
   ShoppingBag,
   Wrench,
@@ -295,6 +296,18 @@ export const Header: React.FC<HeaderProps> = ({
                 </button>
 
                 <button
+                  onClick={() => handleNavClick('profit')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+                    activeTab === 'profit'
+                      ? 'bg-blue-600 text-white shadow-sm'
+                      : 'text-gray-300 hover:text-white hover:bg-gray-800'
+                  }`}
+                >
+                  <TrendingUp className="w-3.5 h-3.5" />
+                  <span>Estimated Profit</span>
+                </button>
+
+                <button
                   onClick={() => handleNavClick('accounts')}
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
                     activeTab === 'accounts'
@@ -431,6 +444,16 @@ export const Header: React.FC<HeaderProps> = ({
               >
                 <Receipt className="w-4 h-4" />
                 <span>{t.sales}</span>
+              </button>
+
+              <button
+                onClick={() => handleNavClick('profit')}
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold transition ${
+                  activeTab === 'profit' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-900'
+                }`}
+              >
+                <TrendingUp className="w-4 h-4" />
+                <span>Estimated Profit</span>
               </button>
 
               <button
