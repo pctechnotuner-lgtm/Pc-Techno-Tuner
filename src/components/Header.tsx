@@ -62,7 +62,7 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <header className="sticky top-0 z-40 bg-gray-950/95 backdrop-blur-md border-b border-gray-800 transition-all">
       {/* Top Banner with Brand & Quick Actions */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex items-center justify-between gap-4">
+      <div className={`max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex items-center justify-between gap-4 ${isAdmin ? "md:ml-64 md:max-w-none" : ""}`}>
         {/* Brand Logo & Name */}
         <div
           className="flex items-center gap-3 cursor-pointer group"
@@ -192,13 +192,13 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* Primary Navigation Tab Bar (Desktop) */}
-      <nav className="hidden md:block bg-gray-900/60 border-t border-gray-800/80 px-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between overflow-x-auto py-1.5">
-          <div className="flex items-center gap-1">
+      <nav className={`hidden md:block ${isAdmin ? "fixed left-0 top-0 bottom-0 z-50 w-64 bg-[#0b1220] border-r border-slate-800 px-4 pt-5 shadow-2xl" : "bg-gray-900/60 border-t border-gray-800/80 px-4"}`}>
+        <div className={`${isAdmin ? "h-full flex flex-col items-stretch justify-start gap-5 overflow-y-auto py-2" : "max-w-7xl mx-auto flex items-center justify-between overflow-x-auto py-1.5"}`}>
+          <div className={`${isAdmin ? "flex flex-col items-stretch gap-1.5" : "flex items-center gap-1"}`}>
             {/* Customer Facing Tabs */}
             <button
               onClick={() => handleNavClick('catalogue')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+              className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition w-full text-left ${
                 activeTab === 'catalogue'
                   ? 'bg-blue-600 text-white shadow-sm'
                   : 'text-gray-300 hover:text-white hover:bg-gray-800'
@@ -210,7 +210,7 @@ export const Header: React.FC<HeaderProps> = ({
 
             <button
               onClick={() => handleNavClick('complaint')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+              className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition w-full text-left ${
                 activeTab === 'complaint'
                   ? 'bg-blue-600 text-white shadow-sm'
                   : 'text-gray-300 hover:text-white hover:bg-gray-800'
@@ -227,7 +227,7 @@ export const Header: React.FC<HeaderProps> = ({
 
                 <button
                   onClick={() => handleNavClick('dashboard')}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+                  className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition w-full text-left ${
                     activeTab === 'dashboard'
                       ? 'bg-blue-600 text-white shadow-sm'
                       : 'text-gray-300 hover:text-white hover:bg-gray-800'
@@ -239,7 +239,7 @@ export const Header: React.FC<HeaderProps> = ({
 
                 <button
                   onClick={() => handleNavClick('products')}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition relative ${
+                  className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition relative w-full text-left ${
                     activeTab === 'products'
                       ? 'bg-blue-600 text-white shadow-sm'
                       : 'text-gray-300 hover:text-white hover:bg-gray-800'
@@ -256,7 +256,7 @@ export const Header: React.FC<HeaderProps> = ({
 
                 <button
                   onClick={() => handleNavClick('complaints')}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition relative ${
+                  className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition relative w-full text-left ${
                     activeTab === 'complaints'
                       ? 'bg-blue-600 text-white shadow-sm'
                       : 'text-gray-300 hover:text-white hover:bg-gray-800'
@@ -273,7 +273,7 @@ export const Header: React.FC<HeaderProps> = ({
 
                 <button
                   onClick={() => handleNavClick('customers')}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+                  className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition w-full text-left ${
                     activeTab === 'customers'
                       ? 'bg-blue-600 text-white shadow-sm'
                       : 'text-gray-300 hover:text-white hover:bg-gray-800'
@@ -285,7 +285,7 @@ export const Header: React.FC<HeaderProps> = ({
 
                 <button
                   onClick={() => handleNavClick('sales')}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+                  className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition w-full text-left ${
                     activeTab === 'sales'
                       ? 'bg-blue-600 text-white shadow-sm'
                       : 'text-gray-300 hover:text-white hover:bg-gray-800'
@@ -297,7 +297,7 @@ export const Header: React.FC<HeaderProps> = ({
 
                 <button
                   onClick={() => handleNavClick('profit')}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+                  className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition w-full text-left ${
                     activeTab === 'profit'
                       ? 'bg-blue-600 text-white shadow-sm'
                       : 'text-gray-300 hover:text-white hover:bg-gray-800'
@@ -309,7 +309,7 @@ export const Header: React.FC<HeaderProps> = ({
 
                 <button
                   onClick={() => handleNavClick('accounts')}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+                  className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition w-full text-left ${
                     activeTab === 'accounts'
                       ? 'bg-blue-600 text-white shadow-sm'
                       : 'text-gray-300 hover:text-white hover:bg-gray-800'
@@ -321,7 +321,7 @@ export const Header: React.FC<HeaderProps> = ({
 
                 <button
                   onClick={() => handleNavClick('reports')}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+                  className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition w-full text-left ${
                     activeTab === 'reports'
                       ? 'bg-blue-600 text-white shadow-sm'
                       : 'text-gray-300 hover:text-white hover:bg-gray-800'
@@ -333,7 +333,7 @@ export const Header: React.FC<HeaderProps> = ({
 
                 <button
                   onClick={() => handleNavClick('settings')}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+                  className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition w-full text-left ${
                     activeTab === 'settings'
                       ? 'bg-blue-600 text-white shadow-sm'
                       : 'text-gray-300 hover:text-white hover:bg-gray-800'
@@ -346,8 +346,8 @@ export const Header: React.FC<HeaderProps> = ({
             )}
           </div>
 
-          <div className="flex items-center gap-2 text-[11px] text-gray-400">
-            <span className="font-mono text-gray-500">GST: {profile.gstin}</span>
+          <div className={`${isAdmin ? "mt-auto rounded-xl border border-slate-800 bg-slate-900/70 p-3 text-[10px] text-slate-400 break-all" : "flex items-center gap-2 text-[11px] text-gray-400"}`}>
+            <div className="space-y-1"><div className="font-bold text-slate-200">PC TECHNO TUNER</div><span className="font-mono text-gray-500">GST: {profile.gstin}</span><div className="text-slate-500">Ahmedabad • 382418</div></div>
           </div>
         </div>
       </nav>
