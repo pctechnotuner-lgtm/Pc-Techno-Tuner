@@ -32,7 +32,7 @@ export const EstimatedProfitView: React.FC<Props> = ({ invoices, products, estim
   const [items, setItems] = useState<InvoiceItem[]>([{ productId: '', description: '', quantity: 1, unitPrice: 0, lineTotal: 0 }]);
 
   const subtotal = items.reduce((sum, item) => sum + (Number(item.lineTotal) || 0), 0);
-  const taxAmount = Math.round(subtotal * taxRate) / 100;
+  const taxAmount = Math.round(subtotal * Number(taxRate) / 100 * 100) / 100;
   const total = Math.max(0, subtotal + taxAmount - discount);
   const cost = items.reduce((sum, item) => {
     const product = products.find((p) => p.id === item.productId);
@@ -55,7 +55,7 @@ export const EstimatedProfitView: React.FC<Props> = ({ invoices, products, estim
     if (!product) {
       updated[index] = { ...updated[index], productId: '', description: '', unitPrice: 0, lineTotal: 0 };
     } else {
-      const base = Math.round((product.sellingPrice / (1 + taxRate / 100)) * 100) / 100;
+      const base = Number(product.sellingPrice) || 0;
       updated[index] = {
         productId: product.id,
         description: [product.name, product.brand, product.model].filter(Boolean).join(' '),
@@ -224,7 +224,7 @@ export const EstimatedProfitView: React.FC<Props> = ({ invoices, products, estim
           <select value={item.productId || ''} onChange={(e) => selectProduct(index, e.target.value)} className="md:col-span-4 bg-gray-900 border border-gray-700 rounded p-2 text-sm"><option value="">Select stock item (optional)</option>{products.map((p) => <option key={p.id} value={p.id}>{p.name} — Stock {p.stockQuantity}</option>)}</select>
           <input value={item.description} onChange={(e) => updateItem(index, 'description', e.target.value)} placeholder="Description / Service" className="md:col-span-3 bg-gray-900 border border-gray-700 rounded p-2 text-sm" />
           <input type="number" min="1" value={item.quantity} onChange={(e) => updateItem(index, 'quantity', Number(e.target.value))} placeholder="Qty" className="md:col-span-1 bg-gray-900 border border-gray-700 rounded p-2 text-sm" />
-          <input type="number" min="0" step="0.01" value={item.unitPrice} onChange={(e) => updateItem(index, 'unitPrice', Number(e.target.value))} placeholder="Rate before GST" className="md:col-span-2 bg-gray-900 border border-gray-700 rounded p-2 text-sm" />
+          <input type="number" min="0" step="0.01" value={item.unitPrice} onChange={(e) => updateItem(index, 'unitPrice', Number(e.target.value))} placeholder="Sale Rate (Before GST)" className="md:col-span-2 bg-gray-900 border border-gray-700 rounded p-2 text-sm" />
           <div className="md:col-span-1 flex items-center text-sm font-semibold">{money(item.lineTotal)}</div>
           <button onClick={() => setItems(items.length > 1 ? items.filter((_, i) => i !== index) : items)} className="text-rose-400 flex justify-center"><Trash2 className="w-4 h-4" /></button>
         </div>)}
