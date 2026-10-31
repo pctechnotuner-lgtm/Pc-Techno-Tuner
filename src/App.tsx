@@ -522,6 +522,12 @@ export default function App() {
     storage.setCustomers(updated);
   };
 
+  const handleDeleteCustomer = (customerId: string) => {
+    const updatedCustomers = customers.filter((customer) => customer.id !== customerId);
+    setCustomers(updatedCustomers);
+    storage.setCustomers(updatedCustomers);
+  };
+
   const handleSaveInvoice = (invoice: Invoice) => {
     const previousInvoice = invoices.find((item) => item.id === invoice.id);
     const updatedInvoices = previousInvoice
@@ -892,6 +898,7 @@ export default function App() {
             complaints={complaints}
             lang={lang}
             onSaveCustomer={handleSaveCustomer}
+            onDeleteCustomer={handleDeleteCustomer}
             onExportCsv={exportCustomersCsv}
           />
         )}
