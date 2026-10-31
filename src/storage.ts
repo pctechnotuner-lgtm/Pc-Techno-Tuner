@@ -4,6 +4,7 @@ import {
   Complaint,
   Customer,
   Invoice,
+  Estimate,
   Transaction,
 } from './types';
 
@@ -13,6 +14,7 @@ const STORAGE_KEYS = {
   COMPLAINTS: 'pctechno_complaints_v1',
   CUSTOMERS: 'pctechno_customers_v1',
   INVOICES: 'pctechno_invoices_v1',
+  ESTIMATES: 'pctechno_estimates_v1',
   TRANSACTIONS: 'pctechno_transactions_v1',
   AUTH: 'pctechno_auth_session_v1',
   ADMIN_USERNAME: 'pctechno_admin_user_v1',
@@ -520,6 +522,8 @@ export const storage = {
 
   getInvoices: (): Invoice[] => getStorageItem(STORAGE_KEYS.INVOICES, INITIAL_INVOICES),
   setInvoices: (invoices: Invoice[]) => setStorageItem(STORAGE_KEYS.INVOICES, invoices),
+  getEstimates: (): Estimate[] => getStorageItem(STORAGE_KEYS.ESTIMATES, []),
+  setEstimates: (estimates: Estimate[]) => setStorageItem(STORAGE_KEYS.ESTIMATES, estimates),
 
   getTransactions: (): Transaction[] => getStorageItem(STORAGE_KEYS.TRANSACTIONS, INITIAL_TRANSACTIONS),
   setTransactions: (transactions: Transaction[]) => setStorageItem(STORAGE_KEYS.TRANSACTIONS, transactions),
@@ -556,6 +560,7 @@ export const storage = {
       complaints: storage.getComplaints(),
       customers: storage.getCustomers(),
       invoices: storage.getInvoices(),
+      estimates: storage.getEstimates(),
       transactions: storage.getTransactions(),
     };
     const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(data, null, 2))}`;
@@ -577,6 +582,7 @@ export const storage = {
       if (Array.isArray(jsonData.complaints)) storage.setComplaints(jsonData.complaints);
       if (Array.isArray(jsonData.customers)) storage.setCustomers(jsonData.customers);
       if (Array.isArray(jsonData.invoices)) storage.setInvoices(jsonData.invoices);
+      if (Array.isArray(jsonData.estimates)) storage.setEstimates(jsonData.estimates);
       if (Array.isArray(jsonData.transactions)) storage.setTransactions(jsonData.transactions);
       return true;
     } catch (err) {
