@@ -132,9 +132,8 @@ export const SalesBillingView: React.FC<SalesBillingViewProps> = ({
     const selected = products.find((p) => p.id === productId);
     const updated = [...items];
     if (selected) {
-      // Selling price in product catalog includes GST.
-      // Let's compute the base price before tax for standard tax invoice:
-      const basePrice = Math.round((selected.sellingPrice / (1 + taxRate / 100)) * 100) / 100;
+      // Product catalogue sellingPrice is the taxable base rate; GST is added to invoice total.
+      const basePrice = Number(selected.sellingPrice) || 0;
       updated[index] = {
         productId: selected.id,
         description: `${selected.name} (${selected.brand} ${selected.model})`,
@@ -183,7 +182,7 @@ export const SalesBillingView: React.FC<SalesBillingViewProps> = ({
     // Save the stock item without submitting or closing the parent GST invoice form.
     onSaveProduct(product);
     setCreateModalOpen(true);
-    const basePrice = Math.round((product.sellingPrice / (1 + taxRate / 100)) * 100) / 100;
+    const basePrice = Number(product.sellingPrice) || 0;
     setItems((current) => [...current, {
       productId: product.id,
       description: product.name + (product.brand || product.model ? ' (' + [product.brand, product.model].filter(Boolean).join(' ') + ')' : ''),
@@ -594,9 +593,9 @@ For support call: 7383871195`;
                           step="0.01"
                           value={item.unitPrice}
                           onChange={(e) => handleItemChange(idx, 'unitPrice', Number(e.target.value))}
-                          placeholder="Unit Base"
+                          placeholder="Sale Rate (Before GST)"
                           className="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1.5 text-white text-xs font-mono"
-                          title="Base Unit Price (Before Tax)"
+                          title="Sale Rate before GST; GST is added to the bill total"
                         />
                       </div>
 
@@ -628,7 +627,7 @@ For support call: 7383871195`;
                     <input value={quickBrand} onChange={e => setQuickBrand(e.target.value)} placeholder="Brand (optional)" className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white" />
                     <input value={quickModel} onChange={e => setQuickModel(e.target.value)} placeholder="Model (optional)" className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white" />
                     <label className="text-xs text-gray-300">Purchase Price / Cost Price (₹)<input type="number" min="0" step="0.01" value={quickPurchase} onChange={e => setQuickPurchase(Number(e.target.value))} placeholder="Enter purchase price" className="mt-1 w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white" /></label>
-                    <label className="text-xs text-gray-300">Sale Price (₹, GST included) *<input required type="number" min="0.01" step="0.01" value={quickSelling} onChange={e => setQuickSelling(Number(e.target.value))} placeholder="Enter sale price" className="mt-1 w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white" /></label>
+                    <label className="text-xs text-gray-300">Sale Price (₹, GST excluded) *<input required type="number" min="0.01" step="0.01" value={quickSelling} onChange={e => setQuickSelling(Number(e.target.value))} placeholder="Enter sale price" className="mt-1 w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white" /></label>
                     <input type="number" min="0" value={quickStock} onChange={e => setQuickStock(Number(e.target.value))} placeholder="Opening stock quantity" className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white" />
                     <button type="button" onClick={(event) => { event.preventDefault(); event.stopPropagation(); handleQuickAddProduct(); }} className="bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg px-3 py-2 font-bold">Save Item & Add to Invoice</button>
                   </div>
