@@ -36,6 +36,7 @@ interface SalesBillingViewProps {
   profile: CompanyProfile;
   lang: Language;
   onSaveInvoice: (invoice: Invoice) => void;
+  onDeleteInvoice: (invoiceId: string) => void;
   onSaveCustomer: (customer: Customer) => void;
   onSaveProduct: (product: Product) => void;
   onExportCsv: () => void;
@@ -49,6 +50,7 @@ export const SalesBillingView: React.FC<SalesBillingViewProps> = ({
   profile,
   lang,
   onSaveInvoice,
+  onDeleteInvoice,
   onSaveCustomer,
   onSaveProduct,
   onExportCsv,
@@ -427,7 +429,16 @@ For support call: 7383871195`;
                       <span>Edit</span>
                     </button>
                     <button
-                      onClick={() => handleTriggerPrint(inv)}
+                      onClick={() => {
+                        if (window.confirm(`Delete invoice ${inv.invoiceNo}? This will restore its stock quantity and remove its linked payment entry.`)) onDeleteInvoice(inv.id);
+                      }}
+                      className="px-2.5 py-1 bg-rose-950 hover:bg-rose-900 border border-rose-800 text-rose-300 rounded text-xs inline-flex items-center gap-1 transition"
+                      title="Delete GST invoice"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" /><span>Delete</span>
+                    </button>
+                    <button
+                      onClick={() => handleTriggerPrint(inv)
                       className="px-2.5 py-1 bg-gray-800 hover:bg-gray-700 text-gray-200 rounded text-xs inline-flex items-center gap-1 transition"
                       title="Print A4 GST invoice"
                     >
