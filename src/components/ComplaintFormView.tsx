@@ -47,10 +47,10 @@ export const ComplaintFormView: React.FC<ComplaintFormViewProps> = ({
   const [mobile, setMobile] = useState('');
   const [businessName, setBusinessName] = useState('');
   const [category, setCategory] = useState<ProductCategory>('Desktop Computers');
-  const [brandModel, setBrandModel] = useState('');
-  const [serialNo, setSerialNo] = useState('');
+  const [brandModel] = useState('');
+  const [serialNo] = useState('');
   const [purchaseDate, setPurchaseDate] = useState('');
-  const [warrantyStatus, setWarrantyStatus] = useState<WarrantyStatus>('Under Warranty');
+  const warrantyStatus: WarrantyStatus = 'Not Sure';
   const [complaintType, setComplaintType] = useState<ComplaintType>('Hardware Problem');
   const [description, setDescription] = useState('');
   const [serviceLocation, setServiceLocation] = useState('');
@@ -180,10 +180,9 @@ PC TECHNO TUNER | Ahmedabad
     setMobile('');
     setBusinessName('');
     setCategory('Desktop Computers');
-    setBrandModel('');
-    setSerialNo('');
+
     setPurchaseDate('');
-    setWarrantyStatus('Under Warranty');
+
     setComplaintType('Hardware Problem');
     setDescription('');
     setServiceLocation('');
@@ -239,7 +238,7 @@ PC TECHNO TUNER | Ahmedabad
             </div>
             <div className="flex justify-between border-b border-gray-800 pb-2">
               <span className="text-gray-400">Product / Model:</span>
-              <span className="text-white">{submittedComplaint.category} - {submittedComplaint.brandModel || 'Standard'}</span>
+              <span className="text-white">{submittedComplaint.category}</span>
             </div>
             <div className="flex justify-between border-b border-gray-800 pb-2">
               <span className="text-gray-400">Complaint Type:</span>
@@ -292,8 +291,8 @@ PC TECHNO TUNER | Ahmedabad
         </div>
       ) : (
         /* The Complaint Form */
-        <form onSubmit={handleSubmit} className="bg-gray-900 border border-gray-800 rounded-2xl p-6 sm:p-8 space-y-5 shadow-xl">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <form onSubmit={handleSubmit} className="bg-gray-900 border border-gray-800 rounded-2xl p-4 sm:p-6 space-y-4 shadow-xl">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold text-gray-300 mb-1.5 flex items-center gap-1">
                 <User className="w-3.5 h-3.5 text-blue-400" />
@@ -305,7 +304,7 @@ PC TECHNO TUNER | Ahmedabad
                 value={customerName}
                 onChange={(e) => setCustomerName(e.target.value)}
                 placeholder="e.g. Ramesh Patel"
-                className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
               />
             </div>
 
@@ -338,7 +337,7 @@ PC TECHNO TUNER | Ahmedabad
                 value={businessName}
                 onChange={(e) => setBusinessName(e.target.value)}
                 placeholder="Company / Firm / Shop Name"
-                className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500"
+                className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
               />
             </div>
 
@@ -356,50 +355,6 @@ PC TECHNO TUNER | Ahmedabad
                     {cat}
                   </option>
                 ))}
-              </select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-gray-300 mb-1.5">
-                {t.brandAndModel}
-              </label>
-              <input
-                type="text"
-                value={brandModel}
-                onChange={(e) => setBrandModel(e.target.value)}
-                placeholder="e.g. HP LaserJet / Hikvision 4CH"
-                className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-gray-300 mb-1.5">
-                {t.serialNumber}
-              </label>
-              <input
-                type="text"
-                value={serialNo}
-                onChange={(e) => setSerialNo(e.target.value)}
-                placeholder="From device back label"
-                className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500 font-mono"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-gray-300 mb-1.5">
-                {t.warrantyStatus}
-              </label>
-              <select
-                value={warrantyStatus}
-                onChange={(e) => setWarrantyStatus(e.target.value as WarrantyStatus)}
-                className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
-              >
-                <option value="Under Warranty">Under Warranty</option>
-                <option value="Out of Warranty">Out of Warranty</option>
-                <option value="AMC Coverage">Under AMC Coverage</option>
-                <option value="Not Sure">Not Sure / Check Bill</option>
               </select>
             </div>
           </div>
@@ -440,14 +395,14 @@ PC TECHNO TUNER | Ahmedabad
           <div>
             <label className="block text-xs font-semibold text-gray-300 mb-1.5 flex items-center gap-1">
               <MapPin className="w-3.5 h-3.5 text-rose-400" />
-              <span>{t.serviceLocation} *</span>
+              <span>Service Location / Customer Address *</span>
             </label>
             <input
               type="text"
               required
               value={serviceLocation}
               onChange={(e) => setServiceLocation(e.target.value)}
-              placeholder="e.g. 402, Navrang Complex, C.G. Road, Ahmedabad — 380009"
+              placeholder="Enter complete service address, area, city and PIN code"
               className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500"
             />
           </div>
