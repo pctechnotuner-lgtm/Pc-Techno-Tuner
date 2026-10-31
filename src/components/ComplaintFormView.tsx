@@ -46,12 +46,12 @@ export const ComplaintFormView: React.FC<ComplaintFormViewProps> = ({
   const [customerName, setCustomerName] = useState('');
   const [mobile, setMobile] = useState('');
   const [businessName, setBusinessName] = useState('');
-  const [category, setCategory] = useState<ProductCategory>('Desktop Computers');
+  const [category, setCategory] = useState<ProductCategory | ''>('');
   const [brandModel] = useState('');
   const [serialNo] = useState('');
   const [purchaseDate, setPurchaseDate] = useState('');
   const warrantyStatus: WarrantyStatus = 'Not Sure';
-  const [complaintType, setComplaintType] = useState<ComplaintType>('Hardware Problem');
+  const [complaintType, setComplaintType] = useState<ComplaintType | ''>('');
   const [description, setDescription] = useState('');
   const [serviceLocation, setServiceLocation] = useState('');
   const [preferredDate, setPreferredDate] = useState('');
@@ -76,7 +76,7 @@ export const ComplaintFormView: React.FC<ComplaintFormViewProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!customerName.trim() || !mobile.trim() || !description.trim() || !serviceLocation.trim()) {
+    if (!customerName.trim() || !mobile.trim() || !category || !complaintType || !description.trim() || !serviceLocation.trim()) {
       alert('Please fill in all mandatory fields (*)');
       return;
     }
@@ -90,12 +90,12 @@ export const ComplaintFormView: React.FC<ComplaintFormViewProps> = ({
       customerName: customerName.trim(),
       mobile: mobile.trim(),
       businessName: businessName.trim() || undefined,
-      category,
+      category: category as ProductCategory,
       brandModel: brandModel.trim() || undefined,
       serialNo: serialNo.trim() || undefined,
       purchaseDate: purchaseDate || undefined,
       warrantyStatus,
-      complaintType,
+      complaintType: complaintType as ComplaintType,
       description: description.trim(),
       serviceLocation: serviceLocation.trim(),
       preferredDate: preferredDate || undefined,
@@ -173,11 +173,11 @@ PC TECHNO TUNER | Ahmedabad
     setCustomerName('');
     setMobile('');
     setBusinessName('');
-    setCategory('Desktop Computers');
+    setCategory('');
 
     setPurchaseDate('');
 
-    setComplaintType('Hardware Problem');
+    setComplaintType('');
     setDescription('');
     setServiceLocation('');
     setPreferredDate('');
@@ -296,7 +296,7 @@ PC TECHNO TUNER | Ahmedabad
                 required
                 value={customerName}
                 onChange={(e) => setCustomerName(e.target.value)}
-                placeholder="e.g. Ramesh Patel"
+                
                 className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
               />
             </div>
@@ -313,7 +313,7 @@ PC TECHNO TUNER | Ahmedabad
                 maxLength={10}
                 value={mobile}
                 onChange={(e) => setMobile(e.target.value.replace(/\D/g, ''))}
-                placeholder="10 digit mobile number"
+                
                 className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-mono"
               />
             </div>
@@ -329,7 +329,7 @@ PC TECHNO TUNER | Ahmedabad
                 type="text"
                 value={businessName}
                 onChange={(e) => setBusinessName(e.target.value)}
-                placeholder="Company / Firm / Shop Name"
+                
                 className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
               />
             </div>
@@ -343,6 +343,9 @@ PC TECHNO TUNER | Ahmedabad
                 onChange={(e) => setCategory(e.target.value as ProductCategory)}
                 className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500"
               >
+                required
+              >
+                <option value="">Select Product Category</option>
                 {PRODUCT_CATEGORIES.map((cat) => (
                   <option key={cat} value={cat}>
                     {cat}
@@ -363,6 +366,9 @@ PC TECHNO TUNER | Ahmedabad
                 onChange={(e) => setComplaintType(e.target.value as ComplaintType)}
                 className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500"
               >
+                required
+              >
+                <option value="">Select Complaint Type</option>
                 {COMPLAINT_TYPES.map((type) => (
                   <option key={type} value={type}>
                     {type}
@@ -396,7 +402,7 @@ PC TECHNO TUNER | Ahmedabad
               required
               value={serviceLocation}
               onChange={(e) => setServiceLocation(e.target.value)}
-              placeholder="Enter complete service address, area, city and PIN code"
+              
               className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500"
             />
           </div>
@@ -410,7 +416,7 @@ PC TECHNO TUNER | Ahmedabad
               rows={3}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Please describe exactly what happens (e.g. system doesn't turn on, camera is showing black screen, printer keeps paper jamming, no internet on switch)..."
+              
               className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 leading-relaxed"
             />
           </div>
