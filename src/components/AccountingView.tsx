@@ -274,6 +274,7 @@ export const AccountingView: React.FC<AccountingViewProps> = ({
         <div>
           <input
             type="date"
+                onClick={(e) => e.currentTarget.showPicker?.()}
             value={dateRange}
             onChange={(e) => setDateRange(e.target.value)}
             className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-blue-500"
@@ -433,6 +434,7 @@ export const AccountingView: React.FC<AccountingViewProps> = ({
                   <label className="block text-gray-400 mb-1 font-semibold">Date</label>
                   <input
                     type="date"
+                onClick={(e) => e.currentTarget.showPicker?.()}
                     required
                     value={formDate}
                     onChange={(e) => setFormDate(e.target.value)}
