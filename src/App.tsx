@@ -823,7 +823,7 @@ export default function App() {
   return (
     <div className="min-h-screen flex flex-col bg-gray-950 text-gray-100 selection:bg-blue-600 selection:text-white">
       {isAdmin && (
-        <div className="px-4 py-2 text-center text-sm bg-gray-900 border-b border-gray-800">
+        <div className="px-4 py-2 text-center text-sm bg-gray-900 border-b border-gray-800 md:ml-64">
           Cloud status: {syncStatus}
         </div>
       )}
@@ -841,7 +841,7 @@ export default function App() {
         lowStockCount={lowStockCount}
       />
 
-      <main className="max-w-7xl mx-auto w-full p-4 sm:p-6 lg:p-8 flex-1">
+      <main className={`max-w-7xl mx-auto w-full p-4 sm:p-6 lg:p-8 flex-1 ${isAdmin ? "md:ml-64 md:max-w-[calc(100%-16rem)]" : ""}`}>
         {activeTab === 'catalogue' && (
           <CatalogueView
             products={products}
