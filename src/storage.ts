@@ -6,6 +6,7 @@ import {
   Invoice,
   Estimate,
   Transaction,
+  AntivirusLicense,
 } from './types';
 
 const STORAGE_KEYS = {
@@ -20,6 +21,7 @@ const STORAGE_KEYS = {
   ADMIN_USERNAME: 'pctechno_admin_user_v1',
   ADMIN_PASSWORD: 'pctechno_admin_pass_v1',
   LANGUAGE: 'pctechno_lang_v1',
+  ANTIVIRUS: 'pctechno_antivirus_licenses_v1',
 };
 
 export const DEFAULT_PROFILE: CompanyProfile = {
@@ -528,6 +530,9 @@ export const storage = {
   getTransactions: (): Transaction[] => getStorageItem(STORAGE_KEYS.TRANSACTIONS, INITIAL_TRANSACTIONS),
   setTransactions: (transactions: Transaction[]) => setStorageItem(STORAGE_KEYS.TRANSACTIONS, transactions),
 
+  getAntivirusLicenses: (): AntivirusLicense[] => getStorageItem(STORAGE_KEYS.ANTIVIRUS, []),
+  setAntivirusLicenses: (items: AntivirusLicense[]) => setStorageItem(STORAGE_KEYS.ANTIVIRUS, items),
+
   getLanguage: (): 'en' | 'hi' | 'gu' => getStorageItem(STORAGE_KEYS.LANGUAGE, 'en'),
   setLanguage: (lang: 'en' | 'hi' | 'gu') => setStorageItem(STORAGE_KEYS.LANGUAGE, lang),
 
@@ -562,6 +567,7 @@ export const storage = {
       invoices: storage.getInvoices(),
       estimates: storage.getEstimates(),
       transactions: storage.getTransactions(),
+      antivirusLicenses: storage.getAntivirusLicenses(),
     };
     const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(data, null, 2))}`;
     const downloadAnchor = document.createElement('a');
@@ -584,6 +590,7 @@ export const storage = {
       if (Array.isArray(jsonData.invoices)) storage.setInvoices(jsonData.invoices);
       if (Array.isArray(jsonData.estimates)) storage.setEstimates(jsonData.estimates);
       if (Array.isArray(jsonData.transactions)) storage.setTransactions(jsonData.transactions);
+      if (Array.isArray(jsonData.antivirusLicenses)) storage.setAntivirusLicenses(jsonData.antivirusLicenses);
       return true;
     } catch (err) {
       console.error('Backup restore failed:', err);
