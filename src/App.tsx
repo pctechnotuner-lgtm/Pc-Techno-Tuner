@@ -39,6 +39,12 @@ import { AdminLoginModal } from './components/AdminLoginModal';
 import { AntivirusView } from './components/AntivirusView';
 
 export default function App() {
+  const [showBrandSplash, setShowBrandSplash] = useState(true);
+
+  useEffect(() => {
+    const splashTimer = window.setTimeout(() => setShowBrandSplash(false), 2000);
+    return () => window.clearTimeout(splashTimer);
+  }, []);
   const [profile, setProfile] = useState<CompanyProfile>(
     storage.getProfile
   );
@@ -862,6 +868,15 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#07111f] md:bg-[#0b1220] text-gray-100 selection:bg-blue-600 selection:text-white">
+      {showBrandSplash && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#020817]">
+          <img
+            src="./pc-techno-splash.svg"
+            alt="PC TECHNO TUNER"
+            className="w-full h-full max-w-full max-h-full object-contain"
+          />
+        </div>
+      )}
       {isAdmin && (
         <div className="px-4 py-2 text-center text-sm bg-gray-900 border-b border-gray-800 md:ml-64">
           Cloud status: {syncStatus}
