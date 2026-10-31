@@ -209,6 +209,7 @@ For any queries, please reply directly to this chat or call our Ahmedabad worksh
         <div>
           <input
             type="date"
+                onClick={(e) => e.currentTarget.showPicker?.()}
             value={filterDate}
             onChange={(e) => setFilterDate(e.target.value)}
             className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-blue-500"
@@ -424,6 +425,7 @@ For any queries, please reply directly to this chat or call our Ahmedabad worksh
                   <label className="block text-gray-400 mb-1 font-semibold">Visit / Inspection Date</label>
                   <input
                     type="date"
+                onClick={(e) => e.currentTarget.showPicker?.()}
                     value={visitDate}
                     onChange={(e) => setVisitDate(e.target.value)}
                     className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-blue-500"
