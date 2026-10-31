@@ -215,6 +215,7 @@ export type AppTab =
   | 'customers'
   | 'complaints'
   | 'sales'
+  | 'profit'
   | 'accounts'
   | 'reports'
   | 'settings';
