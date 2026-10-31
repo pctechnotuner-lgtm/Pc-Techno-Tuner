@@ -511,6 +511,18 @@ export default function App() {
     }
   };
 
+  const handleDeleteComplaint = (complaintId: string) => {
+    const updatedComplaints = complaints.filter((complaint) => complaint.id !== complaintId);
+    setComplaints(updatedComplaints);
+    storage.setComplaints(updatedComplaints);
+
+    const updatedTransactions = transactions.filter(
+      (transaction) => transaction.referenceId !== complaintId
+    );
+    setTransactions(updatedTransactions);
+    storage.setTransactions(updatedTransactions);
+  };
+
   const handleSaveCustomer = (customer: Customer) => {
     const exists = customers.some((c) => c.id === customer.id);
 
@@ -885,6 +897,7 @@ export default function App() {
             profile={profile}
             lang={lang}
             onUpdateComplaint={handleUpdateComplaint}
+            onDeleteComplaint={handleDeleteComplaint}
             onExportCsv={exportComplaintsCsv}
             selectedComplaintForEdit={selectedComplaintForEdit}
             onClearSelectedComplaint={() => setSelectedComplaintForEdit(null)}
