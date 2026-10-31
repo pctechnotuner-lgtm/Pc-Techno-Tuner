@@ -19,6 +19,7 @@ import {
   Settings,
   ShoppingBag,
   Wrench,
+  ShieldCheck,
 } from 'lucide-react';
 import { AppTab, CompanyProfile, Language } from '../types';
 import { getT } from '../i18n';
@@ -332,6 +333,14 @@ export const Header: React.FC<HeaderProps> = ({
                 </button>
 
                 <button
+                  onClick={() => handleNavClick('antivirus')}
+                  className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition w-full text-left ${activeTab === 'antivirus' ? 'bg-violet-600 text-white shadow-sm' : 'text-gray-300 hover:text-white hover:bg-gray-800'}`}
+                >
+                  <ShieldCheck className="w-3.5 h-3.5 text-violet-300" />
+                  <span>Antivirus Licenses</span>
+                </button>
+
+                <button
                   onClick={() => handleNavClick('settings')}
                   className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition w-full text-left ${
                     activeTab === 'settings'
@@ -474,6 +483,14 @@ export const Header: React.FC<HeaderProps> = ({
               >
                 <BarChart3 className="w-4 h-4" />
                 <span>{t.reports}</span>
+              </button>
+
+              <button
+                onClick={() => handleNavClick('antivirus')}
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold transition ${activeTab === 'antivirus' ? 'bg-violet-600 text-white' : 'text-gray-300 hover:bg-gray-900'}`}
+              >
+                <ShieldCheck className="w-4 h-4 text-violet-300" />
+                <span>Antivirus Licenses</span>
               </button>
 
               <button
