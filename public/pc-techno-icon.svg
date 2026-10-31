@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#020817"/><stop offset="1" stop-color="#102d62"/></linearGradient><linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#38e8ff"/><stop offset="1" stop-color="#0877ff"/></linearGradient></defs>
+<rect width="512" height="512" rx="112" fill="url(#bg)"/><rect x="14" y="14" width="484" height="484" rx="100" fill="none" stroke="#18bfff" stroke-opacity=".5" stroke-width="5"/>
+<path d="M70 226 Q104 140 222 126 Q151 169 125 235 Q105 293 166 320 Q91 308 70 260Z" fill="url(#cyan)"/>
+<rect x="194" y="100" width="198" height="146" rx="20" fill="#071426" stroke="#e9f7ff" stroke-width="13"/><path d="M275 248v28h-50v15h132v-15h-50v-28" fill="#e9f7ff"/>
+<circle cx="350" cy="204" r="42" fill="#0b1a31" stroke="url(#cyan)" stroke-width="9"/><path d="M350 172v13m0 38v13m32-32h-13m-38 0h-13m54-22-9 9m-27 27-9 9m45 0-9-9m-27-27-9-9" stroke="#fff" stroke-width="8" stroke-linecap="round"/><circle cx="350" cy="204" r="13" fill="#fff"/>
+<text x="256" y="375" fill="url(#cyan)" font-family="Arial,sans-serif" font-size="104" font-weight="900" text-anchor="middle" font-style="italic">PC</text><text x="256" y="424" fill="#fff" font-family="Arial,sans-serif" font-size="34" font-weight="800" text-anchor="middle">TECHNO TUNER</text>
+</svg>
