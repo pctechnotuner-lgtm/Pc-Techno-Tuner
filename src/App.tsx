@@ -31,6 +31,7 @@ import { CustomersView } from './components/CustomersView';
 import { SalesBillingView } from './components/SalesBillingView';
 import { AccountingView } from './components/AccountingView';
 import { ReportsView } from './components/ReportsView';
+import { EstimatedProfitView } from './components/EstimatedProfitView';
 import { SettingsView } from './components/SettingsView';
 import { AdminLoginModal } from './components/AdminLoginModal';
 
@@ -864,6 +865,10 @@ export default function App() {
             onSaveInvoice={handleSaveInvoice}
             onExportCsv={exportInvoicesCsv}
           />
+        )}
+
+        {activeTab === 'profit' && isAdmin && (
+          <EstimatedProfitView invoices={invoices} products={products} />
         )}
 
         {activeTab === 'accounts' && isAdmin && (
