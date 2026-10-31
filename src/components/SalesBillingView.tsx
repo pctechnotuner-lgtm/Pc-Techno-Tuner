@@ -195,6 +195,16 @@ export const SalesBillingView: React.FC<SalesBillingViewProps> = ({
   const grandTotal = Math.max(0, Math.round((subtotal + taxAmount - Number(discount)) * 100) / 100);
   const balanceDue = Math.max(0, Math.round((grandTotal - Number(amountPaid)) * 100) / 100);
 
+  // Estimated profit uses the saved purchase cost from Products/Stock.
+  // GST is excluded from sales revenue; invoice discount reduces profit.
+  const knownCostItems = items.filter((item) => item.productId && products.some((p) => p.id === item.productId));
+  const purchaseCostTotal = knownCostItems.reduce((sum, item) => {
+    const product = products.find((p) => p.id === item.productId);
+    return sum + (product ? product.purchasePrice * (Number(item.quantity) || 0) : 0);
+  }, 0);
+  const estimatedProfit = subtotal - purchaseCostTotal - (Number(discount) || 0);
+  const itemsWithoutCost = items.filter((item) => !item.productId || !products.some((p) => p.id === item.productId)).length;
+
   const paymentStatus: PaymentStatus =
     balanceDue <= 0 ? 'Paid' : amountPaid > 0 ? 'Partial' : 'Unpaid';
 
@@ -658,6 +668,24 @@ For support call: 7383871195`;
                   <div className="flex justify-between gap-6 font-bold text-sm text-white pt-1 border-t border-gray-800">
                     <span>Grand Total:</span>
                     <span className="font-mono text-emerald-400">₹{grandTotal.toFixed(2)}</span>
+                  </div>
+
+                  <div className="mt-3 pt-3 border-t border-emerald-800 space-y-1.5">
+                    <div className="text-emerald-400 font-bold text-xs">ADMIN ONLY — PROFIT ESTIMATE</div>
+                    <div className="flex justify-between gap-6 text-gray-400">
+                      <span>Sale Value (before GST):</span>
+                      <span className="font-mono text-white">₹{subtotal.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between gap-6 text-gray-400">
+                      <span>Purchase Cost:</span>
+                      <span className="font-mono text-white">₹{purchaseCostTotal.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between gap-6 font-bold text-sm">
+                      <span className="text-gray-200">Estimated Profit:</span>
+                      <span className={`font-mono ${estimatedProfit >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>₹{estimatedProfit.toFixed(2)}</span>
+                    </div>
+                    {itemsWithoutCost > 0 && <p className="text-[10px] text-amber-400">{itemsWithoutCost} item(s) without a linked stock purchase price are not included in cost calculation.</p>}
+                    <p className="text-[10px] text-gray-500">Estimate only; GST excluded. Discount deducted. Other expenses not included.</p>
                   </div>
                 </div>
 
