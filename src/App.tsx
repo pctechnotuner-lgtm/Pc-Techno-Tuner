@@ -597,6 +597,30 @@ export default function App() {
     }
   };
 
+  const handleDeleteInvoice = (invoiceId: string) => {
+    const invoice = invoices.find((item) => item.id === invoiceId);
+    if (!invoice) return;
+    const updatedInvoices = invoices.filter((item) => item.id !== invoiceId);
+    setInvoices(updatedInvoices);
+    storage.setInvoices(updatedInvoices);
+    let updatedProducts = [...products];
+    invoice.items.forEach((item) => {
+      if (!item.productId) return;
+      updatedProducts = updatedProducts.map((product) =>
+        product.id === item.productId
+          ? { ...product, stockQuantity: product.stockQuantity + Number(item.quantity || 0) }
+          : product
+      );
+    });
+    setProducts(updatedProducts);
+    storage.setProducts(updatedProducts);
+    const updatedTransactions = transactions.filter(
+      (tx) => !(tx.referenceId === invoice.invoiceNo && tx.category === 'Product sales')
+    );
+    setTransactions(updatedTransactions);
+    storage.setTransactions(updatedTransactions);
+  };
+
   const handleSaveTransaction = (transaction: Transaction) => {
     const updated = [transaction, ...transactions];
 
@@ -881,13 +905,14 @@ export default function App() {
             lang={lang}
             onSaveProduct={handleSaveProduct}
             onSaveInvoice={handleSaveInvoice}
+            onDeleteInvoice={handleDeleteInvoice}
             onSaveCustomer={handleSaveCustomer}
             onExportCsv={exportInvoicesCsv}
           />
         )}
 
         {activeTab === 'profit' && isAdmin && (
-          <EstimatedProfitView invoices={invoices} products={products} estimates={estimates} customers={customers} profile={profile} onSaveCustomer={handleSaveCustomer} onSaveEstimate={(estimate) => { const exists = estimates.some((item) => item.id === estimate.id); const updated = exists ? estimates.map((item) => item.id === estimate.id ? estimate : item) : [estimate, ...estimates]; setEstimates(updated); storage.setEstimates(updated); }} />
+          <EstimatedProfitView invoices={invoices} products={products} estimates={estimates} customers={customers} profile={profile} onSaveCustomer={handleSaveCustomer} onDeleteEstimate={(estimateId) => { const updated = estimates.filter((item) => item.id !== estimateId); setEstimates(updated); storage.setEstimates(updated); }} onSaveEstimate={(estimate) => { const exists = estimates.some((item) => item.id === estimate.id); const updated = exists ? estimates.map((item) => item.id === estimate.id ? estimate : item) : [estimate, ...estimates]; setEstimates(updated); storage.setEstimates(updated); }} />
         )}
 
         {activeTab === 'accounts' && isAdmin && (
