@@ -210,7 +210,7 @@ export const ProductsAdminView: React.FC<ProductsAdminViewProps> = ({
                 <th className="py-3 px-4">Item & Model</th>
                 <th className="py-3 px-4">Category</th>
                 <th className="py-3 px-4">Purchase Cost (Private)</th>
-                <th className="py-3 px-4">Selling Price (GST Incl.)</th>
+                <th className="py-3 px-4">Selling Price (GST Excl.)</th>
                 <th className="py-3 px-4">Margin</th>
                 <th className="py-3 px-4">In Stock</th>
                 <th className="py-3 px-4">Warranty</th>
@@ -417,7 +417,7 @@ export const ProductsAdminView: React.FC<ProductsAdminViewProps> = ({
 
                 <div>
                   <label className="block text-emerald-400 mb-1 font-semibold">
-                    Selling Price (Incl. GST) *
+                    Selling Price (Before GST) *
                   </label>
                   <input
                     type="number"
@@ -428,7 +428,7 @@ export const ProductsAdminView: React.FC<ProductsAdminViewProps> = ({
                     onChange={(e) => setFormSellingPrice(Number(e.target.value))}
                     className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white font-mono text-xs focus:outline-none focus:border-blue-500"
                   />
-                  <span className="text-[10px] text-gray-500">Public customer offer price</span>
+                  <span className="text-[10px] text-gray-500">Enter base sale rate; GST will be added on invoice</span>
                 </div>
               </div>
 
