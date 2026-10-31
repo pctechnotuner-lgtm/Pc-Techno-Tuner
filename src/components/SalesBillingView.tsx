@@ -36,6 +36,7 @@ interface SalesBillingViewProps {
   profile: CompanyProfile;
   lang: Language;
   onSaveInvoice: (invoice: Invoice) => void;
+  onSaveCustomer: (customer: Customer) => void;
   onSaveProduct: (product: Product) => void;
   onExportCsv: () => void;
   activeInvoiceForModal?: Invoice | null;
@@ -48,6 +49,7 @@ export const SalesBillingView: React.FC<SalesBillingViewProps> = ({
   profile,
   lang,
   onSaveInvoice,
+  onSaveCustomer,
   onSaveProduct,
   onExportCsv,
 }) => {
@@ -261,6 +263,20 @@ export const SalesBillingView: React.FC<SalesBillingViewProps> = ({
       createdAt: new Date().toISOString(),
     };
 
+    const matchedCustomer = customers.find((customer) =>
+      (custMobile.trim() && customer.mobile === custMobile.trim()) ||
+      customer.name.toLowerCase() === custName.trim().toLowerCase()
+    );
+    onSaveCustomer({
+      id: matchedCustomer?.id || 'cust-' + Date.now(),
+      name: custName.trim(),
+      mobile: custMobile.trim(),
+      businessName: custBusiness.trim() || undefined,
+      address: custAddress.trim() || 'Ahmedabad',
+      gstin: custGstin.trim() || undefined,
+      notes: matchedCustomer?.notes || 'Added automatically from sales invoice',
+      createdAt: matchedCustomer?.createdAt || new Date().toISOString(),
+    });
     onSaveInvoice(newInvoice);
     setCreateModalOpen(false);
     setEditingInvoiceId(null);
