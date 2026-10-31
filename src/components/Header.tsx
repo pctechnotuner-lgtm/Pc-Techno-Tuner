@@ -60,7 +60,7 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className={`${isAdmin ? "relative" : "sticky top-0"} z-40 bg-gray-950/95 backdrop-blur-md border-b border-gray-800 transition-all`}>
+    <header className={`${isAdmin ? "relative bg-gray-950/95" : "sticky top-0 bg-gray-950/95 backdrop-blur-md"} z-40 border-b border-gray-800 transition-all`}>
       {/* Top Banner with Brand & Quick Actions */}
       <div className={`max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex items-center justify-between gap-4 ${isAdmin ? "md:ml-64 md:max-w-none" : ""}`}>
         {/* Brand Logo & Name */}
