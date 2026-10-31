@@ -214,6 +214,19 @@ export interface Customer {
   createdAt: string;
 }
 
+export interface AntivirusLicense {
+  id: string;
+  customerName: string;
+  mobile: string;
+  address: string;
+  purchaseDate: string;
+  licenseKey: string;
+  antivirusCompany: string;
+  expiryDate: string;
+  reminderSent?: boolean;
+  createdAt: string;
+}
+
 export interface Transaction {
   id: string;
   type: 'INCOME' | 'EXPENSE';
@@ -238,4 +251,5 @@ export type AppTab =
   | 'profit'
   | 'accounts'
   | 'reports'
-  | 'settings';
+  | 'settings'
+  | 'antivirus';
