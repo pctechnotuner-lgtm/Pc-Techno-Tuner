@@ -523,35 +523,42 @@ export default function App() {
   };
 
   const handleSaveInvoice = (invoice: Invoice) => {
-    const updatedInvoices = [invoice, ...invoices];
-
+    const previousInvoice = invoices.find((item) => item.id === invoice.id);
+    const updatedInvoices = previousInvoice
+      ? invoices.map((item) => item.id === invoice.id ? invoice : item)
+      : [invoice, ...invoices];
     setInvoices(updatedInvoices);
     storage.setInvoices(updatedInvoices);
 
+    // Restore the previous invoice quantities, then deduct the edited quantities.
     let currentProducts = [...products];
-
-    invoice.items.forEach((item) => {
-      if (item.productId) {
-        currentProducts = currentProducts.map((p) =>
-          p.id === item.productId
-            ? {
-                ...p,
-                stockQuantity: Math.max(
-                  0,
-                  p.stockQuantity - item.quantity
-                ),
-              }
-            : p
+    if (previousInvoice) {
+      previousInvoice.items.forEach((item) => {
+        if (!item.productId) return;
+        currentProducts = currentProducts.map((product) =>
+          product.id === item.productId
+            ? { ...product, stockQuantity: product.stockQuantity + Number(item.quantity || 0) }
+            : product
         );
-      }
+      });
+    }
+    invoice.items.forEach((item) => {
+      if (!item.productId) return;
+      currentProducts = currentProducts.map((product) =>
+        product.id === item.productId
+          ? { ...product, stockQuantity: Math.max(0, product.stockQuantity - Number(item.quantity || 0)) }
+          : product
+      );
     });
-
     setProducts(currentProducts);
     storage.setProducts(currentProducts);
 
+    // Keep the invoice-linked payment transaction in sync instead of duplicating it.
+    const linkedPayment = transactions.find((tx) => tx.referenceId === invoice.invoiceNo && tx.category === 'Product sales');
+    let updatedTransactions = transactions.filter((tx) => !(tx.referenceId === invoice.invoiceNo && tx.category === 'Product sales'));
     if (invoice.amountPaid > 0) {
       const salesTx: Transaction = {
-        id: `tr-${Date.now()}`,
+        id: linkedPayment?.id || `tr-${Date.now()}`,
         type: 'INCOME',
         category: 'Product sales',
         amount: invoice.amountPaid,
@@ -560,21 +567,19 @@ export default function App() {
         partyName: invoice.customerName,
         referenceId: invoice.invoiceNo,
         notes: `Payment received for Invoice ${invoice.invoiceNo}`,
-        createdAt: new Date().toISOString(),
+        createdAt: linkedPayment?.createdAt || new Date().toISOString(),
       };
-
-      const updatedTx = [salesTx, ...transactions];
-
-      setTransactions(updatedTx);
-      storage.setTransactions(updatedTx);
+      updatedTransactions = [salesTx, ...updatedTransactions];
+    }
+    if (updatedTransactions !== transactions) {
+      setTransactions(updatedTransactions);
+      storage.setTransactions(updatedTransactions);
     }
 
     const custExists = customers.some(
-      (c) =>
-        c.mobile === invoice.customerMobile ||
-        c.name.toLowerCase() === invoice.customerName.toLowerCase()
+      (customer) => customer.mobile === invoice.customerMobile ||
+        customer.name.toLowerCase() === invoice.customerName.toLowerCase()
     );
-
     if (!custExists) {
       const newCust: Customer = {
         id: `cust-${Date.now()}`,
@@ -586,9 +591,7 @@ export default function App() {
         notes: `Created via invoice ${invoice.invoiceNo}`,
         createdAt: new Date().toISOString(),
       };
-
       const updatedCustomers = [newCust, ...customers];
-
       setCustomers(updatedCustomers);
       storage.setCustomers(updatedCustomers);
     }
