@@ -154,7 +154,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       {/* KPI Summary Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Cash Inflow */}
-        <div className="bg-gradient-to-br from-[#111c30] to-[#0b1220] border border-slate-700/70 rounded-2xl shadow-lg shadow-black/20 p-4 sm:p-5 relative overflow-hidden">
+        <div role="button" tabIndex={0} onClick={() => onNavigateTab('accounts')} onKeyDown={(e) => e.key === 'Enter' && onNavigateTab('accounts')} title="Open accounts" className="cursor-pointer hover:border-blue-500/60 transition bg-gradient-to-br from-[#111c30] to-[#0b1220] border border-slate-700/70 rounded-2xl shadow-lg shadow-black/20 p-4 sm:p-5 relative overflow-hidden">
           <div className="flex items-center justify-between text-xs text-gray-400 mb-1">
             <span>{t.totalCashIn}</span>
             <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
@@ -170,7 +170,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
 
         {/* Cash Outflow */}
-        <div className="bg-gradient-to-br from-[#111c30] to-[#0b1220] border border-slate-700/70 rounded-2xl shadow-lg shadow-black/20 p-4 sm:p-5 relative overflow-hidden">
+        <div role="button" tabIndex={0} onClick={() => onNavigateTab('accounts')} onKeyDown={(e) => e.key === 'Enter' && onNavigateTab('accounts')} title="Open accounts" className="cursor-pointer hover:border-blue-500/60 transition bg-gradient-to-br from-[#111c30] to-[#0b1220] border border-slate-700/70 rounded-2xl shadow-lg shadow-black/20 p-4 sm:p-5 relative overflow-hidden">
           <div className="flex items-center justify-between text-xs text-gray-400 mb-1">
             <span>{t.totalCashOut}</span>
             <div className="p-1.5 rounded-lg bg-rose-500/10 text-rose-400 border border-rose-500/20">
@@ -186,7 +186,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
 
         {/* Customer Dues */}
-        <div className="bg-gradient-to-br from-[#111c30] to-[#0b1220] border border-slate-700/70 rounded-2xl shadow-lg shadow-black/20 p-4 sm:p-5 relative overflow-hidden">
+        <div role="button" tabIndex={0} onClick={() => onNavigateTab('sales')} onKeyDown={(e) => e.key === 'Enter' && onNavigateTab('sales')} title="Open sales" className="cursor-pointer hover:border-blue-500/60 transition bg-gradient-to-br from-[#111c30] to-[#0b1220] border border-slate-700/70 rounded-2xl shadow-lg shadow-black/20 p-4 sm:p-5 relative overflow-hidden">
           <div className="flex items-center justify-between text-xs text-gray-400 mb-1">
             <span>{t.customerDues}</span>
             <div className="p-1.5 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20">
@@ -202,7 +202,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
 
         {/* Estimated Profit */}
-        <div className="bg-gradient-to-br from-[#111c30] to-[#0b1220] border border-slate-700/70 rounded-2xl shadow-lg shadow-black/20 p-4 sm:p-5 relative overflow-hidden">
+        <div role="button" tabIndex={0} onClick={() => onNavigateTab('reports')} onKeyDown={(e) => e.key === 'Enter' && onNavigateTab('reports')} title="Open reports" className="cursor-pointer hover:border-blue-500/60 transition bg-gradient-to-br from-[#111c30] to-[#0b1220] border border-slate-700/70 rounded-2xl shadow-lg shadow-black/20 p-4 sm:p-5 relative overflow-hidden">
           <div className="flex items-center justify-between text-xs text-gray-400 mb-1">
             <span>Net Cash Flow</span>
             <div className="p-1.5 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20">
@@ -219,7 +219,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       </div>
 
       {/* Complaints Pipeline Counter Bar */}
-      <div className="bg-gradient-to-br from-[#111c30] to-[#0b1220] border border-slate-700/70 rounded-2xl shadow-lg shadow-black/20 p-5 space-y-3">
+      <div role="button" tabIndex={0} onClick={() => onNavigateTab('products')} onKeyDown={(e) => e.key === 'Enter' && onNavigateTab('products')} title="Open product inventory" className="cursor-pointer hover:border-blue-500/60 transition bg-gradient-to-br from-[#111c30] to-[#0b1220] border border-slate-700/70 rounded-2xl shadow-lg shadow-black/20 p-5 space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-bold text-white flex items-center gap-2">
             <Wrench className="w-4 h-4 text-blue-400" />
@@ -235,23 +235,23 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 pt-1">
-          <div className="bg-[#080f1d] p-3 rounded-xl border border-blue-900/40 text-center">
+          <div role="button" tabIndex={0} onClick={() => onNavigateTab('complaints')} onKeyDown={(e) => e.key === 'Enter' && onNavigateTab('complaints')} title="Open complaint details" className="cursor-pointer hover:bg-blue-950/40 transition bg-[#080f1d] p-3 rounded-xl border border-blue-900/40 text-center">
             <span className="text-[10px] font-bold text-blue-400 block uppercase">{t.newComplaints}</span>
             <span className="text-xl font-black text-white">{newComplaints}</span>
           </div>
-          <div className="bg-[#080f1d] p-3 rounded-xl border border-amber-900/40 text-center">
+          <div role="button" tabIndex={0} onClick={() => onNavigateTab('complaints')} onKeyDown={(e) => e.key === 'Enter' && onNavigateTab('complaints')} title="Open complaint details" className="cursor-pointer hover:bg-blue-950/40 transition bg-[#080f1d] p-3 rounded-xl border border-amber-900/40 text-center">
             <span className="text-[10px] font-bold text-amber-400 block uppercase">{t.pendingComplaints}</span>
             <span className="text-xl font-black text-white">{pendingComplaints}</span>
           </div>
-          <div className="bg-[#080f1d] p-3 rounded-xl border border-purple-900/40 text-center">
+          <div role="button" tabIndex={0} onClick={() => onNavigateTab('complaints')} onKeyDown={(e) => e.key === 'Enter' && onNavigateTab('complaints')} title="Open complaint details" className="cursor-pointer hover:bg-blue-950/40 transition bg-[#080f1d] p-3 rounded-xl border border-purple-900/40 text-center">
             <span className="text-[10px] font-bold text-purple-400 block uppercase">{t.inProgressComplaints}</span>
             <span className="text-xl font-black text-white">{inProgressComplaints}</span>
           </div>
-          <div className="bg-[#080f1d] p-3 rounded-xl border border-emerald-900/40 text-center">
+          <div role="button" tabIndex={0} onClick={() => onNavigateTab('complaints')} onKeyDown={(e) => e.key === 'Enter' && onNavigateTab('complaints')} title="Open complaint details" className="cursor-pointer hover:bg-blue-950/40 transition bg-[#080f1d] p-3 rounded-xl border border-emerald-900/40 text-center">
             <span className="text-[10px] font-bold text-emerald-400 block uppercase">{t.resolvedComplaints}</span>
             <span className="text-xl font-black text-white">{resolvedComplaints}</span>
           </div>
-          <div className="bg-[#080f1d] p-3 rounded-xl border border-gray-800 text-center">
+          <div role="button" tabIndex={0} onClick={() => onNavigateTab('complaints')} onKeyDown={(e) => e.key === 'Enter' && onNavigateTab('complaints')} title="Open complaint details" className="cursor-pointer hover:bg-blue-950/40 transition bg-[#080f1d] p-3 rounded-xl border border-gray-800 text-center">
             <span className="text-[10px] font-bold text-gray-400 block uppercase">{t.closedComplaints}</span>
             <span className="text-xl font-black text-white">{closedComplaints}</span>
           </div>
@@ -288,7 +288,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               </thead>
               <tbody className="divide-y divide-gray-800/80">
                 {recentComplaints.map((c) => (
-                  <tr key={c.id} className="hover:bg-blue-950/30 transition">
+                  <tr key={c.id} onClick={() => onSelectComplaintForEdit(c)} className="hover:bg-blue-950/50 transition cursor-pointer" title="Click to open full complaint details">
                     <td className="py-3 px-3 font-mono font-bold text-blue-400">{c.id}</td>
                     <td className="py-3 px-3">
                       <div className="font-semibold text-white">{c.customerName}</div>
@@ -314,12 +314,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                       </span>
                     </td>
                     <td className="py-3 px-3 text-right space-x-2">
-                      <button
-                        onClick={() => onSelectComplaintForEdit(c)}
-                        className="px-2 py-1 bg-gray-800 hover:bg-gray-700 text-blue-400 rounded text-xs transition"
-                      >
-                        Manage
-                      </button>
                     </td>
                   </tr>
                 ))}
@@ -350,7 +344,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 {lowStockProducts.slice(0, 4).map((p) => (
                   <div
                     key={p.id}
-                    className="p-3 bg-[#080f1d] rounded-xl border border-slate-800 flex items-center justify-between"
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => onNavigateTab('products')}
+                    onKeyDown={(e) => e.key === 'Enter' && onNavigateTab('products')}
+                    title="Open product inventory"
+                    className="p-3 bg-[#080f1d] rounded-xl border border-slate-800 flex items-center justify-between cursor-pointer hover:border-blue-500/60 transition"
                   >
                     <div>
                       <p className="text-xs font-bold text-white line-clamp-1">{p.name}</p>
