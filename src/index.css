@@ -57,69 +57,64 @@
 
 /* A4 tax invoice layout matching the customer's supplied reference PDF */
 .invoice-sheet {
-  width: 100%;
-  max-width: 190mm;
-  margin: 0 auto;
-  padding: 0;
-  color: #111;
-  background: #fff;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 9px;
-  line-height: 1.25;
+  width:100%; max-width:190mm; margin:0 auto; padding:0; color:#111; background:#fff;
+  font-family:Arial,Helvetica,sans-serif; font-size:8px; line-height:1.25;
 }
-.invoice-caption { display:flex; justify-content:space-between; align-items:center; margin-bottom:5px; font-size:10px; }
-.invoice-caption span { border:1px solid #888; padding:2px 5px; color:#666; font-size:8px; }
-.invoice-header { display:grid; grid-template-columns: 1fr 1fr; border:1px solid #222; min-height:29mm; }
-.invoice-company { display:flex; align-items:center; gap:8px; padding:7px; border-right:1px solid #222; min-width:0; }
-.invoice-logo { width:20mm; height:20mm; object-fit:contain; flex:none; }
-.invoice-company h1 { font-size:14px; font-weight:800; margin:0 0 3px; }
-.invoice-company p { margin:1px 0; overflow-wrap:anywhere; }
-.invoice-mobile-label { margin-left:12px; }
-.invoice-meta { display:grid; grid-template-columns:repeat(3,1fr); align-items:center; text-align:center; }
-.invoice-meta div { padding:5px 3px; }
-.invoice-meta b,.invoice-meta span { display:block; }
-.invoice-meta b { margin-bottom:5px; }
-.invoice-parties { display:grid; grid-template-columns:1fr 1fr; border:1px solid #222; border-top:0; }
-.invoice-parties section { padding:7px; min-height:27mm; }
-.invoice-parties section + section { border-left:1px solid #222; }
-.invoice-parties h3,.invoice-bottom h3,.invoice-footer h3 { font-size:9px; font-weight:800; margin:0 0 4px; }
-.invoice-parties p { margin:2px 0; overflow-wrap:anywhere; }
-.invoice-items,.invoice-gst { width:100%; border-collapse:collapse; table-layout:fixed; }
-.invoice-items { margin-top:0; }
-.invoice-items th,.invoice-items td,.invoice-gst th,.invoice-gst td { border:1px solid #222; padding:5px 4px; }
-.invoice-items th,.invoice-gst th { background:#e5e5e5; font-weight:800; text-align:center; }
-.invoice-items th:nth-child(1) { width:11%; }
-.invoice-items th:nth-child(2) { width:39%; }
-.invoice-items th:nth-child(3) { width:11%; }
-.invoice-items th:nth-child(4) { width:13%; }
-.invoice-items th:nth-child(5) { width:13%; }
-.invoice-items th:nth-child(6) { width:13%; }
-.invoice-items td:not(:nth-child(2)) { text-align:right; }
-.invoice-items td:first-child,.invoice-items td:nth-child(3) { text-align:center; }
-.invoice-item-name { text-align:left; overflow-wrap:anywhere; }
-.invoice-item-name small,.invoice-items td small { display:block; color:#555; font-size:8px; }
-.invoice-empty-row td { height:13mm; }
-.invoice-items tfoot td { background:#e5e5e5; font-weight:800; }
-.invoice-total-label { text-align:right !important; }
-.invoice-gst { margin-top:2mm; font-size:8px; }
-.invoice-gst th,.invoice-gst td { text-align:center; padding:4px 3px; }
-.invoice-words { border:1px solid #222; border-top:0; padding:6px; }
-.invoice-words b,.invoice-words span { display:block; }
-.invoice-words span { margin-top:3px; }
-.invoice-bottom { display:grid; grid-template-columns:1fr 1fr; border:1px solid #222; border-top:0; min-height:25mm; }
-.invoice-bank,.invoice-qr { padding:7px; }
-.invoice-qr { border-left:1px solid #222; }
-.invoice-bank p { margin:2px 0; }
-.invoice-qr p { margin:3px 0; }
-.invoice-qr-amount { font-weight:800; margin-top:8px !important; }
-.invoice-footer { display:grid; grid-template-columns:1fr 1fr; border:1px solid #222; border-top:0; min-height:22mm; }
-.invoice-footer section { padding:7px; }
-.invoice-footer section + section { border-left:1px solid #222; }
-.invoice-footer p { white-space:pre-line; margin:0; }
-.invoice-sign { display:flex; flex-direction:column; justify-content:flex-end; align-items:center; text-align:center; gap:2px; }
-.invoice-sign strong { font-weight:800; }
-.invoice-preview-close { text-align:center; padding:10px; }
-.invoice-preview-close button { background:#222; color:#fff; padding:6px 12px; border-radius:4px; }
+.invoice-caption {display:flex;justify-content:center;align-items:center;position:relative;margin:2mm 0 3mm;font-size:15px}
+.invoice-caption strong {background:#064b91;color:#fff;padding:7px 24px;border-radius:5px;letter-spacing:.4px}
+.invoice-caption span {position:absolute;right:2px;border:0;color:#111;font-size:9px;font-weight:700}
+.invoice-header {display:grid;grid-template-columns:1.15fr 1fr;border:1px solid #8aaed1;border-radius:5px;min-height:25mm;overflow:hidden}
+.invoice-company {display:flex;align-items:center;gap:8px;padding:7px;border-right:1px solid #8aaed1;min-width:0}
+.invoice-logo {width:20mm;height:20mm;object-fit:contain;flex:none}
+.invoice-company h1 {font-size:17px;font-weight:800;color:#073b78;margin:0 0 4px}
+.invoice-company p {margin:2px 0;overflow-wrap:anywhere}
+.invoice-mobile-label {margin-left:10px}
+.invoice-meta {display:grid;grid-template-columns:repeat(3,1fr);align-items:center;text-align:left}
+.invoice-meta div {padding:5px 4px}
+.invoice-meta b,.invoice-meta span {display:block}
+.invoice-meta b {margin-bottom:5px;color:#073b78}
+.invoice-parties {display:grid;grid-template-columns:1fr 1fr;gap:3mm;margin:3mm 0}
+.invoice-parties section {padding:7px;min-height:25mm;border:1px solid #2766a5;border-radius:5px}
+.invoice-parties h3,.invoice-bottom h3,.invoice-footer h3 {font-size:10px;font-weight:800;color:#fff;background:#064b91;display:inline-block;padding:4px 9px;margin:-7px 0 6px -7px;border-radius:4px 0 4px 0}
+.invoice-parties p {margin:2px 0;overflow-wrap:anywhere}
+.invoice-items,.invoice-gst {width:100%;border-collapse:collapse;table-layout:fixed}
+.invoice-items {margin-top:0;font-size:7px}
+.invoice-items th,.invoice-items td,.invoice-gst th,.invoice-gst td {border:1px solid #7089a6;padding:5px 3px}
+.invoice-items th,.invoice-gst th {background:#064b91;color:#fff;font-weight:800;text-align:center}
+.invoice-items th:nth-child(1){width:5%}
+.invoice-items th:nth-child(2){width:23%}
+.invoice-items th:nth-child(3){width:8%}
+.invoice-items th:nth-child(4){width:6%}
+.invoice-items th:nth-child(5){width:9%}
+.invoice-items th:nth-child(6){width:6%}
+.invoice-items th:nth-child(7){width:10%}
+.invoice-items th:nth-child(8),.invoice-items th:nth-child(9){width:8%}
+.invoice-items th:nth-child(10){width:9%}
+.invoice-items td:not(:nth-child(2)){text-align:center}
+.invoice-item-name{text-align:left;overflow-wrap:anywhere}
+.invoice-item-name small,.invoice-items td small{display:block;color:#555;font-size:7px}
+.invoice-empty-row td{height:9mm}
+.invoice-items tfoot td{background:#eef4fb;font-weight:800}
+.invoice-total-label{text-align:right!important}
+.invoice-gst{margin-top:2mm;font-size:8px}
+.invoice-gst th,.invoice-gst td{text-align:center;padding:4px 3px}
+.invoice-words{border:1px solid #a6c4e3;background:#eff5fc;border-radius:4px;padding:8px;margin-top:3mm}
+.invoice-words b,.invoice-words span{display:block}
+.invoice-words span{margin-top:4px;font-weight:800}
+.invoice-bottom{display:grid;grid-template-columns:1fr 1.3fr;border:1px solid #7089a6;border-radius:5px;margin-top:4mm;min-height:25mm}
+.invoice-bank,.invoice-qr{padding:7px}
+.invoice-qr{border-left:1px solid #7089a6}
+.invoice-bank p{margin:2px 0}
+.invoice-qr p{margin:3px 0}
+.invoice-qr-amount{font-weight:800;margin-top:8px!important}
+.invoice-footer{display:grid;grid-template-columns:1fr 1fr;border:1px solid #7089a6;border-radius:5px;margin-top:4mm;min-height:22mm}
+.invoice-footer section{padding:7px}
+.invoice-footer section+section{border-left:1px solid #7089a6}
+.invoice-footer p{white-space:pre-line;margin:0}
+.invoice-sign{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;text-align:center;gap:2px}
+.invoice-sign strong{font-weight:800;color:#073b78}
+.invoice-preview-close{text-align:center;padding:10px}
+.invoice-preview-close button{background:#064b91;color:#fff;padding:6px 12px;border-radius:4px}
 @media print {
   @page { size:A4 portrait; margin:8mm; }
   html, body { width:210mm !important; min-height:297mm !important; margin:0 !important; padding:0 !important; background:#fff !important; }
