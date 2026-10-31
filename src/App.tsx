@@ -986,15 +986,16 @@ export default function App() {
 
       {isAdmin && (
         <nav aria-label="Mobile admin navigation" className="md:hidden fixed bottom-0 inset-x-0 z-50 border-t border-blue-900/70 bg-[#081426]/95 backdrop-blur-xl shadow-[0_-8px_30px_rgba(0,0,0,0.35)] safe-area-bottom">
-          <div className="grid grid-cols-4 max-w-xl mx-auto px-2 py-2">
+          <div className="grid grid-cols-5 max-w-xl mx-auto px-1 py-2">
             {([
               ['dashboard', 'Home'],
-              ['products', 'Products'],
+              ['products', 'Items'],
+              ['complaints', 'Tickets'],
               ['sales', 'Sales'],
               ['profit', 'Estimate']
             ] as [AppTab, string][]).map(([tab, label]) => (
               <button key={tab} onClick={() => setActiveTab(tab)} className={`flex flex-col items-center justify-center gap-1 rounded-xl py-2 text-[10px] font-semibold transition ${activeTab === tab ? 'bg-blue-600/20 text-blue-300' : 'text-slate-400 hover:text-white'}`} aria-current={activeTab === tab ? 'page' : undefined}>
-                <span className="text-base leading-none">{tab === 'dashboard' ? '⌂' : tab === 'products' ? '▦' : tab === 'sales' ? '▤' : '↗'}</span>
+                <span className="text-base leading-none">{tab === 'dashboard' ? '⌂' : tab === 'products' ? '▦' : tab === 'complaints' ? '⚒' : tab === 'sales' ? '▤' : '↗'}</span>
                 <span>{label}</span>
               </button>
             ))}
