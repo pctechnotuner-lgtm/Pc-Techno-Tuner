@@ -105,15 +105,57 @@ export const EstimatedProfitView: React.FC<Props> = ({ invoices, products, estim
   };
 
   const printEstimate = (estimate: Estimate) => {
-    const popup = window.open('', '_blank', 'width=900,height=750');
+    const popup = window.open('', '_blank', 'width=1000,height=900');
     if (!popup) { alert('Please allow pop-ups to print the estimate.'); return; }
-    const rows = estimate.items.map((item, index) => '<tr><td>' + (index + 1) + '</td><td>' + escapeHtml(item.description) + '</td><td>' + item.quantity + '</td><td>' + money(item.unitPrice) + '</td><td>' + money(item.lineTotal) + '</td></tr>').join('');
-    popup.document.write('<!doctype html><html><head><title>' + escapeHtml(estimate.estimateNo) + '</title><style>body{font:14px Arial;color:#111;padding:28px}h1{margin:0;color:#087f5b}small{color:#555}.top{display:flex;justify-content:space-between;border-bottom:2px solid #087f5b;padding-bottom:15px}table{width:100%;border-collapse:collapse;margin-top:25px}th,td{border:1px solid #bbb;padding:9px;text-align:left}th{background:#eee}.totals{margin:20px 0 0 auto;width:300px}.totals div{display:flex;justify-content:space-between;padding:5px}.grand{font-size:18px;font-weight:bold;border-top:2px solid #087f5b}.terms{margin-top:35px;border-top:1px solid #aaa;padding-top:12px}</style></head><body>');
-    popup.document.write('<div class="top"><div><h1>' + escapeHtml(profile.name) + '</h1><p>' + escapeHtml(profile.tagline || '') + '</p><p>' + escapeHtml(profile.address || '') + ', ' + escapeHtml(profile.location || '') + '</p><p>Mobile: ' + escapeHtml(profile.mobile || '') + ' | Email: ' + escapeHtml(profile.email || '') + '</p><p>GSTIN: ' + escapeHtml(profile.gstin || '') + '</p></div><div><h2>ESTIMATE / QUOTATION</h2><b>' + escapeHtml(estimate.estimateNo) + '</b><p>Date: ' + estimate.estimateDate + '</p><p>Valid Until: ' + estimate.validUntil + '</p></div></div>');
-    popup.document.write('<h3>Bill To</h3><p><b>' + escapeHtml(estimate.customerName) + '</b><br>' + escapeHtml(estimate.customerBusiness || '') + '<br>' + escapeHtml(estimate.customerAddress) + '<br>Mobile: ' + escapeHtml(estimate.customerMobile) + '<br>GSTIN: ' + escapeHtml(estimate.customerGstin || '-') + '</p>');
-    popup.document.write('<table><thead><tr><th>#</th><th>Description</th><th>Qty</th><th>Rate</th><th>Amount</th></tr></thead><tbody>' + rows + '</tbody></table>');
-    popup.document.write('<div class="totals"><div><span>Taxable Subtotal</span><b>' + money(estimate.subtotal) + '</b></div><div><span>GST (' + estimate.taxRate + '%)</span><b>' + money(estimate.taxAmount) + '</b></div><div><span>Discount</span><b>' + money(estimate.discount) + '</b></div><div class="grand"><span>Grand Total</span><b>' + money(estimate.totalAmount) + '</b></div></div>');
-    popup.document.write('<p><b>Notes:</b> ' + escapeHtml(estimate.notes || '-') + '</p><div class="terms"><b>Terms & Conditions</b><p>' + escapeHtml(profile.terms || '') + '</p><p>Thank you for your enquiry.</p></div><script>window.onload=function(){window.print();};<\/script></body></html>');
+    const dateText = (value: string) => value ? new Date(value + 'T00:00:00').toLocaleDateString('en-GB') : '';
+    const gst = Number(estimate.taxAmount || 0);
+    const halfTax = gst / 2;
+    const amountWords = (amount: number) => {
+      const n = Math.round(amount);
+      if (!n) return 'Zero Rupees Only';
+      const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+      const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+      const underThousand = (v: number): string => {
+        let out = '';
+        if (v >= 100) out += ones[Math.floor(v / 100)] + ' Hundred ';
+        v %= 100;
+        if (v >= 20) out += tens[Math.floor(v / 10)] + (v % 10 ? ' ' + ones[v % 10] : '');
+        else if (v > 0) out += ones[v];
+        return out.trim();
+      };
+      let v = n;
+      const parts: string[] = [];
+      const crore = Math.floor(v / 10000000); v %= 10000000;
+      const lakh = Math.floor(v / 100000); v %= 100000;
+      const thousand = Math.floor(v / 1000); v %= 1000;
+      if (crore) parts.push(underThousand(crore) + ' Crore');
+      if (lakh) parts.push(underThousand(lakh) + ' Lakh');
+      if (thousand) parts.push(underThousand(thousand) + ' Thousand');
+      if (v) parts.push(underThousand(v));
+      return parts.join(' ') + ' Rupees Only';
+    };
+    const rows = estimate.items.map((item, index) => {
+      const lineTax = Number(item.lineTotal || 0) * Number(estimate.taxRate || 0) / 100;
+      return '<tr><td>' + (index + 1) + '</td><td class="item-name">' + escapeHtml(item.description) + (item.category ? '<small>' + escapeHtml(item.category) + '</small>' : '') + '</td><td>' + item.quantity + ' PCS</td><td>' + money(item.unitPrice) + '</td><td>' + money(lineTax) + '<small>(' + estimate.taxRate + '%)</small></td><td>' + money(Number(item.lineTotal || 0) + lineTax) + '</td></tr>';
+    }).join('');
+    const emptyRows = Array.from({ length: Math.max(0, 5 - estimate.items.length) }).map(() => '<tr class="empty"><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td></tr>').join('');
+    const companyAddress = [profile.address, profile.location, profile.pincode].filter(Boolean).join(', ');
+    const terms = profile.terms || '1. Goods once sold will not be taken back.\n2. Warranty as per terms & condition of the manufacturer & distributor.\n3. Subject to Ahmedabad Jurisdiction Only.';
+    const html = '<!doctype html><html><head><meta charset="utf-8"><title>' + escapeHtml(estimate.estimateNo) + '</title><style>' +
+      '@page{size:A4 portrait;margin:8mm}*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}body{margin:0;color:#111;background:#fff;font:9px/1.25 Arial,Helvetica,sans-serif}.sheet{width:100%;max-width:190mm;margin:0 auto}.caption{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;font-size:10px}.caption span{border:1px solid #888;padding:2px 5px;color:#666;font-size:8px}.header{display:grid;grid-template-columns:1fr 1fr;border:1px solid #222;min-height:29mm}.company{display:flex;align-items:center;gap:8px;padding:7px;border-right:1px solid #222;min-width:0}.logo{width:20mm;height:20mm;object-fit:contain;flex:none}.company h1{font-size:14px;font-weight:800;margin:0 0 3px}.company p{margin:1px 0;overflow-wrap:anywhere}.meta{display:grid;grid-template-columns:repeat(3,1fr);align-items:center;text-align:center}.meta div{padding:5px 3px}.meta b,.meta span{display:block}.meta b{margin-bottom:5px}.parties{display:grid;grid-template-columns:1fr 1fr;border:1px solid #222;border-top:0}.parties section{padding:7px;min-height:27mm}.parties section+section{border-left:1px solid #222}.parties h3,.bottom h3,.footer h3{font-size:9px;font-weight:800;margin:0 0 4px}.parties p{margin:2px 0;overflow-wrap:anywhere}table{width:100%;border-collapse:collapse;table-layout:fixed}.items th,.items td,.gst th,.gst td{border:1px solid #222;padding:5px 4px}.items th,.gst th{background:#e5e5e5;font-weight:800;text-align:center}.items th:nth-child(1){width:11%}.items th:nth-child(2){width:39%}.items th:nth-child(3){width:11%}.items th:nth-child(4){width:13%}.items th:nth-child(5){width:13%}.items th:nth-child(6){width:13%}.items td:not(:nth-child(2)){text-align:right}.items td:first-child,.items td:nth-child(3){text-align:center}.item-name{overflow-wrap:anywhere}.item-name small,.items td small{display:block;color:#555;font-size:8px}.items tr.empty td{height:13mm}.items tfoot td{background:#e5e5e5;font-weight:800}.total-label{text-align:right!important}.gst{margin-top:2mm;font-size:8px}.gst th,.gst td{text-align:center;padding:4px 3px}.words{border:1px solid #222;border-top:0;padding:6px}.words b,.words span{display:block}.words span{margin-top:3px}.bottom{display:grid;grid-template-columns:1fr 1fr;border:1px solid #222;border-top:0;min-height:25mm}.bottom section{padding:7px}.bottom section+section{border-left:1px solid #222}.bottom p{margin:2px 0}.qr p{margin:3px 0}.footer{display:grid;grid-template-columns:1fr 1fr;border:1px solid #222;border-top:0;min-height:22mm}.footer section{padding:7px}.footer section+section{border-left:1px solid #222}.footer p{white-space:pre-line;margin:0}.sign{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;text-align:center;gap:2px}.sign strong{font-weight:800}@media print{body{width:210mm;min-height:297mm}}' +
+      '</style></head><body><main class="sheet">' +
+      '<div class="caption"><strong>ESTIMATE / QUOTATION</strong><span>NOT A TAX INVOICE</span></div>' +
+      '<div class="header"><div class="company">' + (profile.logoUrl ? '<img class="logo" src="' + escapeHtml(profile.logoUrl) + '" alt="Logo">' : '') + '<div><h1>' + escapeHtml(profile.name || 'PC TECHNO TUNER') + '</h1><p>' + escapeHtml(companyAddress) + '</p><p><b>GSTIN:</b> ' + escapeHtml(profile.gstin || '-') + ' <b style="margin-left:12px">Mobile:</b> ' + escapeHtml(profile.mobile || '-') + '</p><p><b>PAN Number:</b> ' + escapeHtml(profile.pan || '-') + '</p><p><b>Email:</b> ' + escapeHtml(profile.email || '-') + '</p><p><b>Website:</b> www.pctechnotuner.com</p></div></div>' +
+      '<div class="meta"><div><b>Estimate No.</b><span>' + escapeHtml(estimate.estimateNo) + '</span></div><div><b>Estimate Date</b><span>' + dateText(estimate.estimateDate) + '</span></div><div><b>Valid Until</b><span>' + dateText(estimate.validUntil) + '</span></div></div></div>' +
+      '<div class="parties"><section><h3>BILL TO</h3><b>' + escapeHtml(estimate.customerBusiness || estimate.customerName) + '</b>' + (estimate.customerBusiness ? '<p>' + escapeHtml(estimate.customerName) + '</p>' : '') + '<p><b>Address:</b> ' + escapeHtml(estimate.customerAddress || '-') + '</p><p><b>GSTIN:</b> ' + escapeHtml(estimate.customerGstin || '-') + '</p><p><b>Mobile:</b> ' + escapeHtml(estimate.customerMobile || '-') + '</p></section><section><h3>SHIP TO</h3><b>' + escapeHtml(estimate.customerBusiness || estimate.customerName) + '</b>' + (estimate.customerBusiness ? '<p>' + escapeHtml(estimate.customerName) + '</p>' : '') + '<p><b>Address:</b> ' + escapeHtml(estimate.customerAddress || '-') + '</p><p><b>Place of Supply:</b> Gujarat</p></section></div>' +
+      '<table class="items"><thead><tr><th>S.NO.</th><th>ITEMS</th><th>QTY.</th><th>RATE</th><th>TAX</th><th>AMOUNT</th></tr></thead><tbody>' + rows + emptyRows + '</tbody><tfoot><tr><td colspan="2" class="total-label">TOTAL</td><td>' + estimate.items.reduce((sum, item) => sum + Number(item.quantity || 0), 0) + '</td><td></td><td>' + money(gst) + '</td><td>' + money(estimate.totalAmount) + '</td></tr><tr><td colspan="5" class="total-label">QUOTATION AMOUNT</td><td>' + money(estimate.totalAmount) + '</td></tr></tfoot></table>' +
+      '<table class="gst"><thead><tr><th rowspan="2">HSN/SAC</th><th rowspan="2">Taxable Value</th><th colspan="2">CGST</th><th colspan="2">SGST</th><th rowspan="2">Total Tax Amount</th></tr><tr><th>Rate</th><th>Amount</th><th>Rate</th><th>Amount</th></tr></thead><tbody><tr><td>-</td><td>' + money(estimate.subtotal) + '</td><td>' + (Number(estimate.taxRate || 0) / 2) + '%</td><td>' + money(halfTax) + '</td><td>' + (Number(estimate.taxRate || 0) / 2) + '%</td><td>' + money(halfTax) + '</td><td>' + money(gst) + '</td></tr></tbody></table>' +
+      '<div class="words"><b>Total Amount (in words)</b><span>' + amountWords(estimate.totalAmount) + '</span></div>' +
+      '<div class="bottom"><section><h3>Bank Details</h3><p><b>Name:</b> ' + escapeHtml(profile.name || 'PC TECHNO TUNER') + '</p><p><b>IFSC Code:</b> ' + escapeHtml(profile.ifscCode || '-') + '</p><p><b>Account No:</b> ' + escapeHtml(profile.accountNumber || '-') + '</p><p><b>Bank:</b> ' + escapeHtml(profile.bankName || '-') + '</p><p><b>UPI ID:</b> ' + escapeHtml(profile.upiId || '-') + '</p></section><section class="qr"><h3>Payment Details</h3><p>Scan and pay using UPI app</p><b>' + escapeHtml(profile.upiId || 'UPI ID not configured') + '</b><p><b>Note:</b> Payment is due only after order confirmation.</p></section></div>' +
+      '<div class="footer"><section><h3>Terms and Conditions</h3><p>' + escapeHtml(terms) + '</p></section><section class="sign"><b>Authorised Signatory For</b><strong>' + escapeHtml(profile.name || 'PC TECHNO TUNER') + '</strong></section></div>' +
+      '</main><script>window.onload=function(){window.print();};<\/script></body></html>';
+    popup.document.open();
+    popup.document.write(html);
     popup.document.close();
   };
 
