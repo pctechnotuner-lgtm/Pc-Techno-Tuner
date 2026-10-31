@@ -141,8 +141,7 @@ export const SalesBillingView: React.FC<SalesBillingViewProps> = ({
     setItems(updated);
   };
 
-  const handleQuickAddProduct = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleQuickAddProduct = () => {
     if (!quickName.trim() || quickSelling <= 0) {
       alert('Please enter item name and selling price.');
       return;
@@ -581,18 +580,18 @@ For support call: 7383871195`;
                     <strong className="text-emerald-400">Add New Item — Invoice + Product Stock</strong>
                     <button type="button" onClick={() => setQuickAddOpen(false)} className="text-gray-400"><X className="w-4 h-4" /></button>
                   </div>
-                  <form onSubmit={handleQuickAddProduct} className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <input required value={quickName} onChange={e => setQuickName(e.target.value)} placeholder="Item / Product name *" className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white" />
                     <select value={quickCategory} onChange={e => setQuickCategory(e.target.value as ProductCategory)} className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white">
                       {PRODUCT_CATEGORIES.map(category => <option key={category} value={category}>{category}</option>)}
                     </select>
                     <input value={quickBrand} onChange={e => setQuickBrand(e.target.value)} placeholder="Brand (optional)" className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white" />
                     <input value={quickModel} onChange={e => setQuickModel(e.target.value)} placeholder="Model (optional)" className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white" />
-                    <input type="number" min="0" step="0.01" value={quickPurchase} onChange={e => setQuickPurchase(Number(e.target.value))} placeholder="Purchase price" className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white" />
-                    <input required type="number" min="0.01" step="0.01" value={quickSelling} onChange={e => setQuickSelling(Number(e.target.value))} placeholder="Selling price (GST included) *" className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white" />
+                    <label className="text-xs text-gray-300">Purchase Price / Cost Price (₹)<input type="number" min="0" step="0.01" value={quickPurchase} onChange={e => setQuickPurchase(Number(e.target.value))} placeholder="Enter purchase price" className="mt-1 w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white" /></label>
+                    <label className="text-xs text-gray-300">Sale Price (₹, GST included) *<input required type="number" min="0.01" step="0.01" value={quickSelling} onChange={e => setQuickSelling(Number(e.target.value))} placeholder="Enter sale price" className="mt-1 w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white" /></label>
                     <input type="number" min="0" value={quickStock} onChange={e => setQuickStock(Number(e.target.value))} placeholder="Opening stock quantity" className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white" />
-                    <button type="submit" className="bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg px-3 py-2 font-bold">Save Item & Add to Invoice</button>
-                  </form>
+                    <button type="button" onClick={handleQuickAddProduct} className="bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg px-3 py-2 font-bold">Save Item & Add to Invoice</button>
+                  </div>
                   <p className="text-[10px] text-gray-400">Item Products/Stock list mein bhi save hoga aur is invoice mein bhi add ho jayega.</p>
                 </div>
               )}
