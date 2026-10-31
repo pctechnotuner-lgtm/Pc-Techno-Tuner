@@ -101,10 +101,10 @@ export const ReportsView: React.FC<ReportsViewProps> = ({
         <div>
           <h1 className="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
             <BarChart3 className="w-6 h-6 text-blue-500" />
-            <span>Financial Statements & P&L Summary</span>
+            <span>Business Cash Flow & Sales Summary</span>
           </h1>
           <p className="text-xs text-gray-400">
-            Daily and monthly cash flows, profit estimations, and receivables breakdown.
+            Daily/monthly cash movement, invoice collections and customer dues.
           </p>
         </div>
 
@@ -131,9 +131,9 @@ export const ReportsView: React.FC<ReportsViewProps> = ({
       <div className="bg-blue-950/40 border border-blue-800/60 rounded-2xl p-4 text-xs text-gray-300 flex items-start gap-3">
         <Info className="w-5 h-5 text-blue-400 shrink-0 mt-0.5" />
         <div className="space-y-1">
-          <p className="font-bold text-white">Cash Flow vs Estimated Accrual Profit</p>
+          <p className="font-bold text-white">Important: Cash Flow is not Net Profit</p>
           <p className="text-gray-400 leading-relaxed text-[11px]">
-            In strict compliance with Indian SME accounting rules: Cash Flow tracks payments actually realized (via UPI, Bank, Cash). Estimated profit reflects invoiced revenue less purchase costs and overheads, preventing double counting of partial payments.
+            This report currently summarizes recorded cash income and expenses, invoice totals, payments received and customer dues. It does not calculate accounting net profit, GST liability, stock cost of goods sold or unpaid supplier bills. Use it as an operational cash summary, not as a tax or statutory financial statement.
           </p>
         </div>
       </div>
