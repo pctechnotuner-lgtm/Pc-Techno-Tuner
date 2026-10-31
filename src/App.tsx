@@ -687,6 +687,7 @@ export default function App() {
       setComplaints(storage.getComplaints());
       setCustomers(storage.getCustomers());
       setInvoices(storage.getInvoices());
+      setEstimates(storage.getEstimates());
       setTransactions(storage.getTransactions());
     }
 
