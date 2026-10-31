@@ -619,135 +619,113 @@ For support call: 7383871195`;
         </div>
       )}
 
-      {/* Printable Invoice Overlay (Rendered into DOM for clean Ctrl+P / window.print) */}
+      {/* Printable Invoice Overlay — A4 layout based on the supplied reference PDF */}
       {printInvoiceData && (
-        <div className="print-only hidden p-8 bg-white text-black font-sans">
-          {/* Header */}
-          <div className="flex justify-between items-start border-b-2 border-black pb-4 mb-4">
-            <div>
-              <h1 className="text-2xl font-black text-blue-700 tracking-tight">{profile.name}</h1>
-              <p className="text-xs text-gray-700">{profile.address}, {profile.location} — {profile.pincode}</p>
-              <p className="text-xs text-gray-700">Mobile/WhatsApp: {profile.mobile} | Email: {profile.email}</p>
-              <p className="text-xs font-bold mt-1">GSTIN: {profile.gstin} | PAN: {profile.pan}</p>
-            </div>
-            <div className="text-right">
-              <span className="text-xl font-bold bg-gray-100 px-3 py-1 border border-gray-300">TAX INVOICE</span>
-              <p className="text-xs font-mono font-bold mt-2">Invoice #: {printInvoiceData.invoiceNo}</p>
-              <p className="text-xs text-gray-600">Date: {printInvoiceData.invoiceDate}</p>
-            </div>
-          </div>
-
-          {/* Customer / Billed To */}
-          <div className="grid grid-cols-2 gap-4 border border-gray-300 p-3 rounded mb-4 text-xs">
-            <div>
-              <p className="text-gray-500 font-bold uppercase text-[10px]">Billed To Customer</p>
-              <p className="text-sm font-bold text-black">{printInvoiceData.customerName}</p>
-              {printInvoiceData.customerBusiness && (
-                <p className="font-semibold">{printInvoiceData.customerBusiness}</p>
-              )}
-              <p>{printInvoiceData.customerAddress}</p>
-              <p className="font-mono mt-1">Mobile: {printInvoiceData.customerMobile}</p>
-            </div>
-            <div className="text-right">
-              {printInvoiceData.customerGstin && (
-                <p className="font-mono font-bold">Customer GSTIN: {printInvoiceData.customerGstin}</p>
-              )}
-              <p className="text-gray-600 mt-2">Payment Method: {printInvoiceData.paymentMethod}</p>
-              <p className="font-semibold text-emerald-700">Status: {printInvoiceData.paymentStatus}</p>
-            </div>
-          </div>
-
-          {/* Items Table */}
-          <table className="w-full text-left text-xs border-collapse border border-gray-300 mb-4">
-            <thead>
-              <tr className="bg-gray-100 border-b border-gray-300 text-gray-800">
-                <th className="p-2 border-r border-gray-300">#</th>
-                <th className="p-2 border-r border-gray-300">Product / Service Description</th>
-                <th className="p-2 border-r border-gray-300 text-center">Qty</th>
-                <th className="p-2 border-r border-gray-300 text-right">Unit Rate (₹)</th>
-                <th className="p-2 text-right">Amount (₹)</th>
-              </tr>
-            </thead>
-            <tbody>
-              {printInvoiceData.items.map((it, idx) => (
-                <tr key={idx} className="border-b border-gray-200">
-                  <td className="p-2 border-r border-gray-300 text-center">{idx + 1}</td>
-                  <td className="p-2 border-r border-gray-300">
-                    <p className="font-bold">{it.description}</p>
-                    {it.category && <p className="text-[10px] text-gray-500">{it.category}</p>}
-                  </td>
-                  <td className="p-2 border-r border-gray-300 text-center font-bold">{it.quantity}</td>
-                  <td className="p-2 border-r border-gray-300 text-right font-mono">
-                    ₹{Number(it.unitPrice).toFixed(2)}
-                  </td>
-                  <td className="p-2 text-right font-mono font-bold">
-                    ₹{Number(it.lineTotal).toFixed(2)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          {/* Totals & Bank Section */}
-          <div className="grid grid-cols-2 gap-4 text-xs mb-6">
-            <div className="border border-gray-300 p-3 rounded">
-              <p className="font-bold uppercase text-[10px] text-gray-600 mb-1">Bank Payment Details</p>
-              <p>Bank: <strong>{profile.bankName}</strong></p>
-              <p>Account No: <strong className="font-mono">{profile.accountNumber}</strong></p>
-              <p>IFSC: <strong className="font-mono">{profile.ifscCode}</strong></p>
-              <p>UPI ID: <strong className="font-mono text-blue-700">{profile.upiId}</strong></p>
-            </div>
-
-            <div className="border border-gray-300 p-3 rounded space-y-1.5 font-mono">
-              <div className="flex justify-between">
-                <span>Subtotal:</span>
-                <span>₹{printInvoiceData.subtotal.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>GST ({printInvoiceData.taxRate}%):</span>
-                <span>₹{printInvoiceData.taxAmount.toFixed(2)}</span>
-              </div>
-              {printInvoiceData.discount > 0 && (
-                <div className="flex justify-between text-red-600">
-                  <span>Discount:</span>
-                  <span>-₹{printInvoiceData.discount.toFixed(2)}</span>
+        <div className="print-only hidden bg-white text-black">
+          {(() => {
+            const inv = printInvoiceData;
+            const money = (value: number) => `₹${Number(value || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            const dateText = (value: string) => value ? new Date(`${value}T00:00:00`).toLocaleDateString('en-GB') : '';
+            const due = new Date(`${inv.invoiceDate}T00:00:00`);
+            due.setDate(due.getDate() + 7);
+            const dueDate = due.toLocaleDateString('en-GB');
+            const taxable = Number(inv.subtotal || 0);
+            const gst = Number(inv.taxAmount || 0);
+            const halfTax = gst / 2;
+            const amountWords = (amount: number) => {
+              const n = Math.round(amount);
+              if (!n) return 'Zero Rupees Only';
+              const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+              const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+              const underThousand = (v: number): string => {
+                let out = '';
+                if (v >= 100) out += ones[Math.floor(v / 100)] + ' Hundred ';
+                v %= 100;
+                if (v >= 20) out += tens[Math.floor(v / 10)] + (v % 10 ? ' ' + ones[v % 10] : '');
+                else if (v > 0) out += ones[v];
+                return out.trim();
+              };
+              let v = n;
+              const parts: string[] = [];
+              const crore = Math.floor(v / 10000000); v %= 10000000;
+              const lakh = Math.floor(v / 100000); v %= 100000;
+              const thousand = Math.floor(v / 1000); v %= 1000;
+              if (crore) parts.push(underThousand(crore) + ' Crore');
+              if (lakh) parts.push(underThousand(lakh) + ' Lakh');
+              if (thousand) parts.push(underThousand(thousand) + ' Thousand');
+              if (v) parts.push(underThousand(v));
+              return parts.join(' ') + ' Rupees Only';
+            };
+            return (
+              <div className="invoice-sheet">
+                <div className="invoice-caption"><strong>TAX INVOICE</strong><span>ORIGINAL FOR RECIPIENT</span></div>
+                <div className="invoice-header">
+                  <div className="invoice-company">
+                    {profile.logoUrl ? <img src={profile.logoUrl} alt="Company logo" className="invoice-logo" /> : null}
+                    <div>
+                      <h1>{profile.name || 'PC TECHNO TUNER'}</h1>
+                      <p>{profile.address}{profile.location ? `, ${profile.location}` : ''}{profile.pincode ? `, ${profile.pincode}` : ''}</p>
+                      <p><b>GSTIN:</b> {profile.gstin || '-'} <b className="invoice-mobile-label">Mobile:</b> {profile.mobile || '-'}</p>
+                      <p><b>PAN Number:</b> {profile.pan || '-'}</p>
+                      <p><b>Email:</b> {profile.email || '-'}</p>
+                      <p><b>Website:</b> www.pctechnotuner.com</p>
+                    </div>
+                  </div>
+                  <div className="invoice-meta">
+                    <div><b>Invoice No.</b><span>{inv.invoiceNo}</span></div>
+                    <div><b>Invoice Date</b><span>{dateText(inv.invoiceDate)}</span></div>
+                    <div><b>Due Date</b><span>{dueDate}</span></div>
+                  </div>
                 </div>
-              )}
-              <div className="flex justify-between font-bold text-sm border-t-2 border-black pt-1">
-                <span>Grand Total:</span>
-                <span>₹{printInvoiceData.totalAmount.toFixed(2)}</span>
+                <div className="invoice-parties">
+                  <section><h3>BILL TO</h3><b>{inv.customerBusiness || inv.customerName}</b>
+                    {inv.customerBusiness && <p>{inv.customerName}</p>}
+                    <p><b>Address:</b> {inv.customerAddress || '-'}</p>
+                    <p><b>GSTIN:</b> {inv.customerGstin || '-'}</p>
+                    <p><b>Mobile:</b> {inv.customerMobile || '-'}</p>
+                  </section>
+                  <section><h3>SHIP TO</h3><b>{inv.customerBusiness || inv.customerName}</b>
+                    {inv.customerBusiness && <p>{inv.customerName}</p>}
+                    <p><b>Address:</b> {inv.customerAddress || '-'}</p>
+                    <p><b>Place of Supply:</b> Gujarat</p>
+                  </section>
+                </div>
+                <table className="invoice-items">
+                  <thead><tr><th>S.NO.</th><th>ITEMS</th><th>QTY.</th><th>RATE</th><th>TAX</th><th>AMOUNT</th></tr></thead>
+                  <tbody>
+                    {inv.items.map((it, idx) => {
+                      const lineTax = Number(it.lineTotal || 0) * Number(inv.taxRate || 0) / 100;
+                      return <tr key={idx}><td>{idx + 1}</td><td className="invoice-item-name">{it.description}{it.category ? <small>{it.category}</small> : null}</td><td>{it.quantity} PCS</td><td>{money(it.unitPrice)}</td><td>{money(lineTax)}<small>({inv.taxRate}%)</small></td><td>{money(Number(it.lineTotal || 0) + lineTax)}</td></tr>;
+                    })}
+                    {Array.from({ length: Math.max(0, 5 - inv.items.length) }).map((_, idx) => <tr className="invoice-empty-row" key={`empty-${idx}`}><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td></tr>)}
+                  </tbody>
+                  <tfoot><tr><td colSpan={2} className="invoice-total-label">TOTAL</td><td>{inv.items.reduce((s, it) => s + Number(it.quantity || 0), 0)}</td><td></td><td>{money(gst)}</td><td>{money(inv.totalAmount)}</td></tr>
+                    <tr><td colSpan={5} className="invoice-total-label">RECEIVED AMOUNT</td><td>{money(inv.amountPaid)}</td></tr></tfoot>
+                </table>
+                <table className="invoice-gst">
+                  <thead><tr><th rowSpan={2}>HSN/SAC</th><th rowSpan={2}>Taxable Value</th><th colSpan={2}>CGST</th><th colSpan={2}>SGST</th><th rowSpan={2}>Total Tax Amount</th></tr><tr><th>Rate</th><th>Amount</th><th>Rate</th><th>Amount</th></tr></thead>
+                  <tbody><tr><td>-</td><td>{money(taxable)}</td><td>{(Number(inv.taxRate || 0) / 2).toFixed(2).replace(/\\.00$/, '')}%</td><td>{money(halfTax)}</td><td>{(Number(inv.taxRate || 0) / 2).toFixed(2).replace(/\\.00$/, '')}%</td><td>{money(halfTax)}</td><td>{money(gst)}</td></tr></tbody>
+                </table>
+                <div className="invoice-words"><b>Total Amount (in words)</b><span>{amountWords(inv.totalAmount)}</span></div>
+                <div className="invoice-bottom">
+                  <section className="invoice-bank"><h3>Bank Details</h3>
+                    <p><b>Name:</b> {profile.name || 'PC TECHNO TUNER'}</p>
+                    <p><b>IFSC Code:</b> {profile.ifscCode || '-'}</p>
+                    <p><b>Account No:</b> {profile.accountNumber || '-'}</p>
+                    <p><b>Bank:</b> {profile.bankName || '-'}</p>
+                    <p><b>UPI ID:</b> {profile.upiId || '-'}</p>
+                    <p><b>Payment Method:</b> {inv.paymentMethod}</p>
+                  </section>
+                  <section className="invoice-qr"><h3>Payment Details</h3><p>Scan and pay using UPI app</p><b>{profile.upiId || 'UPI ID not configured'}</b><p className="invoice-qr-amount">Amount Due: {money(inv.balanceDue)}</p></section>
+                </div>
+                <div className="invoice-footer">
+                  <section><h3>Terms and Conditions</h3><p>{profile.terms || '1. Goods once sold will not be taken back.\n2. Warranty as per terms & condition of the manufacturer & distributor.\n3. Subject to Ahmedabad Jurisdiction Only.'}</p></section>
+                  <section className="invoice-sign"><b>Authorised Signatory For</b><strong>{profile.name || 'PC TECHNO TUNER'}</strong></section>
+                </div>
+                <div className="no-print invoice-preview-close"><button onClick={() => setPrintInvoiceData(null)}>Close Print Preview</button></div>
               </div>
-              <div className="flex justify-between text-emerald-700">
-                <span>Amount Paid:</span>
-                <span>₹{printInvoiceData.amountPaid.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between font-bold text-red-600">
-                <span>Balance Due:</span>
-                <span>₹{printInvoiceData.balanceDue.toFixed(2)}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Terms & Signature */}
-          <div className="flex justify-between items-end border-t border-gray-300 pt-4 text-[10px] text-gray-600">
-            <div className="max-w-md">
-              <p className="font-bold text-black uppercase mb-1">Terms & Conditions:</p>
-              <p className="whitespace-pre-line leading-relaxed">{profile.terms}</p>
-            </div>
-            <div className="text-center">
-              <p className="font-bold text-black mb-8">For, {profile.name}</p>
-              <p className="border-t border-gray-400 pt-1">Authorized Signatory</p>
-            </div>
-          </div>
-
-          <div className="text-center mt-6 no-print">
-            <button
-              onClick={() => setPrintInvoiceData(null)}
-              className="px-4 py-2 bg-gray-800 text-white rounded text-xs"
-            >
-              Close Print Preview
-            </button>
-          </div>
+            );
+          })()}
         </div>
       )}
     </div>
