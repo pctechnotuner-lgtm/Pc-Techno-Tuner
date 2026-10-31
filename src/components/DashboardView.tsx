@@ -103,16 +103,16 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   return (
     <div className="space-y-6 animate-fadeIn">
       {/* Top Welcome & Quick Actions */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gray-900 border border-gray-800 rounded-2xl p-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-br from-[#111c30] to-[#0b1220] border border-slate-700/70 rounded-2xl shadow-lg shadow-black/20 p-6">
         <div>
           <h1 className="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
-            <span>Executive Business Control Center</span>
+            <span>PC TECHNO TUNER • BUSINESS OVERVIEW</span>
             <span className="text-xs font-semibold px-2 py-0.5 rounded bg-blue-950 text-blue-400 border border-blue-800">
-              Ahmedabad Hub
+              PREMIUM WORKSPACE
             </span>
           </h1>
           <p className="text-xs text-gray-400 mt-1">
-            Real-time status for {profile.name} • GSTIN: {profile.gstin}
+            Business performance, service operations and inventory at a glance • GSTIN: {profile.gstin}
           </p>
         </div>
 
@@ -154,7 +154,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       {/* KPI Summary Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Cash Inflow */}
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-4 sm:p-5 relative overflow-hidden">
+        <div className="bg-gradient-to-br from-[#111c30] to-[#0b1220] border border-slate-700/70 rounded-2xl shadow-lg shadow-black/20 p-4 sm:p-5 relative overflow-hidden">
           <div className="flex items-center justify-between text-xs text-gray-400 mb-1">
             <span>{t.totalCashIn}</span>
             <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
@@ -170,7 +170,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
 
         {/* Cash Outflow */}
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-4 sm:p-5 relative overflow-hidden">
+        <div className="bg-gradient-to-br from-[#111c30] to-[#0b1220] border border-slate-700/70 rounded-2xl shadow-lg shadow-black/20 p-4 sm:p-5 relative overflow-hidden">
           <div className="flex items-center justify-between text-xs text-gray-400 mb-1">
             <span>{t.totalCashOut}</span>
             <div className="p-1.5 rounded-lg bg-rose-500/10 text-rose-400 border border-rose-500/20">
@@ -186,7 +186,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
 
         {/* Customer Dues */}
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-4 sm:p-5 relative overflow-hidden">
+        <div className="bg-gradient-to-br from-[#111c30] to-[#0b1220] border border-slate-700/70 rounded-2xl shadow-lg shadow-black/20 p-4 sm:p-5 relative overflow-hidden">
           <div className="flex items-center justify-between text-xs text-gray-400 mb-1">
             <span>{t.customerDues}</span>
             <div className="p-1.5 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20">
@@ -202,7 +202,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
 
         {/* Estimated Profit */}
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-4 sm:p-5 relative overflow-hidden">
+        <div className="bg-gradient-to-br from-[#111c30] to-[#0b1220] border border-slate-700/70 rounded-2xl shadow-lg shadow-black/20 p-4 sm:p-5 relative overflow-hidden">
           <div className="flex items-center justify-between text-xs text-gray-400 mb-1">
             <span>{t.estimatedProfit}</span>
             <div className="p-1.5 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20">
@@ -219,7 +219,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       </div>
 
       {/* Complaints Pipeline Counter Bar */}
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 space-y-3">
+      <div className="bg-gradient-to-br from-[#111c30] to-[#0b1220] border border-slate-700/70 rounded-2xl shadow-lg shadow-black/20 p-5 space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-bold text-white flex items-center gap-2">
             <Wrench className="w-4 h-4 text-blue-400" />
@@ -235,23 +235,23 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 pt-1">
-          <div className="bg-gray-950 p-3 rounded-xl border border-blue-900/40 text-center">
+          <div className="bg-[#080f1d] p-3 rounded-xl border border-blue-900/40 text-center">
             <span className="text-[10px] font-bold text-blue-400 block uppercase">{t.newComplaints}</span>
             <span className="text-xl font-black text-white">{newComplaints}</span>
           </div>
-          <div className="bg-gray-950 p-3 rounded-xl border border-amber-900/40 text-center">
+          <div className="bg-[#080f1d] p-3 rounded-xl border border-amber-900/40 text-center">
             <span className="text-[10px] font-bold text-amber-400 block uppercase">{t.pendingComplaints}</span>
             <span className="text-xl font-black text-white">{pendingComplaints}</span>
           </div>
-          <div className="bg-gray-950 p-3 rounded-xl border border-purple-900/40 text-center">
+          <div className="bg-[#080f1d] p-3 rounded-xl border border-purple-900/40 text-center">
             <span className="text-[10px] font-bold text-purple-400 block uppercase">{t.inProgressComplaints}</span>
             <span className="text-xl font-black text-white">{inProgressComplaints}</span>
           </div>
-          <div className="bg-gray-950 p-3 rounded-xl border border-emerald-900/40 text-center">
+          <div className="bg-[#080f1d] p-3 rounded-xl border border-emerald-900/40 text-center">
             <span className="text-[10px] font-bold text-emerald-400 block uppercase">{t.resolvedComplaints}</span>
             <span className="text-xl font-black text-white">{resolvedComplaints}</span>
           </div>
-          <div className="bg-gray-950 p-3 rounded-xl border border-gray-800 text-center">
+          <div className="bg-[#080f1d] p-3 rounded-xl border border-gray-800 text-center">
             <span className="text-[10px] font-bold text-gray-400 block uppercase">{t.closedComplaints}</span>
             <span className="text-xl font-black text-white">{closedComplaints}</span>
           </div>
@@ -261,7 +261,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       {/* Two Column Layout: Recent Service Tickets & Inventory Alerts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Recent Complaints Table */}
-        <div className="lg:col-span-2 bg-gray-900 border border-gray-800 rounded-2xl p-5 space-y-4">
+        <div className="lg:col-span-2 bg-gradient-to-br from-[#111c30] to-[#0b1220] border border-slate-700/70 rounded-2xl shadow-lg shadow-black/20 p-5 space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-bold text-white flex items-center gap-2">
               <AlertCircle className="w-4 h-4 text-amber-400" />
@@ -288,7 +288,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               </thead>
               <tbody className="divide-y divide-gray-800/80">
                 {recentComplaints.map((c) => (
-                  <tr key={c.id} className="hover:bg-gray-800/40 transition">
+                  <tr key={c.id} className="hover:bg-blue-950/30 transition">
                     <td className="py-3 px-3 font-mono font-bold text-blue-400">{c.id}</td>
                     <td className="py-3 px-3">
                       <div className="font-semibold text-white">{c.customerName}</div>
@@ -330,7 +330,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
         {/* Low Stock & Inventory Value Box */}
         <div className="space-y-4">
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 space-y-4">
+          <div className="bg-gradient-to-br from-[#111c30] to-[#0b1220] border border-slate-700/70 rounded-2xl shadow-lg shadow-black/20 p-5 space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-bold text-white flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4 text-rose-400" />
@@ -350,7 +350,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 {lowStockProducts.slice(0, 4).map((p) => (
                   <div
                     key={p.id}
-                    className="p-3 bg-gray-950 rounded-xl border border-gray-800 flex items-center justify-between"
+                    className="p-3 bg-[#080f1d] rounded-xl border border-slate-800 flex items-center justify-between"
                   >
                     <div>
                       <p className="text-xs font-bold text-white line-clamp-1">{p.name}</p>
@@ -375,7 +375,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
 
           {/* Quick Business Details Card */}
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 space-y-3">
+          <div className="bg-gradient-to-br from-[#111c30] to-[#0b1220] border border-slate-700/70 rounded-2xl shadow-lg shadow-black/20 p-5 space-y-3">
             <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">
               Inventory Asset Valuation
             </h3>
