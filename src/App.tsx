@@ -73,6 +73,7 @@ export default function App() {
 
   // Check the actual Supabase login session.
   useEffect(() => {
+    if (isClientComplaintPage) return;
     let mounted = true;
 
     const checkSession = async () => {
@@ -121,6 +122,7 @@ export default function App() {
   // Load cloud data after login.
   // If a cloud record does not exist yet, migrate local data once.
   useEffect(() => {
+    if (isClientComplaintPage) return;
     if (!isAdmin) {
       loadingCloudRef.current = false;
       setSyncReady(false);
@@ -289,6 +291,7 @@ export default function App() {
   // Save changes to Supabase after cloud loading is complete.
   // Saves are queued so they do not intentionally overlap.
   useEffect(() => {
+    if (isClientComplaintPage) return;
     if (
       !isAdmin ||
       !syncReady ||
