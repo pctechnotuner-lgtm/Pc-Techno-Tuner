@@ -64,6 +64,9 @@ export default function App() {
   const [syncReady, setSyncReady] = useState(false);
   const [syncStatus, setSyncStatus] = useState('Login required');
 
+  // Public customer complaint page, opened with ?page=complaint.
+  const isClientComplaintPage = new URLSearchParams(window.location.search).get('page') === 'complaint';
+
   // Prevent saving local data while the cloud is still loading.
   const loadingCloudRef = useRef(false);
   const saveQueueRef = useRef<Promise<void>>(Promise.resolve());
@@ -169,6 +172,18 @@ export default function App() {
           loadCloudData<Language>('language'),
         ]);
 
+        // Public complaints are stored separately by the secure Edge Function.
+        // Only authenticated admin sessions can read this table (RLS).
+        const { data: publicComplaintRows, error: publicComplaintError } = await supabase
+          .from('public_complaints')
+          .select('payload')
+          .order('created_at', { ascending: false });
+        if (publicComplaintError) throw publicComplaintError;
+        const publicComplaints = (publicComplaintRows || []).map((row: { payload: Complaint }) => row.payload);
+        const cloudComplaintsWithPublic = cloudComplaints === null
+          ? publicComplaints
+          : [...publicComplaints, ...cloudComplaints.filter((item) => !publicComplaints.some((publicItem) => publicItem.id === item.id))];
+
         if (cancelled) return;
 
         // Profile
@@ -188,12 +203,12 @@ export default function App() {
         }
 
         // Complaints: preserve local complaints not already in cloud.
-        if (cloudComplaints !== null) {
+        if (cloudComplaintsWithPublic !== null) {
           const mergedComplaints = [
-            ...cloudComplaints,
+            ...cloudComplaintsWithPublic,
             ...localComplaints.filter(
               (local) =>
-                !cloudComplaints.some(
+                !cloudComplaintsWithPublic.some(
                   (cloud) => cloud.id === local.id
                 )
             ),
@@ -202,7 +217,7 @@ export default function App() {
           setComplaints(mergedComplaints);
           storage.setComplaints(mergedComplaints);
 
-          if (mergedComplaints.length !== cloudComplaints.length) {
+          if (mergedComplaints.length !== cloudComplaintsWithPublic.length) {
             await saveCloudData('complaints', mergedComplaints);
           }
         } else {
@@ -736,6 +751,23 @@ export default function App() {
   const lowStockCount = products.filter(
     (p) => p.stockQuantity <= p.minStockAlert
   ).length;
+
+  if (isClientComplaintPage) {
+    return (
+      <div className="min-h-screen bg-gray-950 text-gray-100 px-4 py-6 sm:py-10">
+        <div className="max-w-3xl mx-auto mb-6 text-center">
+          <div className="text-xl font-black tracking-wide text-white">PC TECHNO TUNER</div>
+          <p className="text-sm text-gray-400 mt-1">Customer Service & Complaint Registration</p>
+        </div>
+        <ComplaintFormView
+          profile={profile}
+          lang={lang}
+          onComplaintSubmitted={handleComplaintSubmitted}
+        />
+        <p className="text-center text-xs text-gray-500 mt-8">PC TECHNO TUNER · Ahmedabad</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-950 text-gray-100 selection:bg-blue-600 selection:text-white">
