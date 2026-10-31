@@ -792,16 +792,17 @@ For support call: 7383871195`;
                   </section>
                 </div>
                 <table className="invoice-items">
-                  <thead><tr><th>S.NO.</th><th>ITEMS</th><th>QTY.</th><th>RATE</th><th>TAX</th><th>AMOUNT</th></tr></thead>
+                  <thead><tr><th rowSpan={2}>S.NO.</th><th rowSpan={2}>DESCRIPTION OF GOODS / SERVICES</th><th rowSpan={2}>HSN/SAC</th><th rowSpan={2}>QTY.</th><th rowSpan={2}>RATE (₹)</th><th rowSpan={2}>TAX %</th><th rowSpan={2}>TAXABLE VALUE (₹)</th><th colSpan={2}>GST (₹)</th><th rowSpan={2}>AMOUNT (₹)</th></tr><tr><th>CGST</th><th>SGST</th></tr></thead>
                   <tbody>
                     {inv.items.map((it, idx) => {
                       const lineTax = Number(it.lineTotal || 0) * Number(inv.taxRate || 0) / 100;
-                      return <tr key={idx}><td>{idx + 1}</td><td className="invoice-item-name">{it.description}{it.category ? <small>{it.category}</small> : null}</td><td>{it.quantity} PCS</td><td>{money(it.unitPrice)}</td><td>{money(lineTax)}<small>({inv.taxRate}%)</small></td><td>{money(Number(it.lineTotal || 0) + lineTax)}</td></tr>;
+                      const halfLineTax = lineTax / 2;
+                      return <tr key={idx}><td>{idx + 1}</td><td className="invoice-item-name">{it.description}{it.category ? <small>{it.category}</small> : null}</td><td>-</td><td>{it.quantity}</td><td>{money(it.unitPrice)}</td><td>{inv.taxRate}%</td><td>{money(it.lineTotal)}</td><td>{money(halfLineTax)}</td><td>{money(halfLineTax)}</td><td>{money(Number(it.lineTotal || 0) + lineTax)}</td></tr>;
                     })}
-                    {Array.from({ length: Math.max(0, 5 - inv.items.length) }).map((_, idx) => <tr className="invoice-empty-row" key={`empty-${idx}`}><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td></tr>)}
+                    {Array.from({ length: Math.max(0, 4 - inv.items.length) }).map((_, idx) => <tr className="invoice-empty-row" key={`empty-${idx}`}><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>)}
                   </tbody>
-                  <tfoot><tr><td colSpan={2} className="invoice-total-label">TOTAL</td><td>{inv.items.reduce((s, it) => s + Number(it.quantity || 0), 0)}</td><td></td><td>{money(gst)}</td><td>{money(inv.totalAmount)}</td></tr>
-                    <tr><td colSpan={5} className="invoice-total-label">RECEIVED AMOUNT</td><td>{money(inv.amountPaid)}</td></tr></tfoot>
+                  <tfoot><tr><td colSpan={3} className="invoice-total-label">TOTAL</td><td>{inv.items.reduce((sum, it) => sum + Number(it.quantity || 0), 0)}</td><td></td><td></td><td>{money(taxable)}</td><td>{money(halfTax)}</td><td>{money(halfTax)}</td><td>{money(inv.totalAmount)}</td></tr>
+                    <tr><td colSpan={9} className="invoice-total-label">RECEIVED AMOUNT</td><td>{money(inv.amountPaid)}</td></tr></tfoot>
                 </table>
                 <table className="invoice-gst">
                   <thead><tr><th rowSpan={2}>HSN/SAC</th><th rowSpan={2}>Taxable Value</th><th colSpan={2}>CGST</th><th colSpan={2}>SGST</th><th rowSpan={2}>Total Tax Amount</th></tr><tr><th>Rate</th><th>Amount</th><th>Rate</th><th>Amount</th></tr></thead>
