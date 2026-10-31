@@ -25,6 +25,25 @@ export const EstimatedProfitView: React.FC<Props> = ({ invoices, products, estim
   const [mobile, setMobile] = useState('');
   const [business, setBusiness] = useState('');
   const [address, setAddress] = useState('');
+  const [addressResults, setAddressResults] = useState<any[]>([]);
+  const [addressSearching, setAddressSearching] = useState(false);
+  const searchCompanyAddress = async () => {
+    const query = (business || customerName).trim();
+    if (!query) return;
+    setAddressSearching(true);
+    try {
+      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=5&q=${encodeURIComponent(query + ', India')}`);
+      const results = await response.json();
+      setAddressResults(Array.isArray(results) ? results : []);
+      if (!results?.length) alert('Company address not found. Please enter it manually.');
+    } catch { alert('Online address search failed. Please try again or enter manually.'); }
+    finally { setAddressSearching(false); }
+  };
+  const chooseCompanyAddress = (place: any) => {
+    const a = place.address || {};
+    setAddress([place.name || a.amenity || a.office || a.shop || a.building, a.road, a.suburb || a.neighbourhood, a.city || a.town || a.village, a.state, a.postcode].filter(Boolean).filter((v, i, arr) => arr.indexOf(v) === i).join(', '));
+    setAddressResults([]);
+  };
   const [gstin, setGstin] = useState('');
   const [estimateDate, setEstimateDate] = useState(new Date().toISOString().slice(0, 10));
   const [validUntil, setValidUntil] = useState(new Date(Date.now() + 15 * 86400000).toISOString().slice(0, 10));
@@ -229,8 +248,8 @@ export const EstimatedProfitView: React.FC<Props> = ({ invoices, products, estim
           <input list="estimate-customers" value={customerName} onChange={(e) => { setCustomerName(e.target.value); const c = customers.find((x) => x.name.toLowerCase() === e.target.value.toLowerCase()); if (c) { setMobile(c.mobile); setBusiness(c.businessName || ''); setAddress(c.address || ''); setGstin(c.gstin || ''); } }} placeholder="Customer / Firm Name *" className="bg-gray-950 border border-gray-700 rounded-lg p-2 text-sm" />
           <datalist id="estimate-customers">{customers.map((c) => <option key={c.id} value={c.name} />)}</datalist>
           <input value={mobile} onChange={(e) => setMobile(e.target.value)} placeholder="Customer Mobile *" className="bg-gray-950 border border-gray-700 rounded-lg p-2 text-sm" />
-          <input value={business} onChange={(e) => setBusiness(e.target.value)} placeholder="Firm Name (optional)" className="bg-gray-950 border border-gray-700 rounded-lg p-2 text-sm" />
-          <input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Address" className="bg-gray-950 border border-gray-700 rounded-lg p-2 text-sm" />
+          <div className="space-y-1"><input value={business} onChange={(e) => setBusiness(e.target.value)} placeholder="Firm Name (optional)" className="w-full bg-gray-950 border border-gray-700 rounded-lg p-2 text-sm" /><button type="button" onClick={searchCompanyAddress} disabled={addressSearching || !(business.trim() || customerName.trim())} className="text-xs text-blue-400 disabled:opacity-50">{addressSearching ? "Searching online…" : "Search company address online"}</button>{addressResults.length > 0 && <div className="max-h-36 overflow-y-auto rounded border border-gray-700 bg-gray-950">{addressResults.map((place: any) => <button type="button" key={place.place_id} onClick={() => chooseCompanyAddress(place)} className="block w-full text-left p-2 text-xs text-gray-200 border-b border-gray-800 hover:bg-gray-800">{place.display_name}</button>)}</div>}</div>
+          <input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Address (verify selected result)" className="bg-gray-950 border border-gray-700 rounded-lg p-2 text-sm" />
           <input value={gstin} onChange={(e) => setGstin(e.target.value)} placeholder="Customer GSTIN" className="bg-gray-950 border border-gray-700 rounded-lg p-2 text-sm" />
           <label className="text-xs text-gray-300">Estimate Date<input type="date" value={estimateDate} onChange={(e) => setEstimateDate(e.target.value)} className="block w-full bg-gray-950 border border-gray-700 rounded-lg p-2 mt-1" /></label>
           <label className="text-xs text-gray-300">Valid Until<input type="date" value={validUntil} onChange={(e) => setValidUntil(e.target.value)} className="block w-full bg-gray-950 border border-gray-700 rounded-lg p-2 mt-1" /></label>
