@@ -55,7 +55,6 @@ export const ComplaintFormView: React.FC<ComplaintFormViewProps> = ({
   const [description, setDescription] = useState('');
   const [serviceLocation, setServiceLocation] = useState('');
   const [preferredDate, setPreferredDate] = useState('');
-  const [whatsappConsent, setWhatsappConsent] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [attachmentPreview, setAttachmentPreview] = useState<string | null>(null);
 
@@ -79,11 +78,6 @@ export const ComplaintFormView: React.FC<ComplaintFormViewProps> = ({
 
     if (!customerName.trim() || !mobile.trim() || !description.trim() || !serviceLocation.trim()) {
       alert('Please fill in all mandatory fields (*)');
-      return;
-    }
-
-    if (!whatsappConsent) {
-      alert('Please agree to receive complaint updates on WhatsApp.');
       return;
     }
 
@@ -114,7 +108,7 @@ export const ComplaintFormView: React.FC<ComplaintFormViewProps> = ({
 
     try {
       const { error } = await supabase.functions.invoke('submit-complaint', {
-        body: { ...newComplaint, whatsappConsent },
+        body: newComplaint,
       });
       if (error) throw error;
       onComplaintSubmitted(newComplaint);
@@ -187,7 +181,6 @@ PC TECHNO TUNER | Ahmedabad
     setDescription('');
     setServiceLocation('');
     setPreferredDate('');
-    setWhatsappConsent(false);
     setAttachmentPreview(null);
   };
 
@@ -456,10 +449,6 @@ PC TECHNO TUNER | Ahmedabad
             </div>
           </div>
 
-          <label className="flex items-start gap-2 text-xs text-gray-300">
-            <input type="checkbox" required checked={whatsappConsent} onChange={(e) => setWhatsappConsent(e.target.checked)} className="mt-0.5" />
-            <span>I agree to receive WhatsApp updates about this complaint on the mobile number provided.</span>
-          </label>
 
           <button
             type="submit"
