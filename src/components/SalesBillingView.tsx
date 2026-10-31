@@ -180,7 +180,9 @@ export const SalesBillingView: React.FC<SalesBillingViewProps> = ({
       imageUrl: '',
       createdAt: new Date().toISOString(),
     };
+    // Save the stock item without submitting or closing the parent GST invoice form.
     onSaveProduct(product);
+    setCreateModalOpen(true);
     const basePrice = Math.round((product.sellingPrice / (1 + taxRate / 100)) * 100) / 100;
     setItems((current) => [...current, {
       productId: product.id,
@@ -628,7 +630,7 @@ For support call: 7383871195`;
                     <label className="text-xs text-gray-300">Purchase Price / Cost Price (₹)<input type="number" min="0" step="0.01" value={quickPurchase} onChange={e => setQuickPurchase(Number(e.target.value))} placeholder="Enter purchase price" className="mt-1 w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white" /></label>
                     <label className="text-xs text-gray-300">Sale Price (₹, GST included) *<input required type="number" min="0.01" step="0.01" value={quickSelling} onChange={e => setQuickSelling(Number(e.target.value))} placeholder="Enter sale price" className="mt-1 w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white" /></label>
                     <input type="number" min="0" value={quickStock} onChange={e => setQuickStock(Number(e.target.value))} placeholder="Opening stock quantity" className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white" />
-                    <button type="button" onClick={handleQuickAddProduct} className="bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg px-3 py-2 font-bold">Save Item & Add to Invoice</button>
+                    <button type="button" onClick={(event) => { event.preventDefault(); event.stopPropagation(); handleQuickAddProduct(); }} className="bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg px-3 py-2 font-bold">Save Item & Add to Invoice</button>
                   </div>
                   <p className="text-[10px] text-gray-400">Item Products/Stock list mein bhi save hoga aur is invoice mein bhi add ho jayega.</p>
                 </div>
