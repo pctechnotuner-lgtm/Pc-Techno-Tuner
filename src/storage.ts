@@ -26,7 +26,7 @@ export const DEFAULT_PROFILE: CompanyProfile = {
   name: 'PC TECHNO TUNER',
   tagline: 'IT Hardware, CCTV Surveillance, Laptop Repairs & AMC Solutions',
   location: 'Ahmedabad, Gujarat, India',
-  address: 'Shop No. 12, Ground Floor, Technology Hub, Near C.G. Road',
+  address: 'A-104, Vedant Skyline, Vastral, SP Ring Road',
   pincode: '382418',
   mobile: '7383871195',
   whatsapp: '917383871195',
@@ -35,10 +35,10 @@ export const DEFAULT_PROFILE: CompanyProfile = {
   pan: 'CGBPP3211M',
   logoUrl: '',
   defaultGstRate: 18,
-  bankName: 'State Bank of India (SBI)',
-  accountNumber: '389201948201',
-  ifscCode: 'SBIN0001248',
-  upiId: '7383871195@okbizaxis',
+  bankName: 'Saraspur Nagrik Co-operative Bank, AMRAIWADI BRANCH',
+  accountNumber: '000910021007922',
+  ifscCode: 'SNBK0000009',
+  upiId: 'panchalradhe8866-4@okaxis',
   terms:
     '1. Goods once sold will be covered by respective manufacturer warranty.\n2. Please retain original invoice for claim verification.\n3. Physical damages or burns are not covered under warranty.',
 };
