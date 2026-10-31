@@ -15,6 +15,7 @@ import {
   MapPin,
   Save,
   CheckCircle,
+  Trash2,
 } from 'lucide-react';
 import {
   Customer,
@@ -30,6 +31,7 @@ interface CustomersViewProps {
   complaints: Complaint[];
   lang: Language;
   onSaveCustomer: (customer: Customer) => void;
+  onDeleteCustomer: (customerId: string) => void;
   onExportCsv: () => void;
 }
 
@@ -39,6 +41,7 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
   complaints,
   lang,
   onSaveCustomer,
+  onDeleteCustomer,
   onExportCsv,
 }) => {
   const t = getT(lang);
@@ -295,6 +298,24 @@ Thank you for your business!`;
                         className="px-2 py-1 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded text-xs transition"
                       >
                         Edit
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          const hasHistory = cInvs.length > 0 || cComps.length > 0;
+                          const message = hasHistory
+                            ? `Delete party "${customer.name}" from Customers? Existing bills and complaints will be kept for history.`
+                            : `Delete party "${customer.name}"?`;
+                          if (window.confirm(message)) {
+                            onDeleteCustomer(customer.id);
+                            if (selectedCustomer?.id === customer.id) setSelectedCustomer(null);
+                          }
+                        }}
+                        className="px-2 py-1 bg-rose-950 hover:bg-rose-900 border border-rose-800 text-rose-300 rounded text-xs inline-flex items-center gap-1 transition"
+                        title="Delete party"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        Delete
                       </button>
 
                       <a
