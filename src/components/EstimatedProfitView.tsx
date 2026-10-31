@@ -18,6 +18,7 @@ export const EstimatedProfitView: React.FC<Props> = ({ invoices, products, estim
   const [search, setSearch] = useState('');
   const [expandedParty, setExpandedParty] = useState<string | null>(null);
   const [builderOpen, setBuilderOpen] = useState(false);
+  const [editingEstimateId, setEditingEstimateId] = useState<string | null>(null);
   const [customerName, setCustomerName] = useState('');
   const [mobile, setMobile] = useState('');
   const [business, setBusiness] = useState('');
@@ -68,11 +69,29 @@ export const EstimatedProfitView: React.FC<Props> = ({ invoices, products, estim
   };
 
   const resetBuilder = () => {
+    setEditingEstimateId(null);
     setCustomerName(''); setMobile(''); setBusiness(''); setAddress(''); setGstin('');
     setEstimateDate(new Date().toISOString().slice(0, 10));
     setValidUntil(new Date(Date.now() + 15 * 86400000).toISOString().slice(0, 10));
     setTaxRate(profile.defaultGstRate || 18); setDiscount(0); setNotes('');
     setItems([{ productId: '', description: '', quantity: 1, unitPrice: 0, lineTotal: 0 }]);
+  };
+
+  const editEstimate = (estimate: Estimate) => {
+    setEditingEstimateId(estimate.id);
+    setCustomerName(estimate.customerName || '');
+    setMobile(estimate.customerMobile || '');
+    setBusiness(estimate.customerBusiness || '');
+    setAddress(estimate.customerAddress || '');
+    setGstin(estimate.customerGstin || '');
+    setEstimateDate(estimate.estimateDate);
+    setValidUntil(estimate.validUntil);
+    setTaxRate(estimate.taxRate);
+    setDiscount(estimate.discount || 0);
+    setNotes(estimate.notes || '');
+    setItems(estimate.items.map((item) => ({ ...item })));
+    setBuilderOpen(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const saveEstimate = () => {
@@ -81,8 +100,8 @@ export const EstimatedProfitView: React.FC<Props> = ({ invoices, products, estim
       return;
     }
     const estimate: Estimate = {
-      id: 'est-' + Date.now(),
-      estimateNo: 'PCT-EST-' + new Date().getFullYear() + '-' + String(Date.now()).slice(-5),
+      id: editingEstimateId || 'est-' + Date.now(),
+      estimateNo: (editingEstimateId ? estimates.find((item) => item.id === editingEstimateId)?.estimateNo : undefined) || 'PCT-EST-' + new Date().getFullYear() + '-' + String(Date.now()).slice(-5),
       estimateDate,
       validUntil,
       customerName: customerName.trim(),
@@ -189,7 +208,7 @@ export const EstimatedProfitView: React.FC<Props> = ({ invoices, products, estim
       </div>
 
       {builderOpen && <section className="bg-gray-900 border border-emerald-800 rounded-xl p-4 space-y-4">
-        <div className="flex items-center justify-between"><h2 className="font-bold text-emerald-400">Create Estimate / Quotation</h2><button onClick={() => setBuilderOpen(false)} className="text-gray-400">Close</button></div>
+        <div className="flex items-center justify-between"><h2 className="font-bold text-emerald-400">{editingEstimateId ? 'Edit Estimate / Quotation' : 'Create Estimate / Quotation'}</h2><button onClick={() => setBuilderOpen(false)} className="text-gray-400">Close</button></div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <input list="estimate-customers" value={customerName} onChange={(e) => { setCustomerName(e.target.value); const c = customers.find((x) => x.name.toLowerCase() === e.target.value.toLowerCase()); if (c) { setMobile(c.mobile); setBusiness(c.businessName || ''); setAddress(c.address || ''); setGstin(c.gstin || ''); } }} placeholder="Customer / Firm Name *" className="bg-gray-950 border border-gray-700 rounded-lg p-2 text-sm" />
           <datalist id="estimate-customers">{customers.map((c) => <option key={c.id} value={c.name} />)}</datalist>
@@ -217,12 +236,12 @@ export const EstimatedProfitView: React.FC<Props> = ({ invoices, products, estim
         <div className="bg-gray-950 rounded-lg p-4 space-y-1 text-sm">
           <div className="flex justify-between"><span>Taxable Subtotal</span><b>{money(subtotal)}</b></div><div className="flex justify-between"><span>GST ({taxRate}%)</span><b>{money(taxAmount)}</b></div><div className="flex justify-between"><span>Discount</span><b>{money(discount)}</b></div><div className="flex justify-between text-lg text-emerald-400 font-bold border-t border-gray-700 pt-2"><span>Quotation Total</span><span>{money(total)}</span></div><div className="flex justify-between text-emerald-300"><span>Internal Estimated Profit (not printed)</span><b>{money(estimatedProfit)}</b></div>
         </div>
-        <div className="flex flex-wrap gap-2"><button onClick={saveEstimate} className="bg-emerald-600 hover:bg-emerald-500 rounded-lg px-5 py-2 font-bold">Save Estimate</button><span className="text-xs text-gray-400 self-center">Estimate save karne se stock, invoice aur accounts change nahi honge.</span></div>
+        <div className="flex flex-wrap gap-2"><button onClick={saveEstimate} className="bg-emerald-600 hover:bg-emerald-500 rounded-lg px-5 py-2 font-bold"{editingEstimateId ? 'Update Estimate' : 'Save Estimate'}</button><span className="text-xs text-gray-400 self-center">Estimate save karne se stock, invoice aur accounts change nahi honge.</span></div>
       </section>}
 
       <section className="bg-gray-900 border border-gray-800 rounded-xl p-4 space-y-3">
         <h2 className="font-bold">Saved Estimates / Quotations</h2>
-        {estimates.length === 0 ? <p className="text-sm text-gray-400">No estimates created yet.</p> : estimates.map((estimate) => <div key={estimate.id} className="flex flex-wrap items-center justify-between gap-3 border-t border-gray-800 pt-3"><div><b className="text-sm">{estimate.estimateNo}</b><p className="text-xs text-gray-400">{estimate.customerName} · {estimate.customerMobile} · {estimate.estimateDate}</p></div><div className="flex items-center gap-3"><b className="text-emerald-400">{money(estimate.totalAmount)}</b><button onClick={() => printEstimate(estimate)} className="text-blue-400 text-sm flex items-center gap-1"><Printer className="w-4 h-4" /> Print / PDF</button></div></div>)}
+        {estimates.length === 0 ? <p className="text-sm text-gray-400">No estimates created yet.</p> : estimates.map((estimate) => <div key={estimate.id} className="flex flex-wrap items-center justify-between gap-3 border-t border-gray-800 pt-3"><div><b className="text-sm">{estimate.estimateNo}</b><p className="text-xs text-gray-400">{estimate.customerName} · {estimate.customerMobile} · {estimate.estimateDate}</p></div><div className="flex items-center gap-3"><b className="text-emerald-400">{money(estimate.totalAmount)}</b><button onClick={() => editEstimate(estimate)} className="text-amber-300 text-sm font-semibold">Edit</button><button onClick={() => printEstimate(estimate)} className="text-blue-400 text-sm flex items-center gap-1"><Printer className="w-4 h-4" /> Print / PDF</button></div></div>)}
       </section>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
