@@ -16,6 +16,7 @@ import {
   Download,
   DollarSign,
   FileText,
+  Trash2,
 } from 'lucide-react';
 import {
   Complaint,
@@ -32,6 +33,7 @@ interface ComplaintsAdminViewProps {
   profile: CompanyProfile;
   lang: Language;
   onUpdateComplaint: (complaint: Complaint) => void;
+  onDeleteComplaint: (complaintId: string) => void;
   onExportCsv: () => void;
   selectedComplaintForEdit: Complaint | null;
   onClearSelectedComplaint: () => void;
@@ -42,6 +44,7 @@ export const ComplaintsAdminView: React.FC<ComplaintsAdminViewProps> = ({
   profile,
   lang,
   onUpdateComplaint,
+  onDeleteComplaint,
   onExportCsv,
   selectedComplaintForEdit,
   onClearSelectedComplaint,
@@ -315,6 +318,19 @@ For any queries, please reply directly to this chat or call our Ahmedabad worksh
                         className="px-2.5 py-1 bg-gray-800 hover:bg-gray-700 text-blue-400 rounded text-xs font-semibold transition"
                       >
                         Manage
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (window.confirm(`Delete complaint ticket ${c.id} for ${c.customerName}? This will also remove its linked service-charge transaction.`)) {
+                            onDeleteComplaint(c.id);
+                            if (editingComplaint?.id === c.id) closeEditModal();
+                          }
+                        }}
+                        className="px-2 py-1 bg-rose-950 hover:bg-rose-900 border border-rose-800 text-rose-300 rounded text-xs font-semibold inline-flex items-center gap-1 transition"
+                        title="Delete complaint"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        Delete
                       </button>
                       <button
                         onClick={() => handleWhatsAppCustomer(c)}
