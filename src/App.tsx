@@ -8,6 +8,7 @@ import {
   Complaint,
   Customer,
   Invoice,
+  Estimate,
   Language,
   Product,
   Transaction,
@@ -51,6 +52,7 @@ export default function App() {
   const [invoices, setInvoices] = useState<Invoice[]>(
     storage.getInvoices
   );
+  const [estimates, setEstimates] = useState<Estimate[]>(storage.getEstimates);
   const [transactions, setTransactions] = useState<Transaction[]>(
     storage.getTransactions
   );
@@ -154,6 +156,7 @@ export default function App() {
         const localComplaints = storage.getComplaints();
         const localCustomers = storage.getCustomers();
         const localInvoices = storage.getInvoices();
+        const localEstimates = storage.getEstimates();
         const localTransactions = storage.getTransactions();
         const localLanguage = storage.getLanguage();
 
@@ -163,6 +166,7 @@ export default function App() {
           cloudComplaints,
           cloudCustomers,
           cloudInvoices,
+          cloudEstimates,
           cloudTransactions,
           cloudLanguage,
         ] = await Promise.all([
@@ -171,6 +175,7 @@ export default function App() {
           loadCloudData<Complaint[]>('complaints'),
           loadCloudData<Customer[]>('customers'),
           loadCloudData<Invoice[]>('invoices'),
+          loadCloudData<Estimate[]>('estimates'),
           loadCloudData<Transaction[]>('transactions'),
           loadCloudData<Language>('language'),
         ]);
@@ -228,6 +233,14 @@ export default function App() {
           storage.setInvoices(cloudInvoices);
         } else {
           await saveCloudData('invoices', localInvoices);
+        }
+
+        // Estimates are separate from invoices and never affect stock or accounting.
+        if (cloudEstimates !== null) {
+          setEstimates(cloudEstimates);
+          storage.setEstimates(cloudEstimates);
+        } else {
+          await saveCloudData('estimates', localEstimates);
         }
 
         // Transactions
@@ -304,6 +317,7 @@ export default function App() {
           saveCloudData('complaints', complaints),
           saveCloudData('customers', customers),
           saveCloudData('invoices', invoices),
+          saveCloudData('estimates', estimates),
           saveCloudData('transactions', transactions),
           saveCloudData('language', lang),
         ]);
@@ -340,6 +354,7 @@ export default function App() {
     complaints,
     customers,
     invoices,
+    estimates,
     transactions,
     lang,
   ]);
@@ -868,7 +883,7 @@ export default function App() {
         )}
 
         {activeTab === 'profit' && isAdmin && (
-          <EstimatedProfitView invoices={invoices} products={products} />
+          <EstimatedProfitView invoices={invoices} products={products} estimates={estimates} customers={customers} profile={profile} onSaveEstimate={(estimate) => { const updated = [estimate, ...estimates]; setEstimates(updated); storage.setEstimates(updated); }} />
         )}
 
         {activeTab === 'accounts' && isAdmin && (
