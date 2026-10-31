@@ -34,7 +34,7 @@ Deno.serve(async (req) => {
     }
     if (
       typeof customerName !== "string" || !customerName.trim() ||
-      typeof mobile !== "string" || !/^\\d{10}$/.test(mobile) ||
+      typeof mobile !== "string" || !/^\d{10}$/.test(mobile) ||
       typeof description !== "string" || !description.trim() ||
       typeof serviceLocation !== "string" || !serviceLocation.trim() ||
       typeof category !== "string" || typeof complaintType !== "string"
