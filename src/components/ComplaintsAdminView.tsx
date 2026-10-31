@@ -242,7 +242,7 @@ For any queries, please reply directly to this chat or call our Ahmedabad worksh
                 </tr>
               ) : (
                 filtered.map((c) => (
-                  <tr key={c.id} className="hover:bg-gray-800/40 transition">
+                  <tr key={c.id} onClick={() => openEditModal(c)} className="hover:bg-gray-800/40 transition cursor-pointer" title="Click to open full complaint details">
                     <td className="py-3 px-4 font-mono font-bold text-blue-400">
                       {c.id}
                       <span className="block text-[10px] text-gray-500 font-sans font-normal">
@@ -314,13 +314,8 @@ For any queries, please reply directly to this chat or call our Ahmedabad worksh
 
                     <td className="py-3 px-4 text-right space-x-1 whitespace-nowrap">
                       <button
-                        onClick={() => openEditModal(c)}
-                        className="px-2.5 py-1 bg-gray-800 hover:bg-gray-700 text-blue-400 rounded text-xs font-semibold transition"
-                      >
-                        Manage
-                      </button>
-                      <button
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation();
                           if (window.confirm(`Delete complaint ticket ${c.id} for ${c.customerName}? This will also remove its linked service-charge transaction.`)) {
                             onDeleteComplaint(c.id);
                             if (editingComplaint?.id === c.id) closeEditModal();
@@ -333,7 +328,7 @@ For any queries, please reply directly to this chat or call our Ahmedabad worksh
                         Delete
                       </button>
                       <button
-                        onClick={() => handleWhatsAppCustomer(c)}
+                        onClick={(e) => { e.stopPropagation(); handleWhatsAppCustomer(c); }}
                         className="p-1 bg-emerald-950 hover:bg-emerald-900 border border-emerald-800 text-emerald-400 rounded text-xs inline-flex items-center transition"
                         title="Send update to customer on WhatsApp"
                       >
