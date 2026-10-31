@@ -364,7 +364,6 @@ PC TECHNO TUNER | Ahmedabad
                 value={complaintType}
                 onChange={(e) => setComplaintType(e.target.value as ComplaintType)}
                 className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500"
-              >
                 required
               >
                 <option value="">Select Complaint Type</option>
