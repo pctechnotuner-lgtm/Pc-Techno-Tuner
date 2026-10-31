@@ -80,6 +80,25 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
     setModalOpen(true);
   };
 
+  const handleBusinessNameChange = (value: string) => {
+    setFormBusiness(value);
+    const normalized = value.trim().toLocaleLowerCase();
+    if (!normalized) return;
+
+    const match = customers.find(
+      (customer) => (customer.businessName || '').trim().toLocaleLowerCase() === normalized
+    );
+
+    if (match) {
+      setFormName(match.name || '');
+      setFormMobile(match.mobile || '');
+      setFormEmail(match.email || '');
+      setFormAddress(match.address || '');
+      setFormGstin(match.gstin || '');
+      setFormNotes(match.notes || '');
+    }
+  };
+
   const handleSaveForm = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formName.trim() || !formMobile.trim()) {
@@ -464,7 +483,7 @@ Thank you for your business!`;
                 <input
                   type="text"
                   value={formBusiness}
-                  onChange={(e) => setFormBusiness(e.target.value)}
+                  onChange={(e) => handleBusinessNameChange(e.target.value)}
                   placeholder="e.g. Shah Trading Co."
                   className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-blue-500"
                 />
