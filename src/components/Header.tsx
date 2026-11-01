@@ -13,6 +13,7 @@ import {
   LayoutDashboard,
   Package,
   ClipboardList,
+  PackageCheck,
   Users,
   AlertCircle,
   Receipt,
@@ -253,6 +254,16 @@ export const Header: React.FC<HeaderProps> = ({
                 </button>
 
                 <button
+                  onClick={() => handleNavClick('outward')}
+                  className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition w-full text-left ${
+                    activeTab === 'outward' ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-300 hover:text-white hover:bg-gray-800'
+                  }`}
+                >
+                  <PackageCheck className="w-3.5 h-3.5 text-emerald-300" />
+                  <span>Outward Register</span>
+                </button>
+
+                <button
                   onClick={() => handleNavClick('customers')}
                   className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition w-full text-left ${
                     activeTab === 'customers'
@@ -453,6 +464,16 @@ export const Header: React.FC<HeaderProps> = ({
               >
                 <ClipboardList className="w-4 h-4 text-cyan-300" />
                 <span>Inward Register</span>
+              </button>
+
+              <button
+                onClick={() => handleNavClick('outward')}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-semibold transition ${
+                  activeTab === 'outward' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-900'
+                }`}
+              >
+                <PackageCheck className="w-4 h-4 text-emerald-300" />
+                <span>Outward Register</span>
               </button>
 
               <button
