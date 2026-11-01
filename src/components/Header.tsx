@@ -3,6 +3,7 @@ import {
   Shield,
   ShieldAlert,
   Phone,
+  Monitor,
   Mail,
   MessageCircle,
   Download,
@@ -67,28 +68,34 @@ export const Header: React.FC<HeaderProps> = ({
       {/* Top Banner with Brand & Quick Actions */}
       <div className={`max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex items-center justify-between gap-4 ${isAdmin ? "md:ml-64 md:max-w-none" : ""}`}>
         {/* Brand Logo & Name */}
-        <div
-          className="flex items-center gap-3 cursor-pointer group"
-          onClick={() => handleNavClick('catalogue')}
-        >
-          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center font-extrabold text-white text-lg tracking-wider shadow-lg shadow-blue-500/25 border border-blue-400/30 group-hover:scale-105 transition-transform">
-            PT
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-base sm:text-lg font-extrabold text-white tracking-tight flex items-center gap-1.5">
-                {profile.name}
-              </span>
-</div>
-</div>
-        </div>
+        <button type="button" className="flex min-w-0 items-center gap-3 cursor-pointer group text-left" onClick={() => handleNavClick('catalogue')} aria-label="PC TECHNO TUNER Home">
+          <span className="relative flex h-11 w-12 shrink-0 items-center justify-center rounded-xl border border-cyan-300/50 bg-gradient-to-br from-slate-800 via-blue-950 to-slate-950 shadow-[0_0_22px_rgba(14,165,233,.22)] group-hover:scale-105 transition-transform">
+            <Monitor className="h-9 w-9 text-cyan-300" strokeWidth={1.8} />
+            <span className="absolute inset-x-0 top-[13px] text-center text-[10px] font-black tracking-tight text-white">PT</span>
+            <span className="absolute bottom-[3px] h-[2px] w-5 rounded-full bg-cyan-300" />
+          </span>
+          <span className="min-w-0">
+            <span className="block truncate text-base sm:text-lg font-extrabold tracking-tight text-white">{profile.name}</span>
+            <span className="hidden xl:block text-[10px] font-medium tracking-wide text-slate-400">IT Hardware | CCTV | Laptop Repairs | AMC</span>
+          </span>
+        </button>
 
-        {/* Right Actions: WhatsApp direct, Language, PWA install, Admin Auth */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        {!isAdmin && (
+          <nav aria-label="Main navigation" className="hidden xl:flex items-center gap-1">
+            <button onClick={() => handleNavClick('catalogue')} className="rounded-lg px-2.5 py-2 text-xs font-semibold text-cyan-200 hover:bg-cyan-500/10 hover:text-white">Home</button>
+            <button onClick={() => { handleNavClick('catalogue'); window.setTimeout(() => document.getElementById('pt-services')?.scrollIntoView({ behavior: 'smooth' }), 80); }} className="rounded-lg px-2.5 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-800 hover:text-white">Services</button>
+            <button onClick={() => { handleNavClick('catalogue'); window.setTimeout(() => document.getElementById('pt-products')?.scrollIntoView({ behavior: 'smooth' }), 80); }} className="rounded-lg px-2.5 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-800 hover:text-white">Products</button>
+            <button onClick={() => handleNavClick('complaint')} className="rounded-lg px-2.5 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-800 hover:text-white">Complaints</button>
+            <button onClick={() => { handleNavClick('catalogue'); window.setTimeout(() => document.getElementById('pt-about')?.scrollIntoView({ behavior: 'smooth' }), 80); }} className="rounded-lg px-2.5 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-800 hover:text-white">About</button>
+          </nav>
+        )}
+
+        {/* Right Actions: WhatsApp, Email and Admin Auth */}
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
           {/* Business email contact */}
           <a
             href={`mailto:${profile.email}`}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-cyan-700/50 bg-cyan-950/60 px-2.5 py-1.5 text-cyan-200 hover:bg-cyan-900/70 text-[11px] sm:text-xs font-semibold transition"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-cyan-500/50 bg-cyan-950/50 px-2.5 py-2 text-cyan-100 hover:bg-cyan-900/70 text-[11px] sm:text-xs font-semibold transition"
             title={`Email: ${profile.email}`}
           >
             <Mail className="h-4 w-4" />
@@ -100,11 +107,11 @@ export const Header: React.FC<HeaderProps> = ({
             href={`https://wa.me/${profile.whatsapp}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-700/50 text-emerald-400 text-xs font-semibold shadow-sm transition"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-500/60 bg-emerald-950/50 px-2.5 py-2 text-emerald-300 hover:bg-emerald-900/70 text-[11px] sm:text-xs font-semibold shadow-sm transition"
             title="Chat on WhatsApp: +91 7383871195"
           >
             <MessageCircle className="w-4 h-4 text-emerald-400" />
-            <span>{profile.mobile}</span>
+            <span className="hidden sm:inline">{profile.mobile}</span>
           </a>
 
           {!isAdmin ? (
@@ -144,7 +151,7 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* Primary Navigation Tab Bar (Desktop) */}
-      <nav className={`hidden md:block ${isAdmin ? "fixed left-0 top-0 bottom-0 z-50 w-64 bg-[#0b1220] border-r border-slate-800 px-4 pt-5 shadow-2xl" : "bg-gray-900/60 border-t border-gray-800/80 px-4"}`}>
+      {isAdmin && <nav className="hidden md:block fixed left-0 top-0 bottom-0 z-50 w-64 bg-[#0b1220] border-r border-slate-800 px-4 pt-5 shadow-2xl">
         <div className={`${isAdmin ? "h-full flex flex-col items-stretch justify-start gap-5 overflow-y-auto py-2" : "max-w-7xl mx-auto flex items-center justify-between overflow-x-auto py-1.5"}`}>
           <div className={`${isAdmin ? "flex flex-col items-stretch gap-1.5" : "flex items-center gap-1"}`}>
             {!isAdmin && (
@@ -319,7 +326,7 @@ export const Header: React.FC<HeaderProps> = ({
             <div className="space-y-1"><div className="font-bold text-slate-200">PC TECHNO TUNER</div><span className="font-mono text-gray-500">GST: {profile.gstin}</span><div className="text-slate-500">Ahmedabad • 382418</div></div>
           </div>
         </div>
-      </nav>
+      </nav>}
 
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
@@ -331,6 +338,17 @@ export const Header: React.FC<HeaderProps> = ({
             <button onClick={() => setLang('gu')} className={`px-3 py-1 rounded-lg text-xs font-semibold ${lang === 'gu' ? 'bg-blue-600 text-white' : 'bg-gray-900 text-gray-300'}`}>ગુજરાતી</button>
             <button onClick={() => setLang('hi')} className={`px-3 py-1 rounded-lg text-xs font-semibold ${lang === 'hi' ? 'bg-blue-600 text-white' : 'bg-gray-900 text-gray-300'}`}>हिन्दी</button>
           </div>
+          {!isAdmin && (
+            <>
+              <button onClick={() => { handleNavClick('catalogue'); window.setTimeout(() => document.getElementById('pt-services')?.scrollIntoView({ behavior: 'smooth' }), 80); }} className="w-full rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-gray-300 hover:bg-gray-900">Services</button>
+              <button onClick={() => { handleNavClick('catalogue'); window.setTimeout(() => document.getElementById('pt-products')?.scrollIntoView({ behavior: 'smooth' }), 80); }} className="w-full rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-gray-300 hover:bg-gray-900">Products</button>
+              <button onClick={() => { handleNavClick('catalogue'); window.setTimeout(() => document.getElementById('pt-about')?.scrollIntoView({ behavior: 'smooth' }), 80); }} className="w-full rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-gray-300 hover:bg-gray-900">About</button>
+              <div className="grid grid-cols-2 gap-2 border-t border-gray-800 pt-3 mt-2">
+                <a href={`https://wa.me/${profile.whatsapp}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 rounded-lg border border-emerald-700/50 bg-emerald-950/50 px-2 py-2.5 text-xs font-bold text-emerald-300"><MessageCircle className="h-4 w-4" /> WhatsApp</a>
+                <a href={`mailto:${profile.email}`} className="flex items-center justify-center gap-2 rounded-lg border border-cyan-700/50 bg-cyan-950/50 px-2 py-2.5 text-xs font-bold text-cyan-200"><Mail className="h-4 w-4" /> Email</a>
+              </div>
+            </>
+          )}
           {!isAdmin && (
             <button onClick={() => { setMobileMenuOpen(false); onOpenLoginModal(); }} className="w-full flex items-center gap-3 rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-3 py-3 text-sm font-bold text-cyan-200">
               <Shield className="h-4 w-4" /> Admin Login
