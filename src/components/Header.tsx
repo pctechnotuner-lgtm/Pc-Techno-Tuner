@@ -95,7 +95,23 @@ export const Header: React.FC<HeaderProps> = ({
             <span>{profile.mobile}</span>
           </a>
 
-          {/* Mobile hamburger menu toggle */}
+          {!isAdmin ? (
+            <button
+              onClick={onOpenLoginModal}
+              className="hidden md:inline-flex items-center gap-2 rounded-xl border border-cyan-500/40 bg-cyan-500/10 px-4 py-2 text-xs font-bold text-cyan-200 transition hover:bg-cyan-500/20"
+            >
+              <Shield className="h-4 w-4" /> Admin Login
+            </button>
+          ) : (
+            <button
+              onClick={() => handleNavClick('accounts')}
+              className="hidden md:inline-flex items-center gap-2 rounded-xl border border-violet-500/40 bg-violet-500/10 px-4 py-2 text-xs font-bold text-violet-200 transition hover:bg-violet-500/20"
+            >
+              <Wallet className="h-4 w-4" /> Accounts
+            </button>
+          )}
+
+                    {/* Mobile hamburger menu toggle */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="md:hidden p-2 rounded-lg bg-gray-900 border border-gray-800 text-gray-300 hover:text-white"
@@ -110,6 +126,15 @@ export const Header: React.FC<HeaderProps> = ({
       <nav className={`hidden md:block ${isAdmin ? "fixed left-0 top-0 bottom-0 z-50 w-64 bg-[#0b1220] border-r border-slate-800 px-4 pt-5 shadow-2xl" : "bg-gray-900/60 border-t border-gray-800/80 px-4"}`}>
         <div className={`${isAdmin ? "h-full flex flex-col items-stretch justify-start gap-5 overflow-y-auto py-2" : "max-w-7xl mx-auto flex items-center justify-between overflow-x-auto py-1.5"}`}>
           <div className={`${isAdmin ? "flex flex-col items-stretch gap-1.5" : "flex items-center gap-1"}`}>
+            {!isAdmin && (
+              <>
+                <button onClick={() => handleNavClick('catalogue')} className="rounded-xl px-3 py-2.5 text-xs font-semibold text-cyan-200 hover:bg-cyan-500/10 hover:text-white">Home</button>
+                <button onClick={() => { handleNavClick('catalogue'); window.setTimeout(() => document.getElementById('pt-services')?.scrollIntoView({ behavior: 'smooth' }), 80); }} className="rounded-xl px-3 py-2.5 text-xs font-semibold text-gray-300 hover:bg-gray-800 hover:text-white">Services</button>
+                <button onClick={() => { handleNavClick('catalogue'); window.setTimeout(() => document.getElementById('pt-products')?.scrollIntoView({ behavior: 'smooth' }), 80); }} className="rounded-xl px-3 py-2.5 text-xs font-semibold text-gray-300 hover:bg-gray-800 hover:text-white">Products</button>
+                <button onClick={() => handleNavClick('complaint')} className="rounded-xl px-3 py-2.5 text-xs font-semibold text-gray-300 hover:bg-gray-800 hover:text-white">Support</button>
+                <button onClick={() => { handleNavClick('catalogue'); window.setTimeout(() => document.getElementById('pt-about')?.scrollIntoView({ behavior: 'smooth' }), 80); }} className="rounded-xl px-3 py-2.5 text-xs font-semibold text-gray-300 hover:bg-gray-800 hover:text-white">About Us</button>
+              </>
+            )}
             {/* Customer Facing Tabs */}
             <button
               onClick={() => handleNavClick('catalogue')}
@@ -285,7 +310,12 @@ export const Header: React.FC<HeaderProps> = ({
             <button onClick={() => setLang('gu')} className={`px-3 py-1 rounded-lg text-xs font-semibold ${lang === 'gu' ? 'bg-blue-600 text-white' : 'bg-gray-900 text-gray-300'}`}>ગુજરાતી</button>
             <button onClick={() => setLang('hi')} className={`px-3 py-1 rounded-lg text-xs font-semibold ${lang === 'hi' ? 'bg-blue-600 text-white' : 'bg-gray-900 text-gray-300'}`}>हिन्दी</button>
           </div>
-          <button
+          {!isAdmin && (
+            <button onClick={() => { setMobileMenuOpen(false); onOpenLoginModal(); }} className="w-full flex items-center gap-3 rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-3 py-3 text-sm font-bold text-cyan-200">
+              <Shield className="h-4 w-4" /> Admin Login
+            </button>
+          )}
+                    <button
             onClick={() => handleNavClick('catalogue')}
             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold transition ${
               activeTab === 'catalogue' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-900'
