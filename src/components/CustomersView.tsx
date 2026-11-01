@@ -144,7 +144,7 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
     setModalOpen(false);
   };
 
-  const handleSendPaymentReminder = (c: Customer, _dueAmount: number) => openWhatsAppBusiness(c.mobile);
+  const handleSendPaymentReminder = (c: Customer, _dueAmount: number) => openWhatsAppBusiness(c.mobile, 'Hello ' + c.name + ', this is a payment reminder from PC TECHNO TUNER regarding your outstanding balance of ₹' + _dueAmount.toLocaleString('en-IN') + '.');
 
   // Compute metrics per customer
   const customerMetrics = customers.map((c) => {
