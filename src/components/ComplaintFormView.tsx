@@ -156,7 +156,7 @@ PC TECHNO TUNER | Ahmedabad
 ━━━━━━━━━━━━━━━━━━━━`;
   };
 
-  const handleOpenWhatsApp = (_c: Complaint) => openWhatsAppBusiness(profile.whatsapp);
+  const handleOpenWhatsApp = (_c: Complaint) => openWhatsAppBusiness(profile.whatsapp, getWhatsAppMessageText(_c));
 
   const handleCopyMessage = (c: Complaint) => {
     const text = getWhatsAppMessageText(c);
