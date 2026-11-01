@@ -1089,6 +1089,8 @@ export default function App() {
             customers={customers}
             invoices={invoices}
             complaints={complaints}
+            inwardRecords={inwardRecords}
+            outwardRecords={outwardRecords}
             lang={lang}
             onSaveCustomer={handleSaveCustomer}
             onDeleteCustomer={handleDeleteCustomer}
