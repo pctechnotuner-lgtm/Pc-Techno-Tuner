@@ -484,6 +484,26 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
 
             <form onSubmit={handleSaveForm} className="space-y-3.5 text-xs">
               <div>
+                <label className="block text-gray-400 mb-1 font-semibold">Party GSTIN (If registered)</label>
+                <input
+                  type="text"
+                  value={formGstin}
+                  onChange={(e) => setFormGstin(e.target.value.toUpperCase().replace(/[^0-9A-Z]/g, '').slice(0, 15))}
+                  maxLength={15}
+                  placeholder="24AAAAA0000A1Z5"
+                  className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-white font-mono uppercase focus:outline-none focus:border-blue-500"
+                />
+                <button
+                  type="button"
+                  onClick={() => window.open('https://services.gst.gov.in/services/searchtp', '_blank', 'noopener,noreferrer')}
+                  className="mt-2 w-full rounded-xl border border-emerald-700 bg-emerald-950/60 px-3 py-2 text-emerald-300 font-bold hover:bg-emerald-900"
+                >
+                  Verify GSTIN on Official GST Portal
+                </button>
+                <p className="text-[10px] text-gray-500 mt-1">GST portal par GSTIN enter karke CAPTCHA complete karein. Verified legal name/address ko yahan copy karke save karein.</p>
+              </div>
+
+              <div>
                 <label className="block text-gray-400 mb-1 font-semibold">Party Contact Person Name *</label>
                 <input
                   type="text"
@@ -539,17 +559,6 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
                 </div>
                 {addressResults.length > 0 && <div className="mt-2 max-h-40 overflow-y-auto rounded-lg border border-gray-700 bg-gray-950">{addressResults.map((place: any) => <button type="button" key={place.place_id} onClick={() => chooseCompanyAddress(place)} className="block w-full text-left p-2 text-xs text-gray-200 border-b border-gray-800 hover:bg-gray-800">{place.display_name}</button>)}</div>}
                 <p className="text-[10px] text-gray-500 mt-1">Search company name online, then select the correct match. Verify the address before saving.</p>
-              </div>
-
-              <div>
-                <label className="block text-gray-400 mb-1 font-semibold">Party GSTIN (If registered)</label>
-                <input
-                  type="text"
-                  value={formGstin}
-                  onChange={(e) => setFormGstin(e.target.value.toUpperCase())}
-                  placeholder="24AAAAA0000A1Z5"
-                  className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-white font-mono uppercase focus:outline-none focus:border-blue-500"
-                />
               </div>
 
               <div>
