@@ -18,7 +18,7 @@ const nextInwardNumber = (records: InwardRecord[]) => {
   }, 0);
   return 'PTT' + String(max + 1).padStart(2, '0');
 };
-const openWhatsApp = (record: InwardRecord) => openWhatsAppBusiness(record.phoneNumber, 'PC TECHNO TUNER - Inward Receipt\\nItem ID: ' + record.id + '\\nCustomer: ' + record.customerName + '\\nProduct: ' + record.productName + '\\nDate: ' + record.inwardDate + '\\nReported Problem: ' + record.problem + '\\nEstimate: ₹' + record.estimateAmount);
+const openWhatsApp = (record: InwardRecord) => openWhatsAppBusiness(record.phoneNumber, 'PC TECHNO TUNER\\nInward Receipt: ' + record.id + '\\nCustomer: ' + record.customerName + '\\nProduct: ' + record.productName + '\\nDate: ' + record.inwardDate + '\\nReported Problem: ' + record.problem + '\\nEstimate: ₹' + record.estimateAmount);
 const printSticker = (record: InwardRecord) => {
   const popup = window.open('', '_blank', 'width=420,height=300');
   if (!popup) { alert('Please allow pop-ups to print the sticker.'); return; }
