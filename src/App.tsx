@@ -460,6 +460,28 @@ export default function App() {
     const updated = [record, ...inwardRecords.filter((item) => item.id !== record.id)];
     setInwardRecords(updated);
     storage.setInwardRecords(updated);
+
+    // Automatically create a Party when an inward is saved.
+    // Match by mobile first so existing party details are never overwritten.
+    const normalizedPhone = record.phoneNumber.replace(/\D/g, '');
+    const existingParty = customers.find((party) =>
+      party.mobile.replace(/\D/g, '') === normalizedPhone ||
+      party.name.trim().toLowerCase() === record.customerName.trim().toLowerCase()
+    );
+
+    if (!existingParty && normalizedPhone) {
+      const newParty: Customer = {
+        id: 'cust-' + Date.now(),
+        name: record.customerName.trim(),
+        mobile: record.phoneNumber.trim(),
+        address: '',
+        notes: 'Automatically added from Inward ' + record.id,
+        createdAt: new Date().toISOString(),
+      };
+      const updatedCustomers = [newParty, ...customers];
+      setCustomers(updatedCustomers);
+      storage.setCustomers(updatedCustomers);
+    }
   };
 
   const handleSaveOutwardRecord = (record: OutwardRecord) => {
