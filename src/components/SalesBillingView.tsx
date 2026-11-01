@@ -285,7 +285,7 @@ export const SalesBillingView: React.FC<SalesBillingViewProps> = ({
     setEditingInvoiceId(null);
   };
 
-  const handleShareInvoiceWhatsApp = (inv: Invoice) => openWhatsAppBusiness(inv.customerMobile);
+  const handleShareInvoiceWhatsApp = (inv: Invoice) => openWhatsAppBusiness(inv.customerMobile, 'PC TECHNO TUNER - TAX INVOICE\\nInvoice No: ' + inv.invoiceNo + '\\nDate: ' + inv.invoiceDate + '\\nCustomer: ' + inv.customerName + '\\nTotal: ₹' + inv.totalAmount.toLocaleString('en-IN') + '\\nPaid: ₹' + inv.amountPaid.toLocaleString('en-IN') + '\\nBalance: ₹' + inv.balanceDue.toLocaleString('en-IN') + '\\nPayment Status: ' + inv.paymentStatus);
 
   const handleTriggerPrint = (inv: Invoice) => {
     setPrintInvoiceData(inv);
