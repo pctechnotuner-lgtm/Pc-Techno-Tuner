@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { PackageCheck, Search, Trash2, CalendarDays, IndianRupee, ClipboardList, CheckCircle2, MessageCircle, Pencil } from 'lucide-react';
 import { InwardRecord, OutwardRecord } from '../types';
+import { openWhatsAppBusiness } from '../lib/whatsapp';
 
 interface Props {
   inwardRecords: InwardRecord[];
@@ -90,12 +91,7 @@ export const OutwardView: React.FC<Props> = ({ inwardRecords, outwardRecords, on
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const sendOutwardWhatsApp = (record: OutwardRecord) => {
-    const phone = record.phoneNumber.replace(/\D/g, '');
-    const whatsappPhone = phone.length === 10 ? '91' + phone : phone;
-    const message = 'PC TECHNO TUNER - Delivery Update\nItem ID: ' + record.inwardRecordId + '\nCustomer: ' + record.customerName + '\nProduct: ' + record.productName + '\nOut Date: ' + record.outDate + '\nWork Done: ' + record.solution + '\nDelivery By: ' + (record.deliveryBy || 'Engineer') + '\nPayment: ' + record.paymentMethod + '\nAmount Collected: ₹' + (record.amountCollected || 0);
-    window.open('https://wa.me/' + whatsappPhone + '?text=' + encodeURIComponent(message), '_blank');
-  };
+  const sendOutwardWhatsApp = (record: OutwardRecord) => openWhatsAppBusiness(record.phoneNumber);
 
   const filtered = outwardRecords.filter((record) =>
     [record.inwardRecordId, record.customerName, record.phoneNumber, record.productName, record.solution]
