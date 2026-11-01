@@ -22,6 +22,7 @@ export const OutwardView: React.FC<Props> = ({ inwardRecords, outwardRecords, on
   const [deliveryBy, setDeliveryBy] = useState<'Porter' | 'Engineer'>('Engineer');
   const [search, setSearch] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [showForm, setShowForm] = useState(false);
 
   const selectedInward = useMemo(
     () => inwardRecords.find((record) => record.id === inwardNumber),
@@ -31,6 +32,7 @@ export const OutwardView: React.FC<Props> = ({ inwardRecords, outwardRecords, on
 
   const resetForm = () => {
     setEditingId(null);
+    setShowForm(false);
     setInwardNumber('');
     setOutDate(today());
     setSolution('');
@@ -78,6 +80,7 @@ export const OutwardView: React.FC<Props> = ({ inwardRecords, outwardRecords, on
 
   const startEdit = (record: OutwardRecord) => {
     setEditingId(record.id);
+    setShowForm(true);
     setInwardNumber(record.inwardRecordId);
     setOutDate(record.outDate);
     setSolution(record.solution);
@@ -118,7 +121,9 @@ export const OutwardView: React.FC<Props> = ({ inwardRecords, outwardRecords, on
         <div className="relative"><Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" /><input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search inward no, name, phone, product..." className="w-full rounded-xl border border-slate-700 bg-slate-950 py-3 pl-9 pr-3 text-sm text-white outline-none focus:border-emerald-500" /></div>
       </section>
 
-      <form onSubmit={save} className="rounded-2xl border border-slate-700 bg-slate-900/70 p-4 shadow-xl sm:p-6">
+      <div className="flex justify-end"><button type="button" onClick={() => { setShowForm((value) => !value); if (showForm) resetForm(); }} className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 text-sm font-bold text-white hover:bg-emerald-500"><PackageCheck className="h-4 w-4" /> {showForm ? 'Close Form' : 'New Outward Entry'}</button></div>
+
+      {showForm && <form onSubmit={save} className="rounded-2xl border border-slate-700 bg-slate-900/70 p-4 shadow-xl sm:p-6">
         <div className="mb-5 flex items-center gap-2"><ClipboardList className="h-5 w-5 text-emerald-300" /><h2 className="text-lg font-bold text-white">{editingId ? `Edit Outward Entry — ${inwardNumber}` : 'New Outward Entry'}</h2></div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <label className="space-y-1.5 sm:col-span-2"><span className="text-sm font-medium text-slate-300">Search Inward Item *</span>
@@ -170,7 +175,7 @@ export const OutwardView: React.FC<Props> = ({ inwardRecords, outwardRecords, on
           <label className="space-y-1.5 sm:col-span-2"><span className="text-sm font-medium text-slate-300">Problem Solution / Work Done *</span><textarea value={solution} onChange={(e) => setSolution(e.target.value)} required rows={3} placeholder="Write what was repaired or resolved..." className={fieldClass} /></label>
         </div>
         <div className="mt-5 flex flex-wrap justify-end gap-2"><button type="button" onClick={resetForm} className="rounded-xl border border-slate-600 px-4 py-2.5 text-sm font-semibold text-slate-300 hover:bg-slate-800">{editingId ? 'Cancel Edit' : 'Clear'}</button><button type="submit" disabled={!selectedInward || alreadyOutward} className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-40"><PackageCheck className="h-4 w-4" /> {editingId ? 'Update Outward' : 'Save Outward'}</button></div>
-      </form>
+      </form>}
 
       <section className="overflow-hidden rounded-2xl border border-slate-700 bg-slate-900/70">
         <div className="border-b border-slate-700 p-4"><h2 className="font-bold text-white">Outward History</h2><p className="text-xs text-slate-400">{filtered.length} record(s)</p></div>
