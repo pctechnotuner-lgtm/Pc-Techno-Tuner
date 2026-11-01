@@ -263,6 +263,7 @@ export interface OutwardRecord {
   outDate: string;
   solution: string;
   paymentMethod: 'UPI' | 'Cash';
+  amountCollected?: number;
   createdAt: string;
 }
 
