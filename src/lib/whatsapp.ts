@@ -26,18 +26,18 @@ export const getCompanyWhatsAppFooter = (): string => {
 };
 
 /** Opens a blank chat or a prefilled message directly in WhatsApp Business on Android. */
-export const getWhatsAppBusinessUrl = (value: string, message = ''): string => {
+export const getWhatsAppBusinessUrl = (value: string, message = '', includeFooter = true): string => {
   const digits = String(value || '').replace(/\\D/g, '');
   const phone = digits.length === 10 ? '91' + digits : digits;
   if (!phone) return '';
-  const text = message ? message + getCompanyWhatsAppFooter() : '';
+  const text = message ? message + (includeFooter ? getCompanyWhatsAppFooter() : '') : '';
   const isAndroid = /Android/i.test(navigator.userAgent);
   return isAndroid
     ? 'intent://send?phone=' + phone + (text ? '&text=' + encodeURIComponent(text) : '') + '#Intent;scheme=whatsapp;package=com.whatsapp.w4b;end'
     : 'https://wa.me/' + phone + (text ? '?text=' + encodeURIComponent(text) : '');
 };
 
-export const openWhatsAppBusiness = (value: string, message = ''): void => {
-  const url = getWhatsAppBusinessUrl(value, message);
+export const openWhatsAppBusiness = (value: string, message = '', includeFooter = true): void => {
+  const url = getWhatsAppBusinessUrl(value, message, includeFooter);
   if (url) window.location.href = url;
 };
