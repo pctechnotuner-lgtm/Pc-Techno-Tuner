@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ClipboardList, Plus, Search, Trash2, CalendarDays, UserRound, Phone, Package, IndianRupee } from 'lucide-react';
+import { ClipboardList, Plus, Search, Trash2, CalendarDays, UserRound, Phone, Package, IndianRupee, MessageCircle, Printer } from 'lucide-react';
 import { InwardRecord } from '../types';
 
 interface Props {
@@ -10,6 +10,25 @@ interface Props {
 
 const today = () => new Date().toISOString().slice(0, 10);
 const money = (value: number) => '₹' + (Number(value) || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 });
+const nextInwardNumber = (records: InwardRecord[]) => {
+  const max = records.reduce((highest, record) => {
+    const match = record.id.match(/^PTT(\\d+)$/i);
+    return match ? Math.max(highest, Number(match[1])) : highest;
+  }, 0);
+  return 'PTT' + String(max + 1).padStart(2, '0');
+};
+const openWhatsApp = (record: InwardRecord) => {
+  const phone = record.phoneNumber.replace(/\\D/g, '');
+  const whatsappPhone = phone.length === 10 ? '91' + phone : phone;
+  const message = 'PC TECHNO TUNER - Inward Receipt\\nItem ID: ' + record.id + '\\nCustomer: ' + record.customerName + '\\nProduct: ' + record.productName + '\\nDate: ' + record.inwardDate + '\\nReported Problem: ' + record.problem + '\\nEstimate: ₹' + record.estimateAmount;
+  window.open('https://wa.me/' + whatsappPhone + '?text=' + encodeURIComponent(message), '_blank');
+};
+const printSticker = (record: InwardRecord) => {
+  const popup = window.open('', '_blank', 'width=420,height=300');
+  if (!popup) { alert('Please allow pop-ups to print the sticker.'); return; }
+  popup.document.write('<!doctype html><html><head><title>' + record.id + ' Sticker</title><style>body{font-family:Arial,sans-serif;text-align:center;padding:18px}.id{font-size:42px;font-weight:800;margin:8px 0}.name{font-size:18px;margin:6px 0}.small{font-size:13px}</style></head><body><div class="small">PC TECHNO TUNER</div><div class="id">' + record.id + '</div><div class="name">' + record.productName + '</div><div class="small">' + record.customerName + ' | ' + record.phoneNumber + '</div><script>window.onload=()=>window.print()</script></body></html>');
+  popup.document.close();
+};
 
 export const InwardView: React.FC<Props> = ({ records, onSaveRecord, onDeleteRecord }) => {
   const [customerName, setCustomerName] = useState('');
@@ -36,7 +55,7 @@ export const InwardView: React.FC<Props> = ({ records, onSaveRecord, onDeleteRec
       return;
     }
     const record: InwardRecord = {
-      id: 'IN-' + Date.now(),
+      id: nextInwardNumber(records),
       customerName: customerName.trim(),
       phoneNumber: phoneNumber.trim(),
       productName: productName.trim(),
@@ -92,7 +111,7 @@ export const InwardView: React.FC<Props> = ({ records, onSaveRecord, onDeleteRec
         {filtered.length === 0 ? <div className="p-10 text-center text-sm text-slate-400">No inward records yet. Add the first entry above.</div> : (
           <div className="overflow-x-auto"><table className="w-full min-w-[850px] text-left text-sm">
             <thead className="bg-slate-950/80 text-xs uppercase tracking-wide text-slate-400"><tr><th className="px-4 py-3">Inward No.</th><th className="px-4 py-3">Customer</th><th className="px-4 py-3">Product</th><th className="px-4 py-3">Inward Date</th><th className="px-4 py-3">Problem</th><th className="px-4 py-3 text-right">Estimate</th><th className="px-4 py-3 text-right">Action</th></tr></thead>
-            <tbody className="divide-y divide-slate-800">{filtered.map((record) => <tr key={record.id} className="text-slate-200 hover:bg-slate-800/40"><td className="px-4 py-3 font-semibold text-cyan-300">{record.id}</td><td className="px-4 py-3"><div className="font-semibold text-white">{record.customerName}</div><div className="text-xs text-slate-400">{record.phoneNumber}</div></td><td className="px-4 py-3">{record.productName}</td><td className="px-4 py-3 whitespace-nowrap">{record.inwardDate}</td><td className="max-w-xs px-4 py-3"><div className="line-clamp-2">{record.problem}</div></td><td className="px-4 py-3 text-right font-semibold text-cyan-300">{money(record.estimateAmount)}</td><td className="px-4 py-3 text-right"><button type="button" onClick={() => { if (window.confirm('Delete this inward record?')) onDeleteRecord(record.id); }} className="rounded-lg p-2 text-rose-300 hover:bg-rose-950/50" title="Delete inward record"><Trash2 className="h-4 w-4" /></button></td></tr>)}</tbody>
+            <tbody className="divide-y divide-slate-800">{filtered.map((record) => <tr key={record.id} className="text-slate-200 hover:bg-slate-800/40"><td className="px-4 py-3"><div className="font-semibold text-cyan-300">{record.id}</div><div className="mt-1 flex gap-2"><button type="button" onClick={() => printSticker(record)} className="text-xs text-slate-300 underline"><Printer className="mr-1 inline h-3 w-3" />Sticker</button><button type="button" onClick={() => openWhatsApp(record)} className="text-xs text-green-300 underline"><MessageCircle className="mr-1 inline h-3 w-3" />WhatsApp</button></div></td><td className="px-4 py-3"><div className="font-semibold text-white">{record.customerName}</div><div className="text-xs text-slate-400">{record.phoneNumber}</div></td><td className="px-4 py-3">{record.productName}</td><td className="px-4 py-3 whitespace-nowrap">{record.inwardDate}</td><td className="max-w-xs px-4 py-3"><div className="line-clamp-2">{record.problem}</div></td><td className="px-4 py-3 text-right font-semibold text-cyan-300">{money(record.estimateAmount)}</td><td className="px-4 py-3 text-right"><button type="button" onClick={() => { if (window.confirm('Delete this inward record?')) onDeleteRecord(record.id); }} className="rounded-lg p-2 text-rose-300 hover:bg-rose-950/50" title="Delete inward record"><Trash2 className="h-4 w-4" /></button></td></tr>)}</tbody>
           </table></div>
         )}
       </section>
