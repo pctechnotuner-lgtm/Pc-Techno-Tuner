@@ -49,7 +49,7 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
   const [search, setSearch] = useState('');
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
 
-  // New / Edit Customer modal
+  // New / Edit Party modal
   const [modalOpen, setModalOpen] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [formName, setFormName] = useState('');
@@ -124,7 +124,7 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
   const handleSaveForm = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formName.trim() || !formMobile.trim()) {
-      alert('Customer Name and Mobile are required.');
+      alert('Party Name and Mobile are required.');
       return;
     }
 
@@ -186,7 +186,7 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
         <div>
           <h1 className="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
             <Users className="w-6 h-6 text-blue-500" />
-            <span>Customer Directory & Service History</span>
+            <span>Party List & Details</span>
           </h1>
           <p className="text-xs text-gray-400">
             Track client hardware purchases, AMC history, past complaints, and ledger balance dues.
@@ -207,7 +207,7 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
             className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-lg shadow-blue-500/20"
           >
             <Plus className="w-4 h-4" />
-            <span>Add Customer</span>
+            <span>Add Party</span>
           </button>
         </div>
       </div>
@@ -220,7 +220,7 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search customer by name, business, or mobile..."
+            placeholder="Search party by name, business, or mobile..."
             className="w-full bg-gray-950 border border-gray-800 rounded-xl pl-9 pr-3 py-1.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
           />
         </div>
@@ -232,7 +232,7 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
           <table className="w-full text-left text-xs text-gray-300">
             <thead className="bg-gray-950 text-gray-400 uppercase font-bold border-b border-gray-800 tracking-wider">
               <tr>
-                <th className="py-3 px-4">Customer / Firm</th>
+                <th className="py-3 px-4">Party / Firm</th>
                 <th className="py-3 px-4">Contact & Location</th>
                 <th className="py-3 px-4">Total Billed</th>
                 <th className="py-3 px-4">Total Paid</th>
@@ -245,7 +245,7 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
               {filteredMetrics.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="py-8 text-center text-gray-500">
-                    No customers found matching search.
+                    No parties found. Add your first party.
                   </td>
                 </tr>
               ) : (
@@ -354,7 +354,7 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
               <div>
                 <h3 className="text-base font-bold text-white flex items-center gap-2">
                   <Users className="w-4 h-4 text-blue-400" />
-                  <span>Customer Ledger & Service History</span>
+                  <span>Party Ledger & Service History</span>
                 </h3>
                 <p className="text-xs text-gray-400">
                   {selectedCustomer.name} • {selectedCustomer.mobile} {selectedCustomer.businessName && `(${selectedCustomer.businessName})`}
@@ -468,14 +468,14 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
         </div>
       )}
 
-      {/* Add / Edit Customer Modal */}
+      {/* Add / Edit Party Modal */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
           <div className="w-full max-w-md bg-gray-900 border border-gray-800 rounded-2xl p-6 space-y-4 my-8 shadow-2xl animate-scaleUp">
             <div className="flex items-center justify-between border-b border-gray-800 pb-3">
               <h3 className="text-base font-bold text-white flex items-center gap-2">
                 <Users className="w-4 h-4 text-blue-400" />
-                <span>{editingCustomer ? 'Edit Customer' : 'Add New Customer'}</span>
+                <span>{editingCustomer ? 'Edit Party' : 'Add New Party'}</span>
               </h3>
               <button onClick={() => setModalOpen(false)} className="text-gray-400 hover:text-white">
                 <X className="w-5 h-5" />
@@ -484,7 +484,7 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
 
             <form onSubmit={handleSaveForm} className="space-y-3.5 text-xs">
               <div>
-                <label className="block text-gray-400 mb-1 font-semibold">Customer Full Name *</label>
+                <label className="block text-gray-400 mb-1 font-semibold">Party Contact Person Name *</label>
                 <input
                   type="text"
                   required
@@ -542,7 +542,7 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
               </div>
 
               <div>
-                <label className="block text-gray-400 mb-1 font-semibold">Customer GSTIN (If registered)</label>
+                <label className="block text-gray-400 mb-1 font-semibold">Party GSTIN (If registered)</label>
                 <input
                   type="text"
                   value={formGstin}
@@ -568,7 +568,7 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
                 className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-lg shadow-blue-500/20 transition flex items-center justify-center gap-1.5"
               >
                 <Save className="w-4 h-4" />
-                <span>Save Customer</span>
+                <span>Save Party</span>
               </button>
             </form>
           </div>
