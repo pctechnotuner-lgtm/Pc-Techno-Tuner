@@ -264,6 +264,7 @@ export interface OutwardRecord {
   solution: string;
   paymentMethod: 'UPI' | 'Cash';
   amountCollected?: number;
+  deliveryBy?: 'Porter' | 'Engineer';
   createdAt: string;
 }
 
