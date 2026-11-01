@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { PackageCheck, Search, Trash2, CalendarDays, IndianRupee, ClipboardList, CheckCircle2, MessageCircle } from 'lucide-react';
+import { PackageCheck, Search, Trash2, CalendarDays, IndianRupee, ClipboardList, CheckCircle2, MessageCircle, Pencil } from 'lucide-react';
 import { InwardRecord, OutwardRecord } from '../types';
 
 interface Props {
@@ -21,14 +21,16 @@ export const OutwardView: React.FC<Props> = ({ inwardRecords, outwardRecords, on
   const [amountCollected, setAmountCollected] = useState('');
   const [deliveryBy, setDeliveryBy] = useState<'Porter' | 'Engineer'>('Engineer');
   const [search, setSearch] = useState('');
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const selectedInward = useMemo(
     () => inwardRecords.find((record) => record.id === inwardNumber),
     [inwardRecords, inwardNumber]
   );
-  const alreadyOutward = outwardRecords.some((record) => record.inwardRecordId === inwardNumber);
+  const alreadyOutward = outwardRecords.some((record) => record.inwardRecordId === inwardNumber && record.id !== editingId);
 
   const resetForm = () => {
+    setEditingId(null);
     setInwardNumber('');
     setOutDate(today());
     setSolution('');
@@ -51,8 +53,10 @@ export const OutwardView: React.FC<Props> = ({ inwardRecords, outwardRecords, on
       alert('This inward entry is already marked as outward.');
       return;
     }
+    if (editingId && !window.confirm('Update this outward entry?')) return;
+    const existingRecord = editingId ? outwardRecords.find((item) => item.id === editingId) : undefined;
     const record: OutwardRecord = {
-      id: 'OUT-' + Date.now(),
+      id: editingId || 'OUT-' + Date.now(),
       inwardRecordId: selectedInward.id,
       customerName: selectedInward.customerName,
       phoneNumber: selectedInward.phoneNumber,
@@ -65,11 +69,22 @@ export const OutwardView: React.FC<Props> = ({ inwardRecords, outwardRecords, on
       paymentMethod,
       amountCollected: Number(amountCollected) || 0,
       deliveryBy,
-      createdAt: new Date().toISOString(),
+      createdAt: existingRecord?.createdAt || new Date().toISOString(),
     };
     onSaveRecord(record);
     resetForm();
-    alert('Outward entry saved successfully.');
+    alert(editingId ? 'Outward entry updated successfully.' : 'Outward entry saved successfully.');
+  };
+
+  const startEdit = (record: OutwardRecord) => {
+    setEditingId(record.id);
+    setInwardNumber(record.inwardRecordId);
+    setOutDate(record.outDate);
+    setSolution(record.solution);
+    setPaymentMethod(record.paymentMethod);
+    setAmountCollected(String(record.amountCollected ?? 0));
+    setDeliveryBy(record.deliveryBy || 'Engineer');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const sendOutwardWhatsApp = (record: OutwardRecord) => {
@@ -104,7 +119,7 @@ export const OutwardView: React.FC<Props> = ({ inwardRecords, outwardRecords, on
       </section>
 
       <form onSubmit={save} className="rounded-2xl border border-slate-700 bg-slate-900/70 p-4 shadow-xl sm:p-6">
-        <div className="mb-5 flex items-center gap-2"><ClipboardList className="h-5 w-5 text-emerald-300" /><h2 className="text-lg font-bold text-white">New Outward Entry</h2></div>
+        <div className="mb-5 flex items-center gap-2"><ClipboardList className="h-5 w-5 text-emerald-300" /><h2 className="text-lg font-bold text-white">{editingId ? `Edit Outward Entry — ${inwardNumber}` : 'New Outward Entry'}</h2></div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <label className="space-y-1.5 sm:col-span-2"><span className="text-sm font-medium text-slate-300">Search Inward Item *</span>
             <input
@@ -154,7 +169,7 @@ export const OutwardView: React.FC<Props> = ({ inwardRecords, outwardRecords, on
           <label className="space-y-1.5"><span className="text-sm font-medium text-slate-300">Delivery By *</span><select value={deliveryBy} onChange={(e) => setDeliveryBy(e.target.value as 'Porter' | 'Engineer')} className={fieldClass}><option value="Engineer">Engineer</option><option value="Porter">Porter</option></select></label>
           <label className="space-y-1.5 sm:col-span-2"><span className="text-sm font-medium text-slate-300">Problem Solution / Work Done *</span><textarea value={solution} onChange={(e) => setSolution(e.target.value)} required rows={3} placeholder="Write what was repaired or resolved..." className={fieldClass} /></label>
         </div>
-        <div className="mt-5 flex flex-wrap justify-end gap-2"><button type="button" onClick={resetForm} className="rounded-xl border border-slate-600 px-4 py-2.5 text-sm font-semibold text-slate-300 hover:bg-slate-800">Clear</button><button type="submit" disabled={!selectedInward || alreadyOutward} className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-40"><PackageCheck className="h-4 w-4" /> Save Outward</button></div>
+        <div className="mt-5 flex flex-wrap justify-end gap-2"><button type="button" onClick={resetForm} className="rounded-xl border border-slate-600 px-4 py-2.5 text-sm font-semibold text-slate-300 hover:bg-slate-800">{editingId ? 'Cancel Edit' : 'Clear'}</button><button type="submit" disabled={!selectedInward || alreadyOutward} className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-40"><PackageCheck className="h-4 w-4" /> {editingId ? 'Update Outward' : 'Save Outward'}</button></div>
       </form>
 
       <section className="overflow-hidden rounded-2xl border border-slate-700 bg-slate-900/70">
@@ -162,7 +177,7 @@ export const OutwardView: React.FC<Props> = ({ inwardRecords, outwardRecords, on
         {filtered.length === 0 ? <div className="p-10 text-center text-sm text-slate-400">No outward records yet. Select an inward entry above.</div> : (
           <div className="overflow-x-auto"><table className="w-full min-w-[1050px] text-left text-sm">
             <thead className="bg-slate-950/80 text-xs uppercase tracking-wide text-slate-400"><tr><th className="px-4 py-3">Inward No.</th><th className="px-4 py-3">Customer / Phone</th><th className="px-4 py-3">Product</th><th className="px-4 py-3">Out Date</th><th className="px-4 py-3">Solution</th><th className="px-4 py-3 text-right">Estimate</th><th className="px-4 py-3">Payment</th><th className="px-4 py-3">Delivery By</th><th className="px-4 py-3 text-right">Collected</th><th className="px-4 py-3 text-right">Action</th></tr></thead>
-            <tbody className="divide-y divide-slate-800">{filtered.map((record) => <tr key={record.id} className="text-slate-200 hover:bg-slate-800/40"><td className="px-4 py-3 font-semibold text-emerald-300">{record.inwardRecordId}</td><td className="px-4 py-3"><div className="font-semibold text-white">{record.customerName}</div><div className="text-xs text-slate-400">{record.phoneNumber}</div></td><td className="px-4 py-3">{record.productName}</td><td className="px-4 py-3 whitespace-nowrap">{record.outDate}</td><td className="max-w-xs px-4 py-3"><div className="line-clamp-2">{record.solution}</div></td><td className="px-4 py-3 text-right">{money(record.estimateAmount)}</td><td className="px-4 py-3">{record.paymentMethod}</td><td className="px-4 py-3">{record.deliveryBy || 'Engineer'}</td><td className="px-4 py-3 text-right font-semibold text-emerald-300">{money(record.amountCollected || 0)}</td><td className="px-4 py-3 text-right"><button type="button" onClick={() => sendOutwardWhatsApp(record)} className="rounded-lg p-2 text-green-300 hover:bg-green-950/50" title="Send outward details on WhatsApp"><MessageCircle className="h-4 w-4" /></button><button type="button" onClick={() => { if (window.confirm('Delete this outward record?')) onDeleteRecord(record.id); }} className="rounded-lg p-2 text-rose-300 hover:bg-rose-950/50" title="Delete outward record"><Trash2 className="h-4 w-4" /></button></td></tr>)}</tbody>
+            <tbody className="divide-y divide-slate-800">{filtered.map((record) => <tr key={record.id} className="text-slate-200 hover:bg-slate-800/40"><td className="px-4 py-3 font-semibold text-emerald-300">{record.inwardRecordId}</td><td className="px-4 py-3"><div className="font-semibold text-white">{record.customerName}</div><div className="text-xs text-slate-400">{record.phoneNumber}</div></td><td className="px-4 py-3">{record.productName}</td><td className="px-4 py-3 whitespace-nowrap">{record.outDate}</td><td className="max-w-xs px-4 py-3"><div className="line-clamp-2">{record.solution}</div></td><td className="px-4 py-3 text-right">{money(record.estimateAmount)}</td><td className="px-4 py-3">{record.paymentMethod}</td><td className="px-4 py-3">{record.deliveryBy || 'Engineer'}</td><td className="px-4 py-3 text-right font-semibold text-emerald-300">{money(record.amountCollected || 0)}</td><td className="px-4 py-3 text-right"><button type="button" onClick={() => startEdit(record)} className="rounded-lg p-2 text-emerald-300 hover:bg-emerald-950/50" title="Edit outward record"><Pencil className="h-4 w-4" /></button><button type="button" onClick={() => sendOutwardWhatsApp(record)} className="rounded-lg p-2 text-green-300 hover:bg-green-950/50" title="Send outward details on WhatsApp"><MessageCircle className="h-4 w-4" /></button><button type="button" onClick={() => { if (window.confirm('Delete this outward record?')) onDeleteRecord(record.id); }} className="rounded-lg p-2 text-rose-300 hover:bg-rose-950/50" title="Delete outward record"><Trash2 className="h-4 w-4" /></button></td></tr>)}</tbody>
           </table></div>
         )}
       </section>
