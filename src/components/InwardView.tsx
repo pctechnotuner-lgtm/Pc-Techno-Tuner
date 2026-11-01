@@ -39,9 +39,11 @@ export const InwardView: React.FC<Props> = ({ records, onSaveRecord, onDeleteRec
   const [estimateAmount, setEstimateAmount] = useState('');
   const [search, setSearch] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [showForm, setShowForm] = useState(false);
 
   const resetForm = () => {
     setEditingId(null);
+    setShowForm(false);
     setCustomerName('');
     setPhoneNumber('');
     setProductName('');
@@ -75,6 +77,7 @@ export const InwardView: React.FC<Props> = ({ records, onSaveRecord, onDeleteRec
 
   const startEdit = (record: InwardRecord) => {
     setEditingId(record.id);
+    setShowForm(true);
     setCustomerName(record.customerName);
     setPhoneNumber(record.phoneNumber);
     setProductName(record.productName);
@@ -108,7 +111,9 @@ export const InwardView: React.FC<Props> = ({ records, onSaveRecord, onDeleteRec
         <div className="relative"><Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" /><input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search name, phone, product..." className="w-full rounded-xl border border-slate-700 bg-slate-950 py-3 pl-9 pr-3 text-sm text-white outline-none focus:border-cyan-500" /></div>
       </section>
 
-      <form onSubmit={save} className="rounded-2xl border border-slate-700 bg-slate-900/70 p-4 sm:p-6 shadow-xl">
+      <div className="flex justify-end"><button type="button" onClick={() => { setShowForm((value) => !value); if (showForm) resetForm(); }} className="inline-flex items-center gap-2 rounded-xl bg-cyan-600 px-5 py-3 text-sm font-bold text-white hover:bg-cyan-500"><Plus className="h-4 w-4" /> {showForm ? 'Close Form' : 'New Inward Entry'}</button></div>
+
+      {showForm && <form onSubmit={save} className="rounded-2xl border border-slate-700 bg-slate-900/70 p-4 sm:p-6 shadow-xl">
         <div className="mb-5 flex items-center gap-2"><Plus className="h-5 w-5 text-cyan-300" /><h2 className="text-lg font-bold text-white">{editingId ? `Edit Inward Entry — ${editingId}` : 'New Inward Entry'}</h2></div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <label className="space-y-1.5"><span className="flex items-center gap-2 text-sm font-medium text-slate-300"><UserRound className="h-4 w-4" /> Customer Name *</span><input value={customerName} onChange={(e) => setCustomerName(e.target.value)} required placeholder="Enter customer name" className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-3 text-sm text-white outline-none focus:border-cyan-500" /></label>
@@ -119,7 +124,7 @@ export const InwardView: React.FC<Props> = ({ records, onSaveRecord, onDeleteRec
           <label className="space-y-1.5"><span className="flex items-center gap-2 text-sm font-medium text-slate-300"><IndianRupee className="h-4 w-4" /> Estimate Amount (₹)</span><input type="number" min="0" step="0.01" value={estimateAmount} onChange={(e) => setEstimateAmount(e.target.value)} placeholder="0" className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-3 text-sm text-white outline-none focus:border-cyan-500" /></label>
         </div>
         <div className="mt-5 flex flex-wrap justify-end gap-2"><button type="button" onClick={resetForm} className="rounded-xl border border-slate-600 px-4 py-2.5 text-sm font-semibold text-slate-300 hover:bg-slate-800">{editingId ? 'Cancel Edit' : 'Clear'}</button><button type="submit" className="inline-flex items-center gap-2 rounded-xl bg-cyan-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-cyan-500"><Plus className="h-4 w-4" /> {editingId ? 'Update Inward' : 'Save Inward'}</button></div>
-      </form>
+      </form>}
 
       <section className="overflow-hidden rounded-2xl border border-slate-700 bg-slate-900/70">
         <div className="border-b border-slate-700 p-4"><h2 className="font-bold text-white">Inward History</h2><p className="text-xs text-slate-400">{filtered.length} record(s)</p></div>
