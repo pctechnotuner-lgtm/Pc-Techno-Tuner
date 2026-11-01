@@ -402,6 +402,8 @@ export default function App() {
     invoices,
     estimates,
     transactions,
+    antivirusLicenses,
+    inwardRecords,
     lang,
   ]);
 
