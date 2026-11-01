@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { openWhatsAppBusiness, getWhatsAppBusinessUrl } from '../lib/whatsapp';
 import {
   Search,
   MessageCircle,
@@ -84,33 +85,9 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
     }
   };
 
-  const handleEnquireWhatsApp = (product: Product) => {
-    const message = `Hello PC TECHNO TUNER,
-I am interested in purchasing/enquiring about:
-Product: ${product.name}
-Brand/Model: ${product.brand} (${product.model})
-Category: ${product.category}
-Price Listed: ₹${product.sellingPrice.toLocaleString('en-IN')}
-Specifications: ${product.specifications}
+  const handleEnquireWhatsApp = (_product: Product) => openWhatsAppBusiness(profile.whatsapp);
 
-Could you please confirm current availability and dispatch details for Ahmedabad?`;
-
-    const encoded = encodeURIComponent(message);
-    window.open(`https://wa.me/${profile.whatsapp}?text=${encoded}`, '_blank');
-  };
-
-  const handleRequestQuoteWhatsApp = (product?: Product) => {
-    const pName = product ? `${product.name} (${product.brand} ${product.model})` : 'IT Hardware & AMC Solution';
-    const message = `Hello PC TECHNO TUNER,
-I would like to request an official GST quotation for:
-Requirement: ${pName}
-Location: Ahmedabad
-
-Please send me the formal quotation including delivery and installation.`;
-
-    const encoded = encodeURIComponent(message);
-    window.open(`https://wa.me/${profile.whatsapp}?text=${encoded}`, '_blank');
-  };
+  const handleRequestQuoteWhatsApp = (_product?: Product) => openWhatsAppBusiness(profile.whatsapp);
 
   return (
     <div className="space-y-8 animate-fadeIn">
@@ -377,7 +354,7 @@ Please send me the formal quotation including delivery and installation.`;
               <span>Direct Support Helpline</span>
             </h4>
             <p className="text-xs text-gray-400">
-              Mobile / WhatsApp: <a href={`https://wa.me/${profile.whatsapp}`} className="text-white hover:underline font-mono font-bold">{profile.mobile}</a>
+              Mobile / WhatsApp: <a href={getWhatsAppBusinessUrl(profile.whatsapp)} className="text-white hover:underline font-mono font-bold">{profile.mobile}</a>
             </p>
             <p className="text-xs text-gray-400">
               Email: <a href={`mailto:${profile.email}`} className="text-white hover:underline">{profile.email}</a>
