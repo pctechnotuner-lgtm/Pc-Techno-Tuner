@@ -73,9 +73,9 @@ export const OutwardView: React.FC<Props> = ({ inwardRecords, outwardRecords, on
   };
 
   const sendOutwardWhatsApp = (record: OutwardRecord) => {
-    const phone = record.phoneNumber.replace(/\\D/g, '');
+    const phone = record.phoneNumber.replace(/\D/g, '');
     const whatsappPhone = phone.length === 10 ? '91' + phone : phone;
-    const message = 'PC TECHNO TUNER - Delivery Update\\nItem ID: ' + record.inwardRecordId + '\\nCustomer: ' + record.customerName + '\\nProduct: ' + record.productName + '\\nOut Date: ' + record.outDate + '\\nWork Done: ' + record.solution + '\\nDelivery By: ' + (record.deliveryBy || 'Engineer') + '\\nPayment: ' + record.paymentMethod + '\\nAmount Collected: ₹' + (record.amountCollected || 0);
+    const message = 'PC TECHNO TUNER - Delivery Update\nItem ID: ' + record.inwardRecordId + '\nCustomer: ' + record.customerName + '\nProduct: ' + record.productName + '\nOut Date: ' + record.outDate + '\nWork Done: ' + record.solution + '\nDelivery By: ' + (record.deliveryBy || 'Engineer') + '\nPayment: ' + record.paymentMethod + '\nAmount Collected: ₹' + (record.amountCollected || 0);
     window.open('https://wa.me/' + whatsappPhone + '?text=' + encodeURIComponent(message), '_blank');
   };
 
