@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { openWhatsAppBusiness } from '../lib/whatsapp';
 import {
   Wrench,
   CheckCircle,
@@ -155,11 +156,7 @@ PC TECHNO TUNER | Ahmedabad
 ━━━━━━━━━━━━━━━━━━━━`;
   };
 
-  const handleOpenWhatsApp = (c: Complaint) => {
-    const text = getWhatsAppMessageText(c);
-    const url = `https://wa.me/${profile.whatsapp}?text=${encodeURIComponent(text)}`;
-    window.open(url, '_blank');
-  };
+  const handleOpenWhatsApp = (_c: Complaint) => openWhatsAppBusiness(profile.whatsapp);
 
   const handleCopyMessage = (c: Complaint) => {
     const text = getWhatsAppMessageText(c);
