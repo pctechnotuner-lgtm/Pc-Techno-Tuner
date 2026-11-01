@@ -27,7 +27,7 @@ export const getCompanyWhatsAppFooter = (): string => {
 
 /** Opens a blank chat or a prefilled message directly in WhatsApp Business on Android. */
 export const getWhatsAppBusinessUrl = (value: string, message = '', includeFooter = true): string => {
-  const digits = String(value || '').replace(/\\D/g, '');
+  const digits = String(value || '').replace(/\D/g, '');
   const phone = digits.length === 10 ? '91' + digits : digits;
   if (!phone) return '';
   const text = message ? message + (includeFooter ? getCompanyWhatsAppFooter() : '') : '';
