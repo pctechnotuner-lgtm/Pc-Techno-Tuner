@@ -26,6 +26,8 @@ export const OutwardView: React.FC<Props> = ({ inwardRecords, outwardRecords, on
   const [search, setSearch] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [viewOutwardRecord, setViewOutwardRecord] = useState<OutwardRecord | null>(null);
+  const [viewPendingInward, setViewPendingInward] = useState<InwardRecord | null>(null);
 
   const selectedInward = useMemo(
     () => inwardRecords.find((record) => record.id === inwardNumber),
@@ -203,6 +205,40 @@ export const OutwardView: React.FC<Props> = ({ inwardRecords, outwardRecords, on
         <div className="mt-5 flex flex-wrap justify-end gap-2"><button type="button" onClick={resetForm} className="rounded-xl border border-slate-600 px-4 py-2.5 text-sm font-semibold text-slate-300 hover:bg-slate-800">{editingId ? 'Cancel Edit' : 'Clear'}</button><button type="submit" disabled={!selectedInward || alreadyOutward} className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-40"><PackageCheck className="h-4 w-4" /> {editingId ? 'Update Outward' : 'Save Outward'}</button></div>
       </form>}
 
+      {viewPendingInward && <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => setViewPendingInward(null)}>
+        <div role="dialog" aria-modal="true" className="w-full max-w-lg rounded-2xl border border-emerald-500/30 bg-slate-900 p-5 shadow-2xl" onClick={(event) => event.stopPropagation()}>
+          <div className="mb-4 flex items-center justify-between"><div><h2 className="text-lg font-bold text-white">Inward Details</h2><p className="text-sm font-semibold text-emerald-300">{viewPendingInward.id}</p></div><button type="button" onClick={() => setViewPendingInward(null)} className="rounded-lg px-3 py-2 text-slate-300 hover:bg-slate-800">Close</button></div>
+          <div className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
+            <div><div className="text-xs text-slate-400">Customer</div><div className="font-semibold text-white">{viewPendingInward.customerName}</div></div>
+            <div><div className="text-xs text-slate-400">Phone</div><div className="font-semibold text-white">{viewPendingInward.phoneNumber}</div></div>
+            <div><div className="text-xs text-slate-400">Product</div><div className="font-semibold text-white">{viewPendingInward.productName}</div></div>
+            <div><div className="text-xs text-slate-400">Inward Date</div><div className="font-semibold text-white">{viewPendingInward.inwardDate}</div></div>
+            <div className="sm:col-span-2"><div className="text-xs text-slate-400">Reported Problem</div><div className="text-white">{viewPendingInward.problem}</div></div>
+            <div><div className="text-xs text-slate-400">Estimate</div><div className="font-bold text-emerald-300">{money(viewPendingInward.estimateAmount)}</div></div>
+          </div>
+          <div className="mt-5 flex justify-end"><button type="button" onClick={() => { const record = viewPendingInward; setViewPendingInward(null); chooseInwardForOutward(record); }} className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white">Outward This Item</button></div>
+        </div>
+      </div>}
+      {viewOutwardRecord && <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => setViewOutwardRecord(null)}>
+        <div role="dialog" aria-modal="true" className="w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl border border-emerald-500/30 bg-slate-900 p-5 shadow-2xl" onClick={(event) => event.stopPropagation()}>
+          <div className="mb-4 flex items-center justify-between"><div><h2 className="text-lg font-bold text-white">Outward Details</h2><p className="text-sm font-semibold text-emerald-300">{viewOutwardRecord.inwardRecordId}</p></div><button type="button" onClick={() => setViewOutwardRecord(null)} className="rounded-lg px-3 py-2 text-slate-300 hover:bg-slate-800">Close</button></div>
+          <div className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
+            <div><div className="text-xs text-slate-400">Customer</div><div className="font-semibold text-white">{viewOutwardRecord.customerName}</div></div>
+            <div><div className="text-xs text-slate-400">Phone</div><div className="font-semibold text-white">{viewOutwardRecord.phoneNumber}</div></div>
+            <div><div className="text-xs text-slate-400">Product</div><div className="font-semibold text-white">{viewOutwardRecord.productName}</div></div>
+            <div><div className="text-xs text-slate-400">Inward Date</div><div className="font-semibold text-white">{viewOutwardRecord.inwardDate}</div></div>
+            <div><div className="text-xs text-slate-400">Outward Date</div><div className="font-semibold text-white">{viewOutwardRecord.outDate}</div></div>
+            <div><div className="text-xs text-slate-400">Delivery By</div><div className="font-semibold text-white">{viewOutwardRecord.deliveryBy || 'Engineer'}</div></div>
+            {viewOutwardRecord.deliveryBy === 'Porter' && <><div><div className="text-xs text-slate-400">Porter Name</div><div className="font-semibold text-white">{viewOutwardRecord.porterName || '—'}</div></div><div><div className="text-xs text-slate-400">Porter Phone</div><div className="font-semibold text-white">{viewOutwardRecord.porterPhoneNumber || '—'}</div></div></>}
+            <div className="sm:col-span-2"><div className="text-xs text-slate-400">Original Problem</div><div className="text-white">{viewOutwardRecord.inwardProblem}</div></div>
+            <div className="sm:col-span-2"><div className="text-xs text-slate-400">Work Done / Solution</div><div className="text-white">{viewOutwardRecord.solution}</div></div>
+            <div><div className="text-xs text-slate-400">Estimate</div><div className="font-bold text-emerald-300">{money(viewOutwardRecord.estimateAmount)}</div></div>
+            <div><div className="text-xs text-slate-400">Amount Collected</div><div className="font-bold text-emerald-300">{money(viewOutwardRecord.amountCollected || 0)}</div></div>
+            <div><div className="text-xs text-slate-400">Payment</div><div className="font-semibold text-white">{viewOutwardRecord.paymentMethod}</div></div>
+          </div>
+          <div className="mt-5 flex justify-end"><button type="button" onClick={() => { const record = viewOutwardRecord; setViewOutwardRecord(null); startEdit(record); }} className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white">Edit Entry</button></div>
+        </div>
+      </div>}
       <section className="overflow-hidden rounded-2xl border border-emerald-500/25 bg-slate-900/70">
         <div className="border-b border-slate-700 p-4">
           <h2 className="font-bold text-white">Pending Inward Entries</h2>
@@ -215,7 +251,7 @@ export const OutwardView: React.FC<Props> = ({ inwardRecords, outwardRecords, on
             {pendingInwardRecords.map((record) => (
               <div key={record.id} className="flex flex-wrap items-center justify-between gap-3 p-4">
                 <div className="min-w-0">
-                  <div className="font-bold text-emerald-300">{record.id}</div>
+                  <button type="button" onClick={() => setViewPendingInward(record)} className="font-bold text-emerald-300 underline decoration-dotted underline-offset-4" title="View inward details">{record.id}</button>
                   <div className="text-sm font-semibold text-white">{record.customerName} · {record.productName}</div>
                   <div className="text-xs text-slate-400">{record.phoneNumber} · {record.inwardDate}</div>
                   <div className="mt-1 text-xs text-slate-400">Problem: {record.problem}</div>
@@ -234,7 +270,7 @@ export const OutwardView: React.FC<Props> = ({ inwardRecords, outwardRecords, on
         {filtered.length === 0 ? <div className="p-10 text-center text-sm text-slate-400">No outward records yet. Select an inward entry above.</div> : (
           <div className="overflow-x-auto"><table className="w-full min-w-[1050px] text-left text-sm">
             <thead className="bg-slate-950/80 text-xs uppercase tracking-wide text-slate-400"><tr><th className="px-4 py-3">Inward No.</th><th className="px-4 py-3">Customer / Phone</th><th className="px-4 py-3">Product</th><th className="px-4 py-3">Out Date</th><th className="px-4 py-3">Solution</th><th className="px-4 py-3 text-right">Estimate</th><th className="px-4 py-3">Payment</th><th className="px-4 py-3">Delivery By</th><th className="px-4 py-3 text-right">Collected</th><th className="px-4 py-3 text-right">Action</th></tr></thead>
-            <tbody className="divide-y divide-slate-800">{filtered.map((record) => <tr key={record.id} className="text-slate-200 hover:bg-slate-800/40"><td className="px-4 py-3 font-semibold text-emerald-300">{record.inwardRecordId}</td><td className="px-4 py-3"><div className="font-semibold text-white">{record.customerName}</div><div className="text-xs text-slate-400">{record.phoneNumber}</div></td><td className="px-4 py-3">{record.productName}</td><td className="px-4 py-3 whitespace-nowrap">{record.outDate}</td><td className="max-w-xs px-4 py-3"><div className="line-clamp-2">{record.solution}</div></td><td className="px-4 py-3 text-right">{money(record.estimateAmount)}</td><td className="px-4 py-3">{record.paymentMethod}</td><td className="px-4 py-3">{record.deliveryBy || 'Engineer'}</td><td className="px-4 py-3 text-right font-semibold text-emerald-300">{money(record.amountCollected || 0)}</td><td className="px-4 py-3 text-right"><button type="button" onClick={() => startEdit(record)} className="rounded-lg p-2 text-emerald-300 hover:bg-emerald-950/50" title="Edit outward record"><Pencil className="h-4 w-4" /></button><button type="button" onClick={() => sendOutwardWhatsApp(record)} className="rounded-lg p-2 text-green-300 hover:bg-green-950/50" title="Send outward details on WhatsApp"><MessageCircle className="h-4 w-4" /></button><button type="button" onClick={() => { if (window.confirm('Delete this outward record?')) onDeleteRecord(record.id); }} className="rounded-lg p-2 text-rose-300 hover:bg-rose-950/50" title="Delete outward record"><Trash2 className="h-4 w-4" /></button></td></tr>)}</tbody>
+            <tbody className="divide-y divide-slate-800">{filtered.map((record) => <tr key={record.id} className="text-slate-200 hover:bg-slate-800/40"><td className="px-4 py-3"><button type="button" onClick={() => setViewOutwardRecord(record)} className="font-semibold text-emerald-300 underline decoration-dotted underline-offset-4" title="View outward details">{record.inwardRecordId}</button></td><td className="px-4 py-3"><div className="font-semibold text-white">{record.customerName}</div><div className="text-xs text-slate-400">{record.phoneNumber}</div></td><td className="px-4 py-3">{record.productName}</td><td className="px-4 py-3 whitespace-nowrap">{record.outDate}</td><td className="max-w-xs px-4 py-3"><div className="line-clamp-2">{record.solution}</div></td><td className="px-4 py-3 text-right">{money(record.estimateAmount)}</td><td className="px-4 py-3">{record.paymentMethod}</td><td className="px-4 py-3">{record.deliveryBy || 'Engineer'}</td><td className="px-4 py-3 text-right font-semibold text-emerald-300">{money(record.amountCollected || 0)}</td><td className="px-4 py-3 text-right"><button type="button" onClick={() => startEdit(record)} className="rounded-lg p-2 text-emerald-300 hover:bg-emerald-950/50" title="Edit outward record"><Pencil className="h-4 w-4" /></button><button type="button" onClick={() => sendOutwardWhatsApp(record)} className="rounded-lg p-2 text-green-300 hover:bg-green-950/50" title="Send outward details on WhatsApp"><MessageCircle className="h-4 w-4" /></button><button type="button" onClick={() => { if (window.confirm('Delete this outward record?')) onDeleteRecord(record.id); }} className="rounded-lg p-2 text-rose-300 hover:bg-rose-950/50" title="Delete outward record"><Trash2 className="h-4 w-4" /></button></td></tr>)}</tbody>
           </table></div>
         )}
       </section>
