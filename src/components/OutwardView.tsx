@@ -18,6 +18,7 @@ export const OutwardView: React.FC<Props> = ({ inwardRecords, outwardRecords, on
   const [outDate, setOutDate] = useState(today());
   const [solution, setSolution] = useState('');
   const [paymentMethod, setPaymentMethod] = useState<'UPI' | 'Cash'>('UPI');
+  const [amountCollected, setAmountCollected] = useState('');
   const [search, setSearch] = useState('');
 
   const selectedInward = useMemo(
@@ -31,6 +32,7 @@ export const OutwardView: React.FC<Props> = ({ inwardRecords, outwardRecords, on
     setOutDate(today());
     setSolution('');
     setPaymentMethod('UPI');
+    setAmountCollected('');
   };
 
   const save = (event: React.FormEvent) => {
@@ -59,6 +61,7 @@ export const OutwardView: React.FC<Props> = ({ inwardRecords, outwardRecords, on
       outDate,
       solution: solution.trim(),
       paymentMethod,
+      amountCollected: Number(amountCollected) || 0,
       createdAt: new Date().toISOString(),
     };
     onSaveRecord(record);
@@ -122,6 +125,7 @@ export const OutwardView: React.FC<Props> = ({ inwardRecords, outwardRecords, on
 
           <label className="space-y-1.5"><span className="flex items-center gap-2 text-sm font-medium text-slate-300"><CalendarDays className="h-4 w-4" /> Out Date *</span><input type="date" value={outDate} onChange={(e) => setOutDate(e.target.value)} required className={fieldClass} /></label>
           <label className="space-y-1.5"><span className="flex items-center gap-2 text-sm font-medium text-slate-300"><IndianRupee className="h-4 w-4" /> Payment Method *</span><select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value as 'UPI' | 'Cash')} className={fieldClass}><option value="UPI">UPI</option><option value="Cash">Cash</option></select></label>
+          <label className="space-y-1.5"><span className="flex items-center gap-2 text-sm font-medium text-slate-300"><IndianRupee className="h-4 w-4" /> Amount Collected (₹) *</span><input type="number" min="0" step="0.01" value={amountCollected} onChange={(e) => setAmountCollected(e.target.value)} required placeholder="Enter amount collected" className={fieldClass} /></label>
           <label className="space-y-1.5 sm:col-span-2"><span className="text-sm font-medium text-slate-300">Problem Solution / Work Done *</span><textarea value={solution} onChange={(e) => setSolution(e.target.value)} required rows={3} placeholder="Write what was repaired or resolved..." className={fieldClass} /></label>
         </div>
         <div className="mt-5 flex flex-wrap justify-end gap-2"><button type="button" onClick={resetForm} className="rounded-xl border border-slate-600 px-4 py-2.5 text-sm font-semibold text-slate-300 hover:bg-slate-800">Clear</button><button type="submit" disabled={!selectedInward || alreadyOutward} className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-40"><PackageCheck className="h-4 w-4" /> Save Outward</button></div>
@@ -134,8 +138,8 @@ export const OutwardView: React.FC<Props> = ({ inwardRecords, outwardRecords, on
         </div>
         {filtered.length === 0 ? <div className="p-10 text-center text-sm text-slate-400">No outward records yet. Select an inward entry above.</div> : (
           <div className="overflow-x-auto"><table className="w-full min-w-[1050px] text-left text-sm">
-            <thead className="bg-slate-950/80 text-xs uppercase tracking-wide text-slate-400"><tr><th className="px-4 py-3">Inward No.</th><th className="px-4 py-3">Customer / Phone</th><th className="px-4 py-3">Product</th><th className="px-4 py-3">Out Date</th><th className="px-4 py-3">Solution</th><th className="px-4 py-3 text-right">Estimate</th><th className="px-4 py-3">Payment</th><th className="px-4 py-3 text-right">Action</th></tr></thead>
-            <tbody className="divide-y divide-slate-800">{filtered.map((record) => <tr key={record.id} className="text-slate-200 hover:bg-slate-800/40"><td className="px-4 py-3 font-semibold text-emerald-300">{record.inwardRecordId}</td><td className="px-4 py-3"><div className="font-semibold text-white">{record.customerName}</div><div className="text-xs text-slate-400">{record.phoneNumber}</div></td><td className="px-4 py-3">{record.productName}</td><td className="px-4 py-3 whitespace-nowrap">{record.outDate}</td><td className="max-w-xs px-4 py-3"><div className="line-clamp-2">{record.solution}</div></td><td className="px-4 py-3 text-right">{money(record.estimateAmount)}</td><td className="px-4 py-3">{record.paymentMethod}</td><td className="px-4 py-3 text-right"><button type="button" onClick={() => { if (window.confirm('Delete this outward record?')) onDeleteRecord(record.id); }} className="rounded-lg p-2 text-rose-300 hover:bg-rose-950/50" title="Delete outward record"><Trash2 className="h-4 w-4" /></button></td></tr>)}</tbody>
+            <thead className="bg-slate-950/80 text-xs uppercase tracking-wide text-slate-400"><tr><th className="px-4 py-3">Inward No.</th><th className="px-4 py-3">Customer / Phone</th><th className="px-4 py-3">Product</th><th className="px-4 py-3">Out Date</th><th className="px-4 py-3">Solution</th><th className="px-4 py-3 text-right">Estimate</th><th className="px-4 py-3">Payment</th><th className="px-4 py-3 text-right">Collected</th><th className="px-4 py-3 text-right">Action</th></tr></thead>
+            <tbody className="divide-y divide-slate-800">{filtered.map((record) => <tr key={record.id} className="text-slate-200 hover:bg-slate-800/40"><td className="px-4 py-3 font-semibold text-emerald-300">{record.inwardRecordId}</td><td className="px-4 py-3"><div className="font-semibold text-white">{record.customerName}</div><div className="text-xs text-slate-400">{record.phoneNumber}</div></td><td className="px-4 py-3">{record.productName}</td><td className="px-4 py-3 whitespace-nowrap">{record.outDate}</td><td className="max-w-xs px-4 py-3"><div className="line-clamp-2">{record.solution}</div></td><td className="px-4 py-3 text-right">{money(record.estimateAmount)}</td><td className="px-4 py-3">{record.paymentMethod}</td><td className="px-4 py-3 text-right font-semibold text-emerald-300">{money(record.amountCollected || 0)}</td><td className="px-4 py-3 text-right"><button type="button" onClick={() => { if (window.confirm('Delete this outward record?')) onDeleteRecord(record.id); }} className="rounded-lg p-2 text-rose-300 hover:bg-rose-950/50" title="Delete outward record"><Trash2 className="h-4 w-4" /></button></td></tr>)}</tbody>
           </table></div>
         )}
       </section>
