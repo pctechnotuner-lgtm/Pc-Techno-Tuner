@@ -25,16 +25,23 @@ export const getCompanyWhatsAppFooter = (): string => {
   return lines.join('\n');
 };
 
-/** Opens a blank chat or a prefilled message directly in WhatsApp Business on Android. */
+/** Builds a WhatsApp Business Android intent with a safe HTTPS fallback. */
 export const getWhatsAppBusinessUrl = (value: string, message = '', includeFooter = true): string => {
   const digits = String(value || '').replace(/\D/g, '');
   const phone = digits.length === 10 ? '91' + digits : digits;
   if (!phone) return '';
   const text = message ? message + (includeFooter ? getCompanyWhatsAppFooter() : '') : '';
-  const isAndroid = /Android/i.test(navigator.userAgent);
-  return isAndroid
-    ? 'intent://send?phone=' + phone + (text ? '&text=' + encodeURIComponent(text) : '') + '#Intent;scheme=whatsapp;package=com.whatsapp.w4b;end'
-    : 'https://wa.me/' + phone + (text ? '?text=' + encodeURIComponent(text) : '');
+  const query = text ? '?text=' + encodeURIComponent(text) : '';
+  const webUrl = 'https://wa.me/' + phone + query;
+
+  if (/Android/i.test(navigator.userAgent)) {
+    const intentQuery = '?phone=' + phone + (text ? '&text=' + encodeURIComponent(text) : '');
+    return 'intent://send/' + intentQuery +
+      '#Intent;scheme=whatsapp;package=com.whatsapp.w4b;S.browser_fallback_url=' +
+      encodeURIComponent(webUrl) + ';end';
+  }
+
+  return webUrl;
 };
 
 export const openWhatsAppBusiness = (value: string, message = '', includeFooter = true): void => {
