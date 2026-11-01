@@ -12,15 +12,15 @@ const today = () => new Date().toISOString().slice(0, 10);
 const money = (value: number) => '₹' + (Number(value) || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 });
 const nextInwardNumber = (records: InwardRecord[]) => {
   const max = records.reduce((highest, record) => {
-    const match = record.id.match(/^PTT(\\d+)$/i);
+    const match = record.id.match(/^PTT(\d+)$/i);
     return match ? Math.max(highest, Number(match[1])) : highest;
   }, 0);
   return 'PTT' + String(max + 1).padStart(2, '0');
 };
 const openWhatsApp = (record: InwardRecord) => {
-  const phone = record.phoneNumber.replace(/\\D/g, '');
+  const phone = record.phoneNumber.replace(/\D/g, '');
   const whatsappPhone = phone.length === 10 ? '91' + phone : phone;
-  const message = 'PC TECHNO TUNER - Inward Receipt\\nItem ID: ' + record.id + '\\nCustomer: ' + record.customerName + '\\nProduct: ' + record.productName + '\\nDate: ' + record.inwardDate + '\\nReported Problem: ' + record.problem + '\\nEstimate: ₹' + record.estimateAmount;
+  const message = 'PC TECHNO TUNER - Inward Receipt\nItem ID: ' + record.id + '\nCustomer: ' + record.customerName + '\nProduct: ' + record.productName + '\nDate: ' + record.inwardDate + '\nReported Problem: ' + record.problem + '\nEstimate: ₹' + record.estimateAmount;
   window.open('https://wa.me/' + whatsappPhone + '?text=' + encodeURIComponent(message), '_blank');
 };
 const printSticker = (record: InwardRecord) => {
