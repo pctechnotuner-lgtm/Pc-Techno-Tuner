@@ -20,6 +20,7 @@ import {
   ShoppingBag,
   Wrench,
   ShieldCheck,
+  LogOut,
 } from 'lucide-react';
 import { AppTab, CompanyProfile, Language } from '../types';
 import { getT } from '../i18n';
@@ -103,12 +104,21 @@ export const Header: React.FC<HeaderProps> = ({
               <Shield className="h-4 w-4" /> Admin Login
             </button>
           ) : (
-            <button
-              onClick={() => handleNavClick('accounts')}
-              className="hidden md:inline-flex items-center gap-2 rounded-xl border border-violet-500/40 bg-violet-500/10 px-4 py-2 text-xs font-bold text-violet-200 transition hover:bg-violet-500/20"
-            >
-              <Wallet className="h-4 w-4" /> Accounts
-            </button>
+            <>
+              <button
+                onClick={() => handleNavClick('accounts')}
+                className="hidden md:inline-flex items-center gap-2 rounded-xl border border-violet-500/40 bg-violet-500/10 px-4 py-2 text-xs font-bold text-violet-200 transition hover:bg-violet-500/20"
+              >
+                <Wallet className="h-4 w-4" /> Accounts
+              </button>
+              <button
+                onClick={() => { setIsAdmin(false); setActiveTab('catalogue'); setMobileMenuOpen(false); }}
+                className="inline-flex items-center gap-2 rounded-xl border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-xs font-bold text-rose-200 transition hover:bg-rose-500/20"
+                title="Admin Logout"
+              >
+                <LogOut className="h-4 w-4" /> <span className="hidden sm:inline">Logout</span>
+              </button>
+            </>
           )}
 
                     {/* Mobile hamburger menu toggle */}
