@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ClipboardList, Plus, Search, Trash2, CalendarDays, UserRound, Phone, Package, IndianRupee, MessageCircle, Printer, Pencil } from 'lucide-react';
 import { InwardRecord } from '../types';
+import { openWhatsAppBusiness } from '../lib/whatsapp';
 
 interface Props {
   records: InwardRecord[];
@@ -17,12 +18,7 @@ const nextInwardNumber = (records: InwardRecord[]) => {
   }, 0);
   return 'PTT' + String(max + 1).padStart(2, '0');
 };
-const openWhatsApp = (record: InwardRecord) => {
-  const phone = record.phoneNumber.replace(/\D/g, '');
-  const whatsappPhone = phone.length === 10 ? '91' + phone : phone;
-  const message = 'PC TECHNO TUNER - Inward Receipt\nItem ID: ' + record.id + '\nCustomer: ' + record.customerName + '\nProduct: ' + record.productName + '\nDate: ' + record.inwardDate + '\nReported Problem: ' + record.problem + '\nEstimate: ₹' + record.estimateAmount;
-  window.open('https://wa.me/' + whatsappPhone + '?text=' + encodeURIComponent(message), '_blank');
-};
+const openWhatsApp = (record: InwardRecord) => openWhatsAppBusiness(record.phoneNumber);
 const printSticker = (record: InwardRecord) => {
   const popup = window.open('', '_blank', 'width=420,height=300');
   if (!popup) { alert('Please allow pop-ups to print the sticker.'); return; }
