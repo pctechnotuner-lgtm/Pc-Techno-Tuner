@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { PackageCheck, Search, Trash2, CalendarDays, UserRound, Phone, Package, IndianRupee, ClipboardList, CheckCircle2 } from 'lucide-react';
+import { PackageCheck, Search, Trash2, CalendarDays, IndianRupee, ClipboardList, CheckCircle2 } from 'lucide-react';
 import { InwardRecord, OutwardRecord } from '../types';
 
 interface Props {
@@ -89,10 +89,17 @@ export const OutwardView: React.FC<Props> = ({ inwardRecords, outwardRecords, on
         <div className="mb-5 flex items-center gap-2"><ClipboardList className="h-5 w-5 text-emerald-300" /><h2 className="text-lg font-bold text-white">New Outward Entry</h2></div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <label className="space-y-1.5 sm:col-span-2"><span className="text-sm font-medium text-slate-300">Inward Entry Number *</span>
-            <select value={inwardNumber} onChange={(e) => setInwardNumber(e.target.value)} required className={fieldClass}>
-              <option value="">Select / Enter inward entry number</option>
-              {inwardRecords.map((record) => <option key={record.id} value={record.id}>{record.id} — {record.customerName} — {record.productName}{outwardRecords.some((out) => out.inwardRecordId === record.id) ? ' (Already Outward)' : ''}</option>)}
-            </select>
+            <input
+              list="available-inward-numbers"
+              value={inwardNumber}
+              onChange={(e) => setInwardNumber(e.target.value.trim())}
+              required
+              placeholder="Enter inward number, e.g. IN-..."
+              className={fieldClass}
+            />
+            <datalist id="available-inward-numbers">
+              {inwardRecords.map((record) => <option key={record.id} value={record.id}>{record.customerName} — {record.productName}</option>)}
+            </datalist>
             <span className="block text-xs text-slate-500">Choose the inward number; customer and product details will fill automatically.</span>
           </label>
 
