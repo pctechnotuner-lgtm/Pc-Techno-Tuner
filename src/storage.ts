@@ -32,7 +32,7 @@ export const DEFAULT_PROFILE: CompanyProfile = {
   pincode: '382418',
   mobile: '7383871195',
   whatsapp: '917383871195',
-  email: 'pctechnotuner@gmail.com',
+  email: 'info@pctechnotuner.com',
   gstin: '24CGBPP3211M1ZJ',
   pan: 'CGBPP3211M',
   logoUrl: '',
