@@ -91,7 +91,7 @@ export const OutwardView: React.FC<Props> = ({ inwardRecords, outwardRecords, on
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const sendOutwardWhatsApp = (record: OutwardRecord) => openWhatsAppBusiness(record.phoneNumber);
+  const sendOutwardWhatsApp = (record: OutwardRecord) => openWhatsAppBusiness(record.phoneNumber, 'PC TECHNO TUNER - Delivery Update\\nItem ID: ' + record.inwardRecordId + '\\nCustomer: ' + record.customerName + '\\nProduct: ' + record.productName + '\\nOut Date: ' + record.outDate + '\\nWork Done: ' + record.solution + '\\nDelivery By: ' + (record.deliveryBy || 'Engineer') + '\\nPayment: ' + record.paymentMethod + '\\nAmount Collected: ₹' + (record.amountCollected || 0));
 
   const filtered = outwardRecords.filter((record) =>
     [record.inwardRecordId, record.customerName, record.phoneNumber, record.productName, record.solution]
