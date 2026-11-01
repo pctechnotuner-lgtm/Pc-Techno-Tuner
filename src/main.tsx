@@ -6,7 +6,7 @@ import './index.css';
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker
-      .register('/sw.js')
+      .register(new URL('sw.js', document.baseURI).toString())
       .then((reg) => {
         console.log('PWA ServiceWorker registered successfully:', reg.scope);
       })
