@@ -30,6 +30,18 @@ export const OutwardView: React.FC<Props> = ({ inwardRecords, outwardRecords, on
     [inwardRecords, inwardNumber]
   );
   const alreadyOutward = outwardRecords.some((record) => record.inwardRecordId === inwardNumber && record.id !== editingId);
+  const pendingInwardRecords = inwardRecords.filter((record) => !outwardRecords.some((outward) => outward.inwardRecordId === record.id));
+  const chooseInwardForOutward = (record: InwardRecord) => {
+    setInwardNumber(record.id);
+    setShowForm(true);
+    setEditingId(null);
+    setOutDate(today());
+    setSolution('');
+    setPaymentMethod('UPI');
+    setAmountCollected('');
+    setDeliveryBy('Engineer');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const resetForm = () => {
     setEditingId(null);
@@ -172,6 +184,32 @@ export const OutwardView: React.FC<Props> = ({ inwardRecords, outwardRecords, on
         </div>
         <div className="mt-5 flex flex-wrap justify-end gap-2"><button type="button" onClick={resetForm} className="rounded-xl border border-slate-600 px-4 py-2.5 text-sm font-semibold text-slate-300 hover:bg-slate-800">{editingId ? 'Cancel Edit' : 'Clear'}</button><button type="submit" disabled={!selectedInward || alreadyOutward} className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-40"><PackageCheck className="h-4 w-4" /> {editingId ? 'Update Outward' : 'Save Outward'}</button></div>
       </form>}
+
+      <section className="overflow-hidden rounded-2xl border border-emerald-500/25 bg-slate-900/70">
+        <div className="border-b border-slate-700 p-4">
+          <h2 className="font-bold text-white">Pending Inward Entries</h2>
+          <p className="text-xs text-slate-400">{pendingInwardRecords.length} item(s) ready for outward</p>
+        </div>
+        {pendingInwardRecords.length === 0 ? (
+          <div className="p-6 text-center text-sm text-slate-400">No pending inward entries. New inward items will appear here automatically.</div>
+        ) : (
+          <div className="divide-y divide-slate-800">
+            {pendingInwardRecords.map((record) => (
+              <div key={record.id} className="flex flex-wrap items-center justify-between gap-3 p-4">
+                <div className="min-w-0">
+                  <div className="font-bold text-emerald-300">{record.id}</div>
+                  <div className="text-sm font-semibold text-white">{record.customerName} · {record.productName}</div>
+                  <div className="text-xs text-slate-400">{record.phoneNumber} · {record.inwardDate}</div>
+                  <div className="mt-1 text-xs text-slate-400">Problem: {record.problem}</div>
+                </div>
+                <button type="button" onClick={() => chooseInwardForOutward(record)} className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-emerald-500">
+                  <PackageCheck className="h-4 w-4" /> Outward This Item
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
 
       <section className="overflow-hidden rounded-2xl border border-slate-700 bg-slate-900/70">
         <div className="border-b border-slate-700 p-4"><h2 className="font-bold text-white">Outward History</h2><p className="text-xs text-slate-400">{filtered.length} record(s)</p></div>
