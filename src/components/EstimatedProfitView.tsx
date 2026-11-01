@@ -71,8 +71,19 @@ export const EstimatedProfitView: React.FC<Props> = ({ invoices, products, estim
   };
 
   const selectProduct = (index: number, id: string) => {
-    const product = products.find((p) => p.id === id);
     const updated = [...items];
+    if (id === '__manual__') {
+      updated[index] = {
+        ...updated[index],
+        productId: '',
+        description: '',
+        unitPrice: 0,
+        lineTotal: 0,
+      };
+      setItems(updated);
+      return;
+    }
+    const product = products.find((p) => p.id === id);
     if (!product) {
       updated[index] = { ...updated[index], productId: '', description: '', unitPrice: 0, lineTotal: 0 };
     } else {
@@ -86,6 +97,18 @@ export const EstimatedProfitView: React.FC<Props> = ({ invoices, products, estim
         lineTotal: base,
       };
     }
+    setItems(updated);
+  };
+
+  const addManualItem = (index: number) => {
+    const updated = [...items];
+    updated[index] = {
+      ...updated[index],
+      productId: '',
+      description: '',
+      unitPrice: 0,
+      lineTotal: 0,
+    };
     setItems(updated);
   };
 
@@ -258,12 +281,13 @@ export const EstimatedProfitView: React.FC<Props> = ({ invoices, products, estim
         </div>
         <div className="flex items-center justify-between"><h3 className="font-semibold">Items</h3><button onClick={() => setItems([...items, { productId: '', description: '', quantity: 1, unitPrice: 0, lineTotal: 0 }])} className="text-blue-400 text-sm">+ Add Item</button></div>
         {items.map((item, index) => <div key={index} className="grid grid-cols-1 md:grid-cols-12 gap-2 bg-gray-950 p-3 rounded-lg">
-          <select value={item.productId || ''} onChange={(e) => selectProduct(index, e.target.value)} className="md:col-span-4 bg-gray-900 border border-gray-700 rounded p-2 text-sm"><option value="">Select stock item (optional)</option><option value="__manual__">＋ Add New Item Manually</option>{products.map((p) => <option key={p.id} value={p.id}>{p.name} — Stock {p.stockQuantity}</option>)}</select>
-          <input value={item.description} onChange={(e) => updateItem(index, 'description', e.target.value)} placeholder="New item name / Description / Service (type manually)" className="md:col-span-3 bg-gray-900 border border-gray-700 rounded p-2 text-sm" />
-          <input type="number" min="1" value={item.quantity} onChange={(e) => updateItem(index, 'quantity', Number(e.target.value))} placeholder="Qty" className="md:col-span-1 bg-gray-900 border border-gray-700 rounded p-2 text-sm" />
-          <input type="number" min="0" step="0.01" value={item.unitPrice} onChange={(e) => updateItem(index, 'unitPrice', Number(e.target.value))} placeholder="Sale Rate (Before GST)" className="md:col-span-2 bg-gray-900 border border-gray-700 rounded p-2 text-sm" />
+          <select value={item.productId || ''} onChange={(e) => selectProduct(index, e.target.value)} className="md:col-span-3 min-w-0 bg-gray-900 border border-gray-700 rounded p-2 text-sm"><option value="">Select stock item (optional)</option>{products.map((p) => <option key={p.id} value={p.id}>{p.name} — Stock {p.stockQuantity}</option>)}</select>
+          <button type="button" onClick={() => addManualItem(index)} className="md:col-span-1 rounded border border-cyan-700 bg-cyan-950/50 px-2 py-2 text-xs font-bold text-cyan-200 hover:bg-cyan-900">＋ Manual</button>
+          <input value={item.description} onChange={(e) => updateItem(index, 'description', e.target.value)} placeholder="Item name / Description / Service" className="md:col-span-3 min-w-0 bg-gray-900 border border-gray-700 rounded p-2 text-sm" />
+          <input type="number" min="1" value={item.quantity} onChange={(e) => updateItem(index, 'quantity', Number(e.target.value))} placeholder="Qty" className="md:col-span-1 min-w-0 bg-gray-900 border border-gray-700 rounded p-2 text-sm" />
+          <input type="number" min="0" step="0.01" value={item.unitPrice} onChange={(e) => updateItem(index, 'unitPrice', Number(e.target.value))} placeholder="Sale Rate (Before GST)" className="md:col-span-2 min-w-0 bg-gray-900 border border-gray-700 rounded p-2 text-sm" />
           <div className="md:col-span-1 flex items-center text-sm font-semibold">{money(item.lineTotal)}</div>
-          <button onClick={() => setItems(items.length > 1 ? items.filter((_, i) => i !== index) : items)} className="text-rose-400 flex justify-center"><Trash2 className="w-4 h-4" /></button>
+          <button type="button" onClick={() => setItems(items.length > 1 ? items.filter((_, i) => i !== index) : items)} className="text-rose-400 flex justify-center"><Trash2 className="w-4 h-4" /></button>
         </div>)}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <label className="text-xs text-gray-300">GST Rate (%)<input type="number" value={taxRate} onChange={(e) => setTaxRate(Number(e.target.value))} className="block w-full bg-gray-950 border border-gray-700 rounded-lg p-2 mt-1" /></label>
