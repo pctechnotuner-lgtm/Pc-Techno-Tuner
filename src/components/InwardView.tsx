@@ -69,6 +69,11 @@ export const InwardView: React.FC<Props> = ({ records, onSaveRecord, onDeleteRec
         </div>
       </div>
 
+      <section className="rounded-2xl border border-slate-700 bg-slate-900/70 p-4">
+        <div className="mb-2 flex items-center justify-between gap-3"><div><h2 className="font-bold text-white">Search Inward History</h2><p className="text-xs text-slate-400">{filtered.length} record(s)</p></div></div>
+        <div className="relative"><Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" /><input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search name, phone, product..." className="w-full rounded-xl border border-slate-700 bg-slate-950 py-3 pl-9 pr-3 text-sm text-white outline-none focus:border-cyan-500" /></div>
+      </section>
+
       <form onSubmit={save} className="rounded-2xl border border-slate-700 bg-slate-900/70 p-4 sm:p-6 shadow-xl">
         <div className="mb-5 flex items-center gap-2"><Plus className="h-5 w-5 text-cyan-300" /><h2 className="text-lg font-bold text-white">New Inward Entry</h2></div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -83,10 +88,7 @@ export const InwardView: React.FC<Props> = ({ records, onSaveRecord, onDeleteRec
       </form>
 
       <section className="overflow-hidden rounded-2xl border border-slate-700 bg-slate-900/70">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-700 p-4">
-          <div><h2 className="font-bold text-white">Inward History</h2><p className="text-xs text-slate-400">{filtered.length} record(s)</p></div>
-          <div className="relative min-w-[220px]"><Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" /><input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search name, phone, product..." className="w-full rounded-xl border border-slate-700 bg-slate-950 py-2.5 pl-9 pr-3 text-sm text-white outline-none focus:border-cyan-500" /></div>
-        </div>
+        <div className="border-b border-slate-700 p-4"><h2 className="font-bold text-white">Inward History</h2><p className="text-xs text-slate-400">{filtered.length} record(s)</p></div>
         {filtered.length === 0 ? <div className="p-10 text-center text-sm text-slate-400">No inward records yet. Add the first entry above.</div> : (
           <div className="overflow-x-auto"><table className="w-full min-w-[850px] text-left text-sm">
             <thead className="bg-slate-950/80 text-xs uppercase tracking-wide text-slate-400"><tr><th className="px-4 py-3">Inward No.</th><th className="px-4 py-3">Customer</th><th className="px-4 py-3">Product</th><th className="px-4 py-3">Inward Date</th><th className="px-4 py-3">Problem</th><th className="px-4 py-3 text-right">Estimate</th><th className="px-4 py-3 text-right">Action</th></tr></thead>
