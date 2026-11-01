@@ -251,6 +251,21 @@ export interface InwardRecord {
   createdAt: string;
 }
 
+export interface OutwardRecord {
+  id: string;
+  inwardRecordId: string;
+  customerName: string;
+  phoneNumber: string;
+  productName: string;
+  inwardDate: string;
+  inwardProblem: string;
+  estimateAmount: number;
+  outDate: string;
+  solution: string;
+  paymentMethod: 'UPI' | 'Cash';
+  createdAt: string;
+}
+
 export type AppTab =
   | 'catalogue'
   | 'complaint'
@@ -264,4 +279,5 @@ export type AppTab =
   | 'reports'
   | 'settings'
   | 'antivirus'
-  | 'inward';
+  | 'inward'
+  | 'outward';
