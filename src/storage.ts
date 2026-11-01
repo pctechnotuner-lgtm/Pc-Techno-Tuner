@@ -8,6 +8,7 @@ import {
   Transaction,
   AntivirusLicense,
   InwardRecord,
+  OutwardRecord,
 } from './types';
 
 const STORAGE_KEYS = {
@@ -24,6 +25,7 @@ const STORAGE_KEYS = {
   LANGUAGE: 'pctechno_lang_v1',
   ANTIVIRUS: 'pctechno_antivirus_licenses_v1',
   INWARD: 'pctechno_inward_records_v1',
+  OUTWARD: 'pctechno_outward_records_v1',
 };
 
 export const DEFAULT_PROFILE: CompanyProfile = {
@@ -538,6 +540,9 @@ export const storage = {
   getInwardRecords: (): InwardRecord[] => getStorageItem(STORAGE_KEYS.INWARD, []),
   setInwardRecords: (items: InwardRecord[]) => setStorageItem(STORAGE_KEYS.INWARD, items),
 
+  getOutwardRecords: (): OutwardRecord[] => getStorageItem(STORAGE_KEYS.OUTWARD, []),
+  setOutwardRecords: (items: OutwardRecord[]) => setStorageItem(STORAGE_KEYS.OUTWARD, items),
+
   getLanguage: (): 'en' | 'hi' | 'gu' => getStorageItem(STORAGE_KEYS.LANGUAGE, 'en'),
   setLanguage: (lang: 'en' | 'hi' | 'gu') => setStorageItem(STORAGE_KEYS.LANGUAGE, lang),
 
@@ -574,6 +579,7 @@ export const storage = {
       transactions: storage.getTransactions(),
       antivirusLicenses: storage.getAntivirusLicenses(),
       inwardRecords: storage.getInwardRecords(),
+      outwardRecords: storage.getOutwardRecords(),
     };
     const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(data, null, 2))}`;
     const downloadAnchor = document.createElement('a');
@@ -598,6 +604,7 @@ export const storage = {
       if (Array.isArray(jsonData.transactions)) storage.setTransactions(jsonData.transactions);
       if (Array.isArray(jsonData.antivirusLicenses)) storage.setAntivirusLicenses(jsonData.antivirusLicenses);
       if (Array.isArray(jsonData.inwardRecords)) storage.setInwardRecords(jsonData.inwardRecords);
+      if (Array.isArray(jsonData.outwardRecords)) storage.setOutwardRecords(jsonData.outwardRecords);
       return true;
     } catch (err) {
       console.error('Backup restore failed:', err);
