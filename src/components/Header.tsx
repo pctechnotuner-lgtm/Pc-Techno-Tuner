@@ -12,6 +12,7 @@ import {
   Languages,
   LayoutDashboard,
   Package,
+  ClipboardList,
   Users,
   AlertCircle,
   Receipt,
@@ -237,6 +238,18 @@ export const Header: React.FC<HeaderProps> = ({
                       {newComplaintsCount}
                     </span>
                   )}
+                </button>
+
+                <button
+                  onClick={() => handleNavClick('inward')}
+                  className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition w-full text-left ${
+                    activeTab === 'inward'
+                      ? 'bg-blue-600 text-white shadow-sm'
+                      : 'text-gray-300 hover:text-white hover:bg-gray-800'
+                  }`}
+                >
+                  <ClipboardList className="w-3.5 h-3.5 text-cyan-300" />
+                  <span>Inward Register</span>
                 </button>
 
                 <button
