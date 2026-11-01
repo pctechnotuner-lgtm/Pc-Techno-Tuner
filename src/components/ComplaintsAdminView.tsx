@@ -111,7 +111,7 @@ export const ComplaintsAdminView: React.FC<ComplaintsAdminViewProps> = ({
     closeEditModal();
   };
 
-  const handleWhatsAppCustomer = (c: Complaint) => openWhatsAppBusiness(c.mobile);
+  const handleWhatsAppCustomer = (c: Complaint) => openWhatsAppBusiness(c.mobile, 'PC TECHNO TUNER - Service Complaint Update\\nTicket ID: ' + c.id + '\\nCustomer: ' + c.customerName + '\\nEquipment: ' + c.category + ' (' + (c.brandModel || 'General') + ')\\nStatus: ' + c.status + '\\nComplaint: ' + c.description);
 
   // Filter complaints
   const filtered = complaints.filter((c) => {
