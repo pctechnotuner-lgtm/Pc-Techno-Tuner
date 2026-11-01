@@ -14,6 +14,7 @@ import {
   Product,
   Transaction,
   AntivirusLicense,
+  InwardRecord,
 } from './types';
 import {
   storage,
@@ -38,6 +39,7 @@ import { EstimatedProfitView } from './components/EstimatedProfitView';
 import { SettingsView } from './components/SettingsView';
 import { AdminLoginModal } from './components/AdminLoginModal';
 import { AntivirusView } from './components/AntivirusView';
+import { InwardView } from './components/InwardView';
 
 export default function App() {
   const isNativeApp = Capacitor.isNativePlatform();
@@ -73,6 +75,7 @@ export default function App() {
     storage.getTransactions
   );
   const [antivirusLicenses, setAntivirusLicenses] = useState<AntivirusLicense[]>(storage.getAntivirusLicenses);
+  const [inwardRecords, setInwardRecords] = useState<InwardRecord[]>(storage.getInwardRecords);
 
   const [lang, setLang] = useState<Language>(storage.getLanguage);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -176,6 +179,7 @@ export default function App() {
         const localEstimates = storage.getEstimates();
         const localTransactions = storage.getTransactions();
         const localAntivirusLicenses = storage.getAntivirusLicenses();
+        const localInwardRecords = storage.getInwardRecords();
         const localLanguage = storage.getLanguage();
 
         const [
@@ -187,6 +191,7 @@ export default function App() {
           cloudEstimates,
           cloudTransactions,
           cloudAntivirusLicenses,
+          cloudInwardRecords,
           cloudLanguage,
         ] = await Promise.all([
           loadCloudData<CompanyProfile>('profile'),
@@ -197,6 +202,7 @@ export default function App() {
           loadCloudData<Estimate[]>('estimates'),
           loadCloudData<Transaction[]>('transactions'),
           loadCloudData<AntivirusLicense[]>('antivirus_licenses'),
+          loadCloudData<InwardRecord[]>('inward_records'),
           loadCloudData<Language>('language'),
         ]);
 
@@ -281,6 +287,14 @@ export default function App() {
           await saveCloudData('antivirus_licenses', localAntivirusLicenses);
         }
 
+        // Inward service intake records
+        if (cloudInwardRecords !== null) {
+          setInwardRecords(cloudInwardRecords);
+          storage.setInwardRecords(cloudInwardRecords);
+        } else {
+          await saveCloudData('inward_records', localInwardRecords);
+        }
+
         // Language
         if (cloudLanguage !== null) {
           setLang(cloudLanguage);
@@ -350,6 +364,7 @@ export default function App() {
           saveCloudData('estimates', estimates),
           saveCloudData('transactions', transactions),
           saveCloudData('antivirus_licenses', antivirusLicenses),
+          saveCloudData('inward_records', inwardRecords),
           saveCloudData('language', lang),
         ]);
       };
@@ -421,6 +436,18 @@ export default function App() {
       setActiveTab('catalogue');
       setLoginModalOpen(true);
     }
+  };
+
+  const handleSaveInwardRecord = (record: InwardRecord) => {
+    const updated = [record, ...inwardRecords.filter((item) => item.id !== record.id)];
+    setInwardRecords(updated);
+    storage.setInwardRecords(updated);
+  };
+
+  const handleDeleteInwardRecord = (recordId: string) => {
+    const updated = inwardRecords.filter((item) => item.id !== recordId);
+    setInwardRecords(updated);
+    storage.setInwardRecords(updated);
   };
 
   const handleSaveProduct = (product: Product) => {
@@ -1056,6 +1083,14 @@ export default function App() {
 
         {activeTab === 'profit' && isAdmin && (
           <EstimatedProfitView invoices={invoices} products={products} estimates={estimates} customers={customers} profile={profile} onSaveCustomer={handleSaveCustomer} onDeleteEstimate={(estimateId) => { const updated = estimates.filter((item) => item.id !== estimateId); setEstimates(updated); storage.setEstimates(updated); }} onSaveEstimate={(estimate) => { const exists = estimates.some((item) => item.id === estimate.id); const updated = exists ? estimates.map((item) => item.id === estimate.id ? estimate : item) : [estimate, ...estimates]; setEstimates(updated); storage.setEstimates(updated); }} />
+        )}
+
+        {activeTab === 'inward' && isAdmin && (
+          <InwardView
+            records={inwardRecords}
+            onSaveRecord={handleSaveInwardRecord}
+            onDeleteRecord={handleDeleteInwardRecord}
+          />
         )}
 
         {activeTab === 'antivirus' && isAdmin && (
