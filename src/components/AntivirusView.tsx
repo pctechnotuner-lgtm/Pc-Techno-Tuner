@@ -1,3 +1,4 @@
+import { openWhatsAppBusiness } from '../lib/whatsapp';
 import React, { useMemo, useState } from 'react';
 import { AntivirusLicense } from '../types';
 import { ShieldCheck, Plus, Search, CalendarClock, MessageCircle, Trash2, Pencil, AlertTriangle } from 'lucide-react';
@@ -31,7 +32,7 @@ export const AntivirusView: React.FC<Props> = ({ licenses, onSave, onDelete }) =
   const reminderCount = licenses.filter(x => daysUntil(x.expiryDate) >= 0 && daysUntil(x.expiryDate) <= 5).length;
   const expiredCount = licenses.filter(x => daysUntil(x.expiryDate) < 0).length;
   const openEdit = (x: AntivirusLicense) => { setForm(x); setEditing(true); setShowForm(true); };
-  const wa = (x: AntivirusLicense) => window.open('https://wa.me/91' + x.mobile.replace(/\D/g,'') + '?text=' + encodeURIComponent('Hello ' + x.customerName + ', your ' + x.antivirusCompany + ' antivirus license will expire on ' + x.expiryDate + '. Please contact PC TECHNO TUNER for renewal.'), '_blank');
+  const wa = (x: AntivirusLicense) => openWhatsAppBusiness(x.mobile);
   return <div className="max-w-6xl mx-auto space-y-5">
     <div className="rounded-2xl border border-violet-500/25 bg-gradient-to-br from-violet-950/50 to-slate-950 p-5 sm:p-7 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div><div className="flex items-center gap-2 text-violet-300"><ShieldCheck/><span className="font-bold text-xs uppercase tracking-widest">License Management</span></div><h1 className="text-2xl font-black text-white mt-2">Antivirus Licenses</h1><p className="text-sm text-slate-400 mt-1">Customer licenses, expiry dates and renewal reminders</p></div>
