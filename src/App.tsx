@@ -15,6 +15,7 @@ import {
   Transaction,
   AntivirusLicense,
   InwardRecord,
+  OutwardRecord,
 } from './types';
 import {
   storage,
@@ -40,6 +41,7 @@ import { SettingsView } from './components/SettingsView';
 import { AdminLoginModal } from './components/AdminLoginModal';
 import { AntivirusView } from './components/AntivirusView';
 import { InwardView } from './components/InwardView';
+import { OutwardView } from './components/OutwardView';
 
 export default function App() {
   const isNativeApp = Capacitor.isNativePlatform();
@@ -76,6 +78,7 @@ export default function App() {
   );
   const [antivirusLicenses, setAntivirusLicenses] = useState<AntivirusLicense[]>(storage.getAntivirusLicenses);
   const [inwardRecords, setInwardRecords] = useState<InwardRecord[]>(storage.getInwardRecords);
+  const [outwardRecords, setOutwardRecords] = useState<OutwardRecord[]>(storage.getOutwardRecords);
 
   const [lang, setLang] = useState<Language>(storage.getLanguage);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -180,6 +183,7 @@ export default function App() {
         const localTransactions = storage.getTransactions();
         const localAntivirusLicenses = storage.getAntivirusLicenses();
         const localInwardRecords = storage.getInwardRecords();
+        const localOutwardRecords = storage.getOutwardRecords();
         const localLanguage = storage.getLanguage();
 
         const [
@@ -192,6 +196,7 @@ export default function App() {
           cloudTransactions,
           cloudAntivirusLicenses,
           cloudInwardRecords,
+          cloudOutwardRecords,
           cloudLanguage,
         ] = await Promise.all([
           loadCloudData<CompanyProfile>('profile'),
@@ -203,6 +208,7 @@ export default function App() {
           loadCloudData<Transaction[]>('transactions'),
           loadCloudData<AntivirusLicense[]>('antivirus_licenses'),
           loadCloudData<InwardRecord[]>('inward_records'),
+          loadCloudData<OutwardRecord[]>('outward_records'),
           loadCloudData<Language>('language'),
         ]);
 
@@ -295,6 +301,14 @@ export default function App() {
           await saveCloudData('inward_records', localInwardRecords);
         }
 
+        // Outward service delivery records
+        if (cloudOutwardRecords !== null) {
+          setOutwardRecords(cloudOutwardRecords);
+          storage.setOutwardRecords(cloudOutwardRecords);
+        } else {
+          await saveCloudData('outward_records', localOutwardRecords);
+        }
+
         // Language
         if (cloudLanguage !== null) {
           setLang(cloudLanguage);
@@ -365,6 +379,7 @@ export default function App() {
           saveCloudData('transactions', transactions),
           saveCloudData('antivirus_licenses', antivirusLicenses),
           saveCloudData('inward_records', inwardRecords),
+          saveCloudData('outward_records', outwardRecords),
           saveCloudData('language', lang),
         ]);
       };
@@ -404,6 +419,7 @@ export default function App() {
     transactions,
     antivirusLicenses,
     inwardRecords,
+    outwardRecords,
     lang,
   ]);
 
@@ -444,6 +460,18 @@ export default function App() {
     const updated = [record, ...inwardRecords.filter((item) => item.id !== record.id)];
     setInwardRecords(updated);
     storage.setInwardRecords(updated);
+  };
+
+  const handleSaveOutwardRecord = (record: OutwardRecord) => {
+    const updated = [record, ...outwardRecords.filter((item) => item.id !== record.id)];
+    setOutwardRecords(updated);
+    storage.setOutwardRecords(updated);
+  };
+
+  const handleDeleteOutwardRecord = (recordId: string) => {
+    const updated = outwardRecords.filter((item) => item.id !== recordId);
+    setOutwardRecords(updated);
+    storage.setOutwardRecords(updated);
   };
 
   const handleDeleteInwardRecord = (recordId: string) => {
@@ -1092,6 +1120,15 @@ export default function App() {
             records={inwardRecords}
             onSaveRecord={handleSaveInwardRecord}
             onDeleteRecord={handleDeleteInwardRecord}
+          />
+        )}
+
+        {activeTab === 'outward' && isAdmin && (
+          <OutwardView
+            inwardRecords={inwardRecords}
+            outwardRecords={outwardRecords}
+            onSaveRecord={handleSaveOutwardRecord}
+            onDeleteRecord={handleDeleteOutwardRecord}
           />
         )}
 
