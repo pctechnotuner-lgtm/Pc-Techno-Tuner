@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { getWhatsAppBusinessUrl, openWhatsAppBusiness } from '../lib/whatsapp';
 import {
   Users,
   Search,
@@ -143,16 +144,7 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
     setModalOpen(false);
   };
 
-  const handleSendPaymentReminder = (c: Customer, dueAmount: number) => {
-    const message = `Hello ${c.name},
-Greetings from PC TECHNO TUNER, Ahmedabad.
-This is a gentle reminder regarding your outstanding balance of ₹${dueAmount.toLocaleString('en-IN')}.
-You can clear this via UPI (7383871195@okbizaxis) or bank transfer.
-
-Thank you for your business!`;
-
-    window.open(`https://wa.me/91${c.mobile}?text=${encodeURIComponent(message)}`, '_blank');
-  };
+  const handleSendPaymentReminder = (c: Customer, _dueAmount: number) => openWhatsAppBusiness(c.mobile);
 
   // Compute metrics per customer
   const customerMetrics = customers.map((c) => {
@@ -337,7 +329,7 @@ Thank you for your business!`;
                       </button>
 
                       <a
-                        href={`https://wa.me/91${customer.mobile}`}
+                        href={getWhatsAppBusinessUrl(customer.mobile)}
                         target="_blank"
                         rel="noreferrer"
                         className="p-1 bg-emerald-950 hover:bg-emerald-900 border border-emerald-800 text-emerald-400 rounded text-xs inline-flex items-center transition"
