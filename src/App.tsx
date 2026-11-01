@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
+import { Capacitor } from '@capacitor/core';
 import { loadCloudData, saveCloudData } from './lib/cloudStorage';
 import { supabase } from './lib/supabaseClient';
 import {
@@ -39,12 +40,17 @@ import { AdminLoginModal } from './components/AdminLoginModal';
 import { AntivirusView } from './components/AntivirusView';
 
 export default function App() {
+  const isNativeApp = Capacitor.isNativePlatform();
   const [showBrandSplash, setShowBrandSplash] = useState(true);
 
   useEffect(() => {
+    if (!isNativeApp) {
+      setShowBrandSplash(false);
+      return;
+    }
     const splashTimer = window.setTimeout(() => setShowBrandSplash(false), 2000);
     return () => window.clearTimeout(splashTimer);
-  }, []);
+  }, [isNativeApp]);
   const [profile, setProfile] = useState<CompanyProfile>(
     storage.getProfile
   );
@@ -868,7 +874,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#07111f] md:bg-[#0b1220] text-gray-100 selection:bg-blue-600 selection:text-white">
-      {showBrandSplash && (
+      {isNativeApp && showBrandSplash && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#020817]">
           <img
             src="./pc-techno-splash.svg"
@@ -897,13 +903,68 @@ export default function App() {
       />
 
       <main className={`max-w-7xl mx-auto w-full p-3 sm:p-6 lg:p-8 pb-24 md:pb-8 flex-1 ${isAdmin ? "md:ml-64 md:max-w-[calc(100%-16rem)]" : ""}`}>
+        {!isNativeApp && !isAdmin && activeTab === 'catalogue' && (
+          <section className="relative isolate -mx-3 sm:-mx-6 lg:-mx-8 -mt-3 sm:-mt-6 lg:-mt-8 mb-10 min-h-[calc(100svh-5rem)] overflow-hidden bg-[#030817]">
+            <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_18%_20%,rgba(0,190,255,.24),transparent_38%),radial-gradient(ellipse_at_85%_75%,rgba(50,70,210,.28),transparent_42%),linear-gradient(135deg,#030817,#081a36_55%,#10113b)]" />
+            <div className="absolute -top-28 -right-20 -z-10 h-96 w-96 rounded-full border border-cyan-400/20" />
+            <div className="absolute -bottom-48 -left-20 -z-10 h-96 w-96 rounded-full border border-blue-400/20" />
+            <div className="mx-auto flex min-h-[calc(100svh-5rem)] max-w-7xl items-center px-6 py-16 sm:px-10 lg:px-16">
+              <div className="grid w-full items-center gap-12 lg:grid-cols-[1.15fr_.85fr]">
+                <div className="max-w-3xl">
+                  <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-cyan-300/25 bg-cyan-300/10 px-4 py-2 text-sm font-semibold text-cyan-200">
+                    <span className="h-2 w-2 rounded-full bg-cyan-300 shadow-[0_0_14px_#22d3ee]" />
+                    Welcome to PC TECHNO TUNER
+                  </div>
+                  <h1 className="text-4xl font-black leading-[1.08] tracking-tight text-white sm:text-6xl lg:text-7xl">
+                    Smart IT Solutions.
+                    <span className="mt-2 block bg-gradient-to-r from-cyan-300 via-blue-300 to-violet-300 bg-clip-text text-transparent">Reliable Service.</span>
+                  </h1>
+                  <p className="mt-7 max-w-2xl text-base leading-8 text-slate-300 sm:text-xl">
+                    Your trusted technology partner in Ahmedabad for computer and laptop support, CCTV surveillance, IT hardware, networking and Annual Maintenance Contracts.
+                  </p>
+                  <div className="mt-9 flex flex-wrap gap-3">
+                    <button onClick={() => document.getElementById('pt-services')?.scrollIntoView({ behavior: 'smooth' })} className="rounded-xl bg-cyan-400 px-7 py-3.5 font-bold text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:bg-cyan-300">
+                      Explore Services <span aria-hidden="true">→</span>
+                    </button>
+                    <a href="tel:7383871195" className="rounded-xl border border-white/20 bg-white/5 px-7 py-3.5 font-bold text-white transition hover:bg-white/10">
+                      Contact Us
+                    </a>
+                  </div>
+                  <div className="mt-12 grid max-w-2xl grid-cols-2 gap-3 sm:grid-cols-4">
+                    {['IT Hardware','CCTV Security','Laptop Repairs','AMC Support'].map((item) => (
+                      <div key={item} className="rounded-xl border border-white/10 bg-white/[.06] px-3 py-4 text-center text-sm font-semibold text-slate-200 backdrop-blur">
+                        {item}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="mx-auto w-full max-w-md">
+                  <div className="rounded-[2rem] border border-cyan-200/20 bg-white/[.07] p-8 shadow-[0_25px_100px_rgba(0,150,255,.15)] backdrop-blur-xl">
+                    <div className="mx-auto flex h-28 w-28 items-center justify-center rounded-3xl border border-cyan-300/30 bg-gradient-to-br from-cyan-300/20 to-blue-500/20 text-5xl font-black italic text-cyan-200 shadow-xl">PC</div>
+                    <div className="mt-6 text-center">
+                      <div className="text-2xl font-black tracking-wide text-white">PC TECHNO TUNER</div>
+                      <div className="mt-2 text-sm font-medium text-cyan-200">Technology • Security • Support</div>
+                      <p className="mt-5 text-sm leading-7 text-slate-300">Complete technology care for homes, offices and businesses — from setup and installation to repair and ongoing support.</p>
+                    </div>
+                    <div className="mt-7 border-t border-white/10 pt-5 text-center text-sm text-slate-300">
+                      <span className="font-semibold text-white">Serving Ahmedabad, Gujarat</span>
+                      <div className="mt-2">Call: 73838 71195</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
         {activeTab === 'catalogue' && (
+          <div id="pt-services">
           <CatalogueView
             products={products}
             profile={profile}
             lang={lang}
             onNavigateToComplaint={() => setActiveTab('complaint')}
           />
+          </div>
         )}
 
         {activeTab === 'complaint' && (
