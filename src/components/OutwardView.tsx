@@ -21,6 +21,8 @@ export const OutwardView: React.FC<Props> = ({ inwardRecords, outwardRecords, on
   const [paymentMethod, setPaymentMethod] = useState<'UPI' | 'Cash'>('UPI');
   const [amountCollected, setAmountCollected] = useState('');
   const [deliveryBy, setDeliveryBy] = useState<'Porter' | 'Engineer'>('Engineer');
+  const [porterName, setPorterName] = useState('');
+  const [porterPhoneNumber, setPorterPhoneNumber] = useState('');
   const [search, setSearch] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
@@ -40,6 +42,8 @@ export const OutwardView: React.FC<Props> = ({ inwardRecords, outwardRecords, on
     setPaymentMethod('UPI');
     setAmountCollected('');
     setDeliveryBy('Engineer');
+    setPorterName('');
+    setPorterPhoneNumber('');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -52,12 +56,18 @@ export const OutwardView: React.FC<Props> = ({ inwardRecords, outwardRecords, on
     setPaymentMethod('UPI');
     setAmountCollected('');
     setDeliveryBy('Engineer');
+    setPorterName('');
+    setPorterPhoneNumber('');
   };
 
   const save = (event: React.FormEvent) => {
     event.preventDefault();
     if (!selectedInward) {
       alert('Please select a valid Inward Entry Number.');
+      return;
+    }
+    if (deliveryBy === 'Porter' && (!porterName.trim() || !porterPhoneNumber.trim())) {
+      alert('Please enter Porter name and phone number.');
       return;
     }
     if (!solution.trim()) {
@@ -84,6 +94,8 @@ export const OutwardView: React.FC<Props> = ({ inwardRecords, outwardRecords, on
       paymentMethod,
       amountCollected: Number(amountCollected) || 0,
       deliveryBy,
+      porterName: deliveryBy === 'Porter' ? porterName.trim() : '',
+      porterPhoneNumber: deliveryBy === 'Porter' ? porterPhoneNumber.trim() : '',
       createdAt: existingRecord?.createdAt || new Date().toISOString(),
     };
     onSaveRecord(record);
@@ -100,6 +112,8 @@ export const OutwardView: React.FC<Props> = ({ inwardRecords, outwardRecords, on
     setPaymentMethod(record.paymentMethod);
     setAmountCollected(String(record.amountCollected ?? 0));
     setDeliveryBy(record.deliveryBy || 'Engineer');
+    setPorterName(record.porterName || '');
+    setPorterPhoneNumber(record.porterPhoneNumber || '');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -180,6 +194,10 @@ export const OutwardView: React.FC<Props> = ({ inwardRecords, outwardRecords, on
           <label className="space-y-1.5"><span className="flex items-center gap-2 text-sm font-medium text-slate-300"><IndianRupee className="h-4 w-4" /> Payment Method *</span><select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value as 'UPI' | 'Cash')} className={fieldClass}><option value="UPI">UPI</option><option value="Cash">Cash</option></select></label>
           <label className="space-y-1.5"><span className="flex items-center gap-2 text-sm font-medium text-slate-300"><IndianRupee className="h-4 w-4" /> Amount Collected (₹) *</span><input type="number" min="0" step="0.01" value={amountCollected} onChange={(e) => setAmountCollected(e.target.value)} required placeholder="Enter amount collected" className={fieldClass} /></label>
           <label className="space-y-1.5"><span className="text-sm font-medium text-slate-300">Delivery By *</span><select value={deliveryBy} onChange={(e) => setDeliveryBy(e.target.value as 'Porter' | 'Engineer')} className={fieldClass}><option value="Engineer">Engineer</option><option value="Porter">Porter</option></select></label>
+          {deliveryBy === 'Porter' && <>
+            <label className="space-y-1.5"><span className="text-sm font-medium text-slate-300">Porter Name *</span><input value={porterName} onChange={(e) => setPorterName(e.target.value)} required placeholder="Enter porter name" className={fieldClass} /></label>
+            <label className="space-y-1.5"><span className="text-sm font-medium text-slate-300">Porter Phone Number *</span><input type="tel" inputMode="tel" value={porterPhoneNumber} onChange={(e) => setPorterPhoneNumber(e.target.value)} required placeholder="Enter porter phone number" className={fieldClass} /></label>
+          </>}
           <label className="space-y-1.5 sm:col-span-2"><span className="text-sm font-medium text-slate-300">Problem Solution / Work Done *</span><textarea value={solution} onChange={(e) => setSolution(e.target.value)} required rows={3} placeholder="Write what was repaired or resolved..." className={fieldClass} /></label>
         </div>
         <div className="mt-5 flex flex-wrap justify-end gap-2"><button type="button" onClick={resetForm} className="rounded-xl border border-slate-600 px-4 py-2.5 text-sm font-semibold text-slate-300 hover:bg-slate-800">{editingId ? 'Cancel Edit' : 'Clear'}</button><button type="submit" disabled={!selectedInward || alreadyOutward} className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-40"><PackageCheck className="h-4 w-4" /> {editingId ? 'Update Outward' : 'Save Outward'}</button></div>
