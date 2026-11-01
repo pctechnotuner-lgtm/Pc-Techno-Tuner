@@ -51,9 +51,11 @@ export default function App() {
     const splashTimer = window.setTimeout(() => setShowBrandSplash(false), 2000);
     return () => window.clearTimeout(splashTimer);
   }, [isNativeApp]);
-  const [profile, setProfile] = useState<CompanyProfile>(
-    storage.getProfile
-  );
+  const BUSINESS_EMAIL = 'info@pctechnotuner.com';
+  const [profile, setProfile] = useState<CompanyProfile>(() => ({
+    ...storage.getProfile(),
+    email: BUSINESS_EMAIL,
+  }));
   const [products, setProducts] = useState<Product[]>(
     storage.getProducts
   );
@@ -214,10 +216,12 @@ export default function App() {
 
         // Profile
         if (cloudProfile !== null) {
-          setProfile(cloudProfile);
-          storage.setProfile(cloudProfile);
+          const updatedCloudProfile = { ...cloudProfile, email: BUSINESS_EMAIL };
+          setProfile(updatedCloudProfile);
+          storage.setProfile(updatedCloudProfile);
+          await saveCloudData('profile', updatedCloudProfile);
         } else {
-          await saveCloudData('profile', localProfile);
+          await saveCloudData('profile', { ...localProfile, email: BUSINESS_EMAIL });
         }
 
         // Products
@@ -705,8 +709,9 @@ export default function App() {
   };
 
   const handleSaveProfile = (newProfile: CompanyProfile) => {
-    setProfile(newProfile);
-    storage.setProfile(newProfile);
+    const updatedProfile = { ...newProfile, email: BUSINESS_EMAIL };
+    setProfile(updatedProfile);
+    storage.setProfile(updatedProfile);
   };
 
   const handleExportBackup = () => {
@@ -717,7 +722,7 @@ export default function App() {
     const success = storage.restoreBackupJson(jsonData);
 
     if (success) {
-      setProfile(storage.getProfile());
+      setProfile({ ...storage.getProfile(), email: BUSINESS_EMAIL });
       setProducts(storage.getProducts());
       setComplaints(storage.getComplaints());
       setCustomers(storage.getCustomers());
@@ -736,14 +741,14 @@ export default function App() {
 
     if (!confirmed) return;
 
-    storage.setProfile(DEFAULT_PROFILE);
+    storage.setProfile({ ...DEFAULT_PROFILE, email: BUSINESS_EMAIL });
     storage.setProducts(INITIAL_PRODUCTS);
     storage.setComplaints(INITIAL_COMPLAINTS);
     storage.setCustomers(INITIAL_CUSTOMERS);
     storage.setInvoices(INITIAL_INVOICES);
     storage.setTransactions(INITIAL_TRANSACTIONS);
 
-    setProfile(DEFAULT_PROFILE);
+    setProfile({ ...DEFAULT_PROFILE, email: BUSINESS_EMAIL });
     setProducts(INITIAL_PRODUCTS);
     setComplaints(INITIAL_COMPLAINTS);
     setCustomers(INITIAL_CUSTOMERS);
@@ -950,6 +955,7 @@ export default function App() {
                     <div className="mt-7 border-t border-white/10 pt-5 text-center text-sm text-slate-300">
                       <span className="font-semibold text-white">Serving Ahmedabad, Gujarat</span>
                       <div className="mt-2">Call: 73838 71195</div>
+                      <a href={`mailto:${profile.email}`} className="mt-2 inline-block break-all text-cyan-200 hover:text-white hover:underline">{profile.email}</a>
                     </div>
                   </div>
                 </div>
