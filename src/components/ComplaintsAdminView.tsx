@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { openWhatsAppBusiness } from '../lib/whatsapp';
 import {
   AlertCircle,
   Search,
@@ -110,21 +111,7 @@ export const ComplaintsAdminView: React.FC<ComplaintsAdminViewProps> = ({
     closeEditModal();
   };
 
-  const handleWhatsAppCustomer = (c: Complaint) => {
-    const message = `Hello ${c.customerName},
-This is regarding your service ticket with PC TECHNO TUNER:
-Ticket ID: ${c.id}
-Equipment: ${c.category} (${c.brandModel || 'General'})
-Current Status: ${c.status}
-${c.assignedTechnician ? `Assigned Engineer: ${c.assignedTechnician}` : ''}
-${c.visitDate ? `Scheduled Visit Date: ${c.visitDate}` : ''}
-${c.serviceCharges > 0 ? `Estimated Service Charges: ₹${c.serviceCharges}` : ''}
-
-For any queries, please reply directly to this chat or call our Ahmedabad workshop at 7383871195.`;
-
-    const encoded = encodeURIComponent(message);
-    window.open(`https://wa.me/91${c.mobile}?text=${encoded}`, '_blank');
-  };
+  const handleWhatsAppCustomer = (c: Complaint) => openWhatsAppBusiness(c.mobile);
 
   // Filter complaints
   const filtered = complaints.filter((c) => {
