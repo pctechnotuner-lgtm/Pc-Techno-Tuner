@@ -3,6 +3,7 @@ import {
   Shield,
   ShieldAlert,
   Phone,
+  Mail,
   MessageCircle,
   Download,
   Menu,
@@ -84,6 +85,16 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Right Actions: WhatsApp direct, Language, PWA install, Admin Auth */}
         <div className="flex items-center gap-2 sm:gap-3">
+          {/* Business email contact */}
+          <a
+            href={`mailto:${profile.email}`}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-cyan-700/50 bg-cyan-950/60 px-2.5 py-1.5 text-cyan-200 hover:bg-cyan-900/70 text-[11px] sm:text-xs font-semibold transition"
+            title={`Email: ${profile.email}`}
+          >
+            <Mail className="h-4 w-4" />
+            <span className="hidden sm:inline">{profile.email}</span>
+          </a>
+
           {/* Direct WhatsApp Callout */}
           <a
             href={`https://wa.me/${profile.whatsapp}`}
