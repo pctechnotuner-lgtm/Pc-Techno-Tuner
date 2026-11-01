@@ -106,19 +106,29 @@ export const OutwardView: React.FC<Props> = ({ inwardRecords, outwardRecords, on
       <form onSubmit={save} className="rounded-2xl border border-slate-700 bg-slate-900/70 p-4 shadow-xl sm:p-6">
         <div className="mb-5 flex items-center gap-2"><ClipboardList className="h-5 w-5 text-emerald-300" /><h2 className="text-lg font-bold text-white">New Outward Entry</h2></div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <label className="space-y-1.5 sm:col-span-2"><span className="text-sm font-medium text-slate-300">Inward Entry Number *</span>
+          <label className="space-y-1.5 sm:col-span-2"><span className="text-sm font-medium text-slate-300">Search Inward Item *</span>
             <input
               list="available-inward-numbers"
               value={inwardNumber}
-              onChange={(e) => setInwardNumber(e.target.value.trim())}
+              onChange={(e) => {
+                const value = e.target.value;
+                const matched = inwardRecords.find((record) =>
+                  [record.id, record.customerName, record.phoneNumber, record.productName]
+                    .some((field) => field.toLowerCase().includes(value.trim().toLowerCase()))
+                );
+                setInwardNumber(matched ? matched.id : value.trim());
+              }}
               required
-              placeholder="Enter inward number, e.g. IN-..."
+              placeholder="Type PTT01, customer name, mobile or product..."
               className={fieldClass}
             />
             <datalist id="available-inward-numbers">
-              {inwardRecords.map((record) => <option key={record.id} value={record.id}>{record.customerName} — {record.productName}</option>)}
+              {inwardRecords.map((record) => <option key={record.id} value={record.id}>{record.customerName} — {record.phoneNumber} — {record.productName}</option>)}
+              {inwardRecords.map((record) => <option key={record.id + '-name'} value={record.customerName}>{record.id} — {record.phoneNumber} — {record.productName}</option>)}
+              {inwardRecords.map((record) => <option key={record.id + '-phone'} value={record.phoneNumber}>{record.id} — {record.customerName} — {record.productName}</option>)}
+              {inwardRecords.map((record) => <option key={record.id + '-product'} value={record.productName}>{record.id} — {record.customerName} — {record.phoneNumber}</option>)}
             </datalist>
-            <span className="block text-xs text-slate-500">Choose the inward number; customer and product details will fill automatically.</span>
+            <span className="block text-xs text-slate-500">Search by item number, party name, mobile number or product. Select a suggestion to load details.</span>
           </label>
 
           {selectedInward ? (
