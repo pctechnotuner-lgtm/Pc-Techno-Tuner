@@ -1,3 +1,4 @@
+import { getWhatsAppBusinessUrl } from '../lib/whatsapp';
 import React, { useState } from 'react';
 import {
   Shield,
@@ -106,7 +107,7 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Direct WhatsApp Callout */}
           <a
-            href={`https://wa.me/${profile.whatsapp}`}
+            href={getWhatsAppBusinessUrl(profile.whatsapp)}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-500/60 bg-emerald-950/50 px-2.5 py-2 text-emerald-300 hover:bg-emerald-900/70 text-[11px] sm:text-xs font-semibold shadow-sm transition"
@@ -368,7 +369,7 @@ export const Header: React.FC<HeaderProps> = ({
               <button onClick={() => { handleNavClick('catalogue'); window.setTimeout(() => document.getElementById('pt-products')?.scrollIntoView({ behavior: 'smooth' }), 80); }} className="w-full rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-gray-300 hover:bg-gray-900">Products</button>
               <button onClick={() => { handleNavClick('catalogue'); window.setTimeout(() => document.getElementById('pt-about')?.scrollIntoView({ behavior: 'smooth' }), 80); }} className="w-full rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-gray-300 hover:bg-gray-900">About</button>
               <div className="grid grid-cols-2 gap-2 border-t border-gray-800 pt-3 mt-2">
-                <a href={`https://wa.me/${profile.whatsapp}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 rounded-lg border border-emerald-700/50 bg-emerald-950/50 px-2 py-2.5 text-xs font-bold text-emerald-300"><MessageCircle className="h-4 w-4" /> WhatsApp</a>
+                <a href={getWhatsAppBusinessUrl(profile.whatsapp)} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 rounded-lg border border-emerald-700/50 bg-emerald-950/50 px-2 py-2.5 text-xs font-bold text-emerald-300"><MessageCircle className="h-4 w-4" /> WhatsApp</a>
                 <a href={`mailto:${profile.email}`} className="flex items-center justify-center gap-2 rounded-lg border border-cyan-700/50 bg-cyan-950/50 px-2 py-2.5 text-xs font-bold text-cyan-200"><Mail className="h-4 w-4" /> Email</a>
               </div>
             </>
