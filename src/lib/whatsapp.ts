@@ -18,8 +18,7 @@ export const getCompanyWhatsAppFooter = (): string => {
     '📞 Mobile / WhatsApp: ' + (p.mobile || '7383871195'),
     '✉️ Email: ' + (p.email || 'info@pctechnotuner.com'),
     '📍 Address: ' + [p.address || 'A-104, Vedant Skyline, Vastral, SP Ring Road', p.location || 'Ahmedabad, Gujarat, India', p.pincode || '382418'].filter(Boolean).join(', '),
-    '🌐 Website: https://pctechnotuner-lgtm.github.io/Pc-Techno-Tuner/',
-    '📝 Complaint / Service Booking: https://pctechnotuner-lgtm.github.io/Pc-Techno-Tuner/',
+    '🌐 Website: pctechnotuner.com',
     '━━━━━━━━━━━━━━━━━━━━',
     'Thank you for choosing ' + name + '!'
   ];
