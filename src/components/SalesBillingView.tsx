@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { openWhatsAppBusiness } from '../lib/whatsapp';
 import {
   Receipt,
   Plus,
@@ -284,21 +285,7 @@ export const SalesBillingView: React.FC<SalesBillingViewProps> = ({
     setEditingInvoiceId(null);
   };
 
-  const handleShareInvoiceWhatsApp = (inv: Invoice) => {
-    const text = `PC TECHNO TUNER — TAX INVOICE
-Invoice No: ${inv.invoiceNo}
-Date: ${inv.invoiceDate}
-Customer: ${inv.customerName}
-Total Amount: ₹${inv.totalAmount.toLocaleString('en-IN')}
-Amount Paid: ₹${inv.amountPaid.toLocaleString('en-IN')}
-Balance Due: ₹${inv.balanceDue.toLocaleString('en-IN')}
-Payment Status: ${inv.paymentStatus}
-
-Thank you for choosing PC TECHNO TUNER, Ahmedabad!
-For support call: 7383871195`;
-
-    window.open(`https://wa.me/91${inv.customerMobile}?text=${encodeURIComponent(text)}`, '_blank');
-  };
+  const handleShareInvoiceWhatsApp = (inv: Invoice) => openWhatsAppBusiness(inv.customerMobile);
 
   const handleTriggerPrint = (inv: Invoice) => {
     setPrintInvoiceData(inv);
