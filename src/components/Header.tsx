@@ -273,7 +273,7 @@ export const Header: React.FC<HeaderProps> = ({
                   }`}
                 >
                   <Users className="w-3.5 h-3.5" />
-                  <span>{t.customers}</span>
+                  <span>Party List</span>
                 </button>
 
                 <button
@@ -484,7 +484,7 @@ export const Header: React.FC<HeaderProps> = ({
                 }`}
               >
                 <Users className="w-4 h-4" />
-                <span>{t.customers}</span>
+                <span>Party List</span>
               </button>
 
               <button
