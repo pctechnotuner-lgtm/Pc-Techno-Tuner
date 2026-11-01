@@ -22,6 +22,8 @@ import {
   Customer,
   Complaint,
   Invoice,
+  InwardRecord,
+  OutwardRecord,
   Language,
 } from '../types';
 import { getT } from '../i18n';
@@ -30,6 +32,8 @@ interface CustomersViewProps {
   customers: Customer[];
   invoices: Invoice[];
   complaints: Complaint[];
+  inwardRecords: InwardRecord[];
+  outwardRecords: OutwardRecord[];
   lang: Language;
   onSaveCustomer: (customer: Customer) => void;
   onDeleteCustomer: (customerId: string) => void;
@@ -40,6 +44,8 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
   customers,
   invoices,
   complaints,
+  inwardRecords,
+  outwardRecords,
   lang,
   onSaveCustomer,
   onDeleteCustomer,
@@ -367,8 +373,13 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
 
             {/* Quick Metrics Bar */}
             {(() => {
-              const custInvs = invoices.filter((i) => i.customerMobile === selectedCustomer.mobile);
-              const custComps = complaints.filter((c) => c.mobile === selectedCustomer.mobile);
+              const matchesParty = (name?: string, mobile?: string) =>
+                (!!mobile && mobile.replace(/\D/g, '') === selectedCustomer.mobile.replace(/\D/g, '')) ||
+                (!!name && name.trim().toLowerCase() === selectedCustomer.name.trim().toLowerCase());
+              const custInvs = invoices.filter((i) => matchesParty(i.customerName, i.customerMobile));
+              const custComps = complaints.filter((c) => matchesParty(c.customerName, c.mobile));
+              const custInwards = inwardRecords.filter((r) => matchesParty(r.customerName, r.phoneNumber));
+              const custOutwards = outwardRecords.filter((r) => matchesParty(r.customerName, r.phoneNumber));
               const totalBilled = custInvs.reduce((s, i) => s + i.totalAmount, 0);
               const totalPaid = custInvs.reduce((s, i) => s + i.amountPaid, 0);
               const due = custInvs.reduce((s, i) => s + i.balanceDue, 0);
@@ -429,6 +440,40 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
                         ))}
                       </div>
                     )}
+                  </div>
+
+                  {/* Inward and outward service history for this party */}
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    <section className="space-y-2">
+                      <h4 className="text-xs font-bold uppercase tracking-wider text-white">Inward Records ({custInwards.length})</h4>
+                      {custInwards.length === 0 ? <p className="text-xs italic text-gray-500">No inward records.</p> : (
+                        <div className="max-h-56 divide-y divide-gray-800 overflow-y-auto rounded-xl border border-gray-800 bg-gray-950">
+                          {custInwards.slice().sort((a,b) => (b.inwardDate || '').localeCompare(a.inwardDate || '')).map((r) => (
+                            <div key={r.id} className="p-3 text-xs">
+                              <div className="flex justify-between gap-2"><span className="font-mono font-bold text-amber-300">{r.id}</span><span className="text-gray-500">{r.inwardDate}</span></div>
+                              <p className="mt-1 font-semibold text-white">{r.productName}</p>
+                              <p className="text-gray-400">{r.problem}</p>
+                              <p className="mt-1 text-amber-300">Estimate: ₹{Number(r.estimateAmount || 0).toLocaleString('en-IN')}</p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </section>
+                    <section className="space-y-2">
+                      <h4 className="text-xs font-bold uppercase tracking-wider text-white">Outward Records ({custOutwards.length})</h4>
+                      {custOutwards.length === 0 ? <p className="text-xs italic text-gray-500">No outward records.</p> : (
+                        <div className="max-h-56 divide-y divide-gray-800 overflow-y-auto rounded-xl border border-gray-800 bg-gray-950">
+                          {custOutwards.slice().sort((a,b) => (b.outDate || '').localeCompare(a.outDate || '')).map((r) => (
+                            <div key={r.id} className="p-3 text-xs">
+                              <div className="flex justify-between gap-2"><span className="font-mono font-bold text-emerald-300">{r.inwardRecordId}</span><span className="text-gray-500">{r.outDate}</span></div>
+                              <p className="mt-1 font-semibold text-white">{r.productName}</p>
+                              <p className="text-gray-400">{r.solution}</p>
+                              <p className="mt-1 text-emerald-300">Collected: ₹{Number(r.amountCollected || 0).toLocaleString('en-IN')}</p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </section>
                   </div>
 
                   {/* Past Service Complaints */}
