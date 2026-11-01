@@ -874,7 +874,8 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#07111f] md:bg-[#0b1220] text-gray-100 selection:bg-blue-600 selection:text-white">
-      {isNativeApp && showBrandSplash && (
+      {/* Website pages never show the startup splash on refresh. Native app splash remains unchanged. */}
+      {isNativeApp && showBrandSplash && window.location.protocol === 'capacitor:' && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#020817]">
           <img
             src="./pc-techno-splash.svg"
