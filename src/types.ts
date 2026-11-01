@@ -240,6 +240,17 @@ export interface Transaction {
   createdAt: string;
 }
 
+export interface InwardRecord {
+  id: string;
+  customerName: string;
+  phoneNumber: string;
+  productName: string;
+  inwardDate: string;
+  problem: string;
+  estimateAmount: number;
+  createdAt: string;
+}
+
 export type AppTab =
   | 'catalogue'
   | 'complaint'
@@ -252,4 +263,5 @@ export type AppTab =
   | 'accounts'
   | 'reports'
   | 'settings'
-  | 'antivirus';
+  | 'antivirus'
+  | 'inward';
