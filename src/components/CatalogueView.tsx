@@ -180,7 +180,7 @@ Please send me the formal quotation including delivery and installation.`;
       </div>
 
       {/* Filter and Search Controls */}
-      <div className="space-y-4">
+      <div id="pt-products" className="space-y-4 scroll-mt-28">
         {/* Search Input */}
         <div className="relative max-w-md">
           <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
@@ -355,7 +355,7 @@ Please send me the formal quotation including delivery and installation.`;
       )}
 
       {/* Footer Contact & Trust Bar */}
-      <div className="bg-gray-900/70 border border-gray-800 rounded-2xl p-6 sm:p-8 space-y-6">
+      <div id="pt-about" className="bg-gray-900/70 scroll-mt-28 border border-gray-800 rounded-2xl p-6 sm:p-8 space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="space-y-2">
             <h4 className="text-sm font-bold text-white flex items-center gap-2">
