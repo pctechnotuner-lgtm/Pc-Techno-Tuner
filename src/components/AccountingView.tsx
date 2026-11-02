@@ -564,7 +564,7 @@ export const AccountingView: React.FC<AccountingViewProps> = ({
                   <input list="accounting-customer-options" value={formParty} onChange={(e) => {setFormParty(e.target.value);setSelectedBillId('');}} placeholder="Party ka naam ya mobile likhkar search karein..." className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-white"/>
                   <datalist id="accounting-customer-options">{customers.flatMap((customer) => [<option key={customer.id+'-name'} value={customer.name}/>, ...(customer.businessName ? [<option key={customer.id+'-business'} value={customer.businessName}/>] : []), <option key={customer.id+'-mobile'} value={customer.mobile}/>])}</datalist>
                 </div>
-                {formType === 'INCOME' && formParty.trim() && <div>
+                {formType === 'INCOME' && <div>
                   <label className="block text-gray-400 mb-1 font-semibold">Payment Type</label>
                   <div className="grid grid-cols-2 gap-2">
                     <button type="button" onClick={() => {setCustomerPaymentKind('ADVANCE');setSelectedBillId('');}} className={`rounded-lg border p-2.5 text-xs font-bold ${customerPaymentKind==='ADVANCE'?'border-emerald-400 bg-emerald-600/20 text-emerald-200':'border-gray-700 text-gray-400'}`}>Advance</button>
