@@ -77,6 +77,7 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
   const [search, setSearch] = useState('');
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [selectedLedgerEntry, setSelectedLedgerEntry] = useState<any | null>(null);
+  const [showOutstandingEntries, setShowOutstandingEntries] = useState(false);
 
   const printLedgerEntry = () => {
     if (!selectedLedgerEntry || !selectedCustomer) return;
@@ -485,12 +486,10 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
                       <span className="text-[10px] text-gray-500 uppercase block">Total Paid</span>
                       <span className="text-sm font-bold text-emerald-400 font-mono">₹{totalPaid.toLocaleString('en-IN')}</span>
                     </div>
-                    <div>
-                      <span className="text-[10px] text-gray-500 uppercase block">Outstanding Due</span>
-                      <span className={`text-sm font-bold font-mono ${due > 0 ? 'text-rose-400' : 'text-gray-400'}`}>
-                        ₹{due.toLocaleString('en-IN')}
-                      </span>
-                    </div>
+                    <button type="button" onClick={() => due > 0 && setShowOutstandingEntries(true)} disabled={due <= 0} className={`rounded-lg p-2 transition ${due > 0 ? 'cursor-pointer hover:bg-rose-950/40 focus:outline-none focus:ring-2 focus:ring-rose-400' : 'cursor-default'}`} title={due > 0 ? 'Click to view unpaid entries' : 'No outstanding payment'}>
+                      <span className="text-[10px] text-gray-500 uppercase block">Outstanding Due {due > 0 ? '↗' : ''}</span>
+                      <span className={`text-sm font-bold font-mono ${due > 0 ? 'text-rose-400' : 'text-gray-400'}`}>₹{due.toLocaleString('en-IN')}</span>
+                    </button>
                   </div>
 
                   {due > 0 && (
@@ -545,6 +544,30 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
                           </table>
                         </div>
                         <p className="text-[10px] text-gray-500">Invoice balance is shown as due. Estimate and inward amounts are not counted as outstanding until an invoice is made. Payment entries are shown separately to avoid double counting.</p>
+{showOutstandingEntries && (
+                          <div className="fixed inset-0 z-[125] flex items-center justify-center bg-black/80 p-3 backdrop-blur-sm" onClick={() => setShowOutstandingEntries(false)}>
+                            <section role="dialog" aria-modal="true" aria-labelledby="outstanding-list-title" className="w-full max-w-2xl max-h-[85vh] overflow-y-auto rounded-2xl border border-rose-500/30 bg-gray-950 text-white shadow-2xl" onClick={(event) => event.stopPropagation()}>
+                              <header className="flex items-center justify-between border-b border-gray-800 p-5"><div><h3 id="outstanding-list-title" className="text-lg font-black text-rose-300">Outstanding Entries</h3><p className="mt-1 text-sm text-gray-400">{selectedCustomer.name} • Total pending ₹{due.toLocaleString('en-IN')}</p></div><button type="button" onClick={() => setShowOutstandingEntries(false)} className="rounded-lg border border-gray-700 p-2"><X className="h-5 w-5"/></button></header>
+                              <div className="space-y-2 p-4">
+                                {[
+                                  ...custInvs.filter((inv) => Number(inv.balanceDue || 0) > 0).map((inv) => ({ key: 'inv-' + inv.id, type: 'Invoice', ref: inv.invoiceNo, date: inv.invoiceDate, work: (inv.items || []).map((item) => item.description + ' × ' + item.quantity).join(', '), amount: inv.totalAmount, paid: inv.amountPaid, due: inv.balanceDue, status: inv.paymentStatus, detail: (inv.items || []).map((item) => ({ name: item.description, qty: item.quantity, rate: item.unitPrice, total: item.lineTotal })) })),
+                                  ...custOutwards.filter((outward) => !outward.settlementApplied && Math.max(0, Number(outward.estimateAmount || custInwards.find((inward) => inward.id === outward.inwardRecordId)?.estimateAmount || 0) - Number(outward.amountCollected || 0)) > 0).map((outward) => {
+                                    const estimate = Number(outward.estimateAmount || custInwards.find((inward) => inward.id === outward.inwardRecordId)?.estimateAmount || 0);
+                                    const paid = Number(outward.amountCollected || 0);
+                                    return { key: 'out-' + outward.id, type: 'Outward Service', ref: outward.inwardRecordId, date: outward.outDate, work: outward.productName, amount: estimate, paid, due: Math.max(0, estimate - paid), status: 'Payment pending', detail: [{ name: 'Solution', value: outward.solution }, { name: 'Settlement', value: 'Not settled' }] };
+                                  })
+                                ].map((entry) => (
+                                  <button key={entry.key} type="button" onClick={() => { setShowOutstandingEntries(false); setSelectedLedgerEntry(entry); }} className="w-full rounded-xl border border-gray-800 bg-gray-900 p-4 text-left transition hover:border-rose-500/50 hover:bg-rose-950/20">
+                                    <div className="flex flex-wrap items-center justify-between gap-2"><span className="font-bold text-cyan-300">{entry.type} • {entry.ref}</span><span className="text-xs text-gray-400">{entry.date || '—'}</span></div>
+                                    <p className="mt-2 font-semibold text-white">{entry.work || '—'}</p>
+                                    <div className="mt-2 flex flex-wrap justify-between gap-2 text-sm"><span className="text-gray-400">Pending Amount</span><strong className="text-rose-300">₹{Number(entry.due || 0).toLocaleString('en-IN')}</strong></div>
+                                    <p className="mt-1 text-xs text-gray-400">Click to open full entry details</p>
+                                  </button>
+                                ))}
+                              </div>
+                            </section>
+                          </div>
+                        )}
 {selectedLedgerEntry && (
                           <div className="fixed inset-0 z-[130] flex items-center justify-center bg-black/80 p-3 backdrop-blur-sm" onClick={() => setSelectedLedgerEntry(null)}>
                             <section className="party-ledger-print w-full max-w-2xl max-h-[92vh] overflow-y-auto rounded-2xl border border-cyan-500/30 bg-gray-950 text-white shadow-2xl" role="dialog" aria-modal="true" aria-labelledby="ledger-entry-title" onClick={(event) => event.stopPropagation()}>
