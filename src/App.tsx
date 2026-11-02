@@ -1078,6 +1078,7 @@ export default function App() {
             profile={profile}
             lang={lang}
             onNavigateToComplaint={() => setActiveTab('complaint')}
+            onNavigateToQuote={() => setActiveTab('quote')}
           />
           </div>
         )}
