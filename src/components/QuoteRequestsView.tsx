@@ -37,7 +37,6 @@ export const QuoteRequestsView: React.FC<QuoteRequestsViewProps> = ({ isAdmin, p
   const [selectedQuoteId,setSelectedQuoteId]=useState<string|null>(null);
   const [editingQuoteId,setEditingQuoteId]=useState<string|null>(null);
   const [editDraft,setEditDraft]=useState<QuoteRow|null>(null);
-  const [printQuoteId,setPrintQuoteId]=useState<string|null>(null);
 
   const subtotal = useMemo(() => cart.reduce((sum,item)=>sum+(item.lineTotal||0),0),[cart]);
   const load = async () => {
@@ -45,7 +44,6 @@ export const QuoteRequestsView: React.FC<QuoteRequestsViewProps> = ({ isAdmin, p
     if(error) throw error; setRows((data||[]) as QuoteRow[]);
   };
   useEffect(()=>{ if(isAdmin) void load().catch(e=>setError(e.message||'Could not load quote requests')); },[isAdmin]);
-  useEffect(()=>{ if(!printQuoteId) return; const done=()=>setPrintQuoteId(null); window.addEventListener('afterprint',done); window.print(); return ()=>window.removeEventListener('afterprint',done); },[printQuoteId]);
 
   const addProduct = () => {
     const product=catalogue.find(p=>p.id===selectedProduct);
@@ -84,6 +82,19 @@ export const QuoteRequestsView: React.FC<QuoteRequestsViewProps> = ({ isAdmin, p
   const updateDraftItem=(index:number,field:'name'|'quantity'|'unitPrice',value:string)=>setEditDraft(old=>{if(!old)return old;const items=[...(old.items||[])];const item={...items[index]};if(field==='name')item.name=value;if(field==='quantity')item.quantity=Math.max(1,Number(value)||1);if(field==='unitPrice')item.unitPrice=value===''?null:Math.max(0,Number(value)||0);item.lineTotal=item.unitPrice===null?null:item.unitPrice*item.quantity;items[index]=item;return {...old,items,subtotal:items.reduce((sum,x)=>sum+(x.lineTotal||0),0),item_or_service:items.map(x=>x.name).join(', ')};});
   const removeDraftItem=(index:number)=>setEditDraft(old=>{if(!old)return old;const items=(old.items||[]).filter((_,i)=>i!==index);return {...old,items,subtotal:items.reduce((sum,x)=>sum+(x.lineTotal||0),0),item_or_service:items.map(x=>x.name).join(', ')};});
   const saveEdit=async()=>{if(!editDraft)return;if(!editDraft.customer_name.trim()||!editDraft.mobile.trim()){setError('Customer name aur mobile number zaroori hain.');return;}setBusy(true);setError('');const items=editDraft.items||[];const payload={customer_name:editDraft.customer_name.trim(),mobile:editDraft.mobile.trim(),business_name:editDraft.business_name?.trim()||null,email:editDraft.email?.trim()||null,details:editDraft.details||null,items,item_or_service:items.map(x=>x.name).join(', ')||editDraft.item_or_service,subtotal:items.reduce((sum,x)=>sum+(x.lineTotal||0),0)};const {error}=await supabase.from('quote_requests').update(payload).eq('id',editDraft.id);setBusy(false);if(error){setError(error.message||'Quote update nahi hua.');return;}setRows(old=>old.map(row=>row.id===editDraft.id?{...row,...payload}:row));setEditingQuoteId(null);setEditDraft(null);};
+  const printQuoteDocument=(quote:QuoteRow,draft:QuoteRow)=>{
+    const printWindow=window.open('','_blank','width=900,height=700');
+    if(!printWindow){setError('PDF print window block ho gayi. Browser me pop-ups allow karke dobara try karein.');return;}
+    const esc=(value:unknown)=>String(value??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    const items=draft.items||[];
+    const total=items.reduce((sum,item)=>sum+(item.lineTotal||0),0);
+    const itemRows=items.map(item=>'<tr><td>'+esc(item.name)+'</td><td>'+esc(item.quantity)+'</td><td>'+(item.unitPrice===null?'To be quoted':esc(money(item.unitPrice)))+'</td><td>'+(item.lineTotal===null?'Pending':esc(money(item.lineTotal)))+'</td></tr>').join('');
+    const html='<!doctype html><html><head><meta charset="utf-8"><title>Quotation '+esc(quote.id)+'</title><style>@page{size:A4 portrait;margin:14mm}*{box-sizing:border-box}body{font-family:Arial,Helvetica,sans-serif;color:#111;background:#fff;font-size:12px;line-height:1.45;margin:0}.header{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #164b82;padding-bottom:14px;margin-bottom:18px}.header h1{font-size:24px;color:#164b82;margin:0}.header p{margin:4px 0;color:#444}.header strong{font-size:20px}.meta{display:flex;justify-content:space-between;gap:12px;margin:14px 0 22px;font-size:11px}h3{font-size:13px;background:#edf3fa;padding:8px;margin:18px 0 8px}p{margin:7px 0}.items{width:100%;border-collapse:collapse;margin-top:8px}.items th,.items td{border:1px solid #888;padding:9px;text-align:left;color:#111}.items th{background:#edf3fa}.items td:nth-child(2),.items td:nth-child(3),.items td:nth-child(4){text-align:right}.total{text-align:right;font-size:16px;font-weight:bold;margin-top:16px}.foot{border-top:1px solid #aaa;padding-top:12px;margin-top:36px;font-size:10px;color:#444}@media screen{body{max-width:800px;margin:30px auto;padding:30px;box-shadow:0 0 12px #999}.actions{margin-bottom:20px}.actions button{padding:10px 18px;background:#164b82;color:#fff;border:0;border-radius:6px;cursor:pointer}}@media print{.actions{display:none}}</style></head><body><div class="actions"><button onclick="window.print()">Print / Save as PDF</button></div><div class="header"><div><h1>PC TECHNO TUNER</h1><p>IT Hardware • CCTV Surveillance • Laptop Repairs &amp; AMC Solutions</p></div><strong>QUOTATION</strong></div><div class="meta"><span><b>Quote ID:</b> '+esc(quote.id)+'</span><span><b>Date:</b> '+esc(new Date(quote.created_at).toLocaleDateString('en-IN'))+'</span><span><b>Status:</b> '+esc(quote.status)+'</span></div><h3>Customer Details</h3><p><b>Name:</b> '+esc(draft.customer_name)+'　 <b>Mobile:</b> '+esc(draft.mobile)+'</p><p><b>Business:</b> '+esc(draft.business_name||'—')+'　 <b>Email:</b> '+esc(draft.email||'—')+'</p><h3>Items / Services</h3><table class="items"><thead><tr><th>Item</th><th>Qty</th><th>Unit Price</th><th>Total</th></tr></thead><tbody>'+itemRows+'</tbody></table><p class="total">Grand Total: '+esc(money(total))+'</p>'+(draft.details?'<h3>Additional Details</h3><p>'+esc(draft.details)+'</p>':'')+'<p class="foot">PC TECHNO TUNER • Quotation enquiry / estimate. Final pricing and availability will be confirmed by PC TECHNO TUNER.</p></body></html>';
+    printWindow.document.open();
+    printWindow.document.write(html);
+    printWindow.document.close();
+    printWindow.focus();
+  };
   const updateStatus=async(id:string,status:QuoteRow['status'])=>{
     const {error}=await supabase.from('quote_requests').update({status}).eq('id',id);
     if(error){setError(error.message);return;} setRows(old=>old.map(r=>r.id===id?{...r,status}:r));
@@ -98,7 +109,7 @@ export const QuoteRequestsView: React.FC<QuoteRequestsViewProps> = ({ isAdmin, p
       return <div className="space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3"><button type="button" onClick={()=>{setSelectedQuoteId(null);setEditDraft(null);setError('');}} className="rounded-lg border border-slate-700 px-3 py-2 text-sm text-white">← Back</button><div><h1 className="text-xl font-black text-white">Quote Details</h1><p className="text-xs text-slate-400">{selectedQuote.id}</p></div></div>
-          <div className="flex flex-wrap items-center gap-2"><select aria-label="Quote status" value={selectedQuote.status} onChange={e=>void updateStatus(selectedQuote.id,e.target.value as QuoteRow['status'])} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-white"><option>New</option><option>Contacted</option><option>Quoted</option><option>Closed</option></select><button type="button" onClick={()=>setPrintQuoteId(selectedQuote.id)} className="rounded-lg border border-cyan-700 px-3 py-2 text-xs font-bold text-cyan-200">Save / Print PDF</button></div>
+          <div className="flex flex-wrap items-center gap-2"><select aria-label="Quote status" value={selectedQuote.status} onChange={e=>void updateStatus(selectedQuote.id,e.target.value as QuoteRow['status'])} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-white"><option>New</option><option>Contacted</option><option>Quoted</option><option>Closed</option></select><button type="button" onClick={()=>printQuoteDocument(selectedQuote,draft)} className="rounded-lg border border-cyan-700 px-3 py-2 text-xs font-bold text-cyan-200">Save / Print PDF</button></div>
         </div>
         {error&&<p className="rounded-lg border border-rose-800 bg-rose-950/40 p-3 text-xs text-rose-300">{error}</p>}
         <div className="rounded-xl border border-slate-800 bg-slate-900 p-4 sm:p-6 space-y-5">
@@ -123,13 +134,7 @@ export const QuoteRequestsView: React.FC<QuoteRequestsViewProps> = ({ isAdmin, p
           <div className="flex flex-wrap gap-2"><button type="button" disabled={busy} onClick={()=>void saveEdit()} className="rounded-lg bg-violet-600 px-5 py-3 text-sm font-bold text-white disabled:opacity-50">{busy?'Saving...':'Save Changes'}</button><button type="button" onClick={()=>setPrintQuoteId(selectedQuote.id)} className="rounded-lg border border-cyan-700 px-5 py-3 text-sm font-bold text-cyan-200">Save as PDF</button></div>
           <p className="text-[11px] text-slate-500">Request received: {new Date(selectedQuote.created_at).toLocaleString('en-IN')}</p>
         </div>
-        <div className="quote-print-area" data-print-active={printQuoteId===selectedQuote.id?'true':'false'}><div className="quote-print-sheet">
-          <div className="quote-print-header"><div><h1>PC TECHNO TUNER</h1><p>IT Hardware • CCTV Surveillance • Laptop Repairs & AMC Solutions</p></div><strong>QUOTATION</strong></div>
-          <div className="quote-print-meta"><span><b>Quote ID:</b> {selectedQuote.id}</span><span><b>Date:</b> {new Date(selectedQuote.created_at).toLocaleDateString('en-IN')}</span><span><b>Status:</b> {selectedQuote.status}</span></div>
-          <h3>Customer Details</h3><p><b>Name:</b> {draft.customer_name}　 <b>Mobile:</b> {draft.mobile}</p><p><b>Business:</b> {draft.business_name||'—'}　 <b>Email:</b> {draft.email||'—'}</p>
-          <h3>Items / Services</h3><table><thead><tr><th>Item</th><th>Qty</th><th>Unit Price</th><th>Total</th></tr></thead><tbody>{draftItems.map((item,i)=><tr key={i}><td>{item.name}</td><td>{item.quantity}</td><td>{item.unitPrice===null?'To be quoted':money(item.unitPrice)}</td><td>{item.lineTotal===null?'Pending':money(item.lineTotal)}</td></tr>)}</tbody></table>
-          <p className="quote-print-total">Grand Total: {money(draftItems.reduce((sum,item)=>sum+(item.lineTotal||0),0))}</p>{draft.details&&<><h3>Additional Details</h3><p>{draft.details}</p></>}<p className="quote-print-foot">PC TECHNO TUNER • Quotation</p>
-        </div></div>
+
       </div>;
     }
     return <div className="space-y-4">
