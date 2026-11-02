@@ -89,7 +89,7 @@ export const QuoteRequestsView: React.FC<QuoteRequestsViewProps> = ({ isAdmin, p
     if(error){setError(error.message);return;} setRows(old=>old.map(r=>r.id===id?{...r,status}:r));
   };
 
-<style>{`.quote-print-area{display:none}@media print{@page{size:A4;margin:14mm}body *{visibility:hidden!important}.quote-print-area[data-print-active="true"],.quote-print-area[data-print-active="true"] *{visibility:visible!important}.quote-print-area[data-print-active="true"]{display:block!important;position:absolute!important;left:0;top:0;width:100%;color:#111!important;background:#fff!important}.quote-print-sheet{font-family:Arial,sans-serif;color:#111;font-size:11px}.quote-print-header{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #164b82;padding-bottom:12px;margin-bottom:16px}.quote-print-header h1{font-size:22px;margin:0;color:#164b82}.quote-print-header p{margin:4px 0}.quote-print-header strong{font-size:18px}.quote-print-meta{display:flex;justify-content:space-between;gap:10px;margin:12px 0}.quote-print-sheet h3{background:#edf3fa;padding:7px;margin:14px 0 8px;font-size:12px}.quote-print-sheet p{margin:6px 0}.quote-print-sheet table{width:100%;border-collapse:collapse;margin-top:8px}.quote-print-sheet th,.quote-print-sheet td{border:1px solid #999;padding:8px;text-align:left}.quote-print-sheet th{background:#edf3fa}.quote-print-total{text-align:right;font-weight:bold;font-size:14px;margin-top:12px!important}.quote-print-foot{border-top:1px solid #aaa;padding-top:12px;margin-top:28px!important;font-size:10px}}`}</style>
+
   if(isAdmin) {
     const selectedQuote=rows.find(row=>row.id===selectedQuoteId);
     if(selectedQuote) {
