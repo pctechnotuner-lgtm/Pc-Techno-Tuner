@@ -1,6 +1,6 @@
 import { Customer } from '../types';
 
-export const normalizePartyPhone = (value?: string) => (value || '').replace(/\D/g, '');
+export const normalizePartyPhone = (value?: string) => { const digits=(value||'').replace(/\D/g,''); return digits.length===12 && digits.startsWith('91') ? digits.slice(2) : digits; };
 
 export const sameParty = (
   a: { name?: string; mobile?: string },
