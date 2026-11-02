@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { getWhatsAppBusinessUrl, openWhatsAppBusiness } from '../lib/whatsapp';
 import {
   Users,
@@ -31,6 +31,7 @@ import {
 } from '../types';
 import { getT } from '../i18n';
 import { sameParty } from '../lib/party';
+import { supabase } from '../lib/supabaseClient';
 
 interface CustomersViewProps {
   customers: Customer[];
@@ -45,6 +46,17 @@ interface CustomersViewProps {
   onSaveCustomer: (customer: Customer) => void;
   onDeleteCustomer: (customerId: string) => void;
   onExportCsv: () => void;
+}
+
+interface QuoteLedgerRecord {
+  id: string;
+  customer_name: string;
+  mobile: string;
+  business_name?: string | null;
+  items?: Array<{ name?: string; quantity?: number; unitPrice?: number | null; lineTotal?: number | null }>;
+  subtotal?: number;
+  status?: string;
+  created_at?: string;
 }
 
 export const CustomersView: React.FC<CustomersViewProps> = ({
@@ -64,6 +76,17 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
   const t = getT(lang);
   const [search, setSearch] = useState('');
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [quoteHistory, setQuoteHistory] = useState<QuoteLedgerRecord[]>([]);
+
+  useEffect(() => {
+    let active = true;
+    void supabase.from('quote_requests').select('id,customer_name,mobile,business_name,items,subtotal,status,created_at').then(({ data, error }) => {
+      if (!active) return;
+      if (error) { console.error('Party quote history load failed:', error); return; }
+      setQuoteHistory((data || []) as QuoteLedgerRecord[]);
+    });
+    return () => { active = false; };
+  }, []);
 
   // New / Edit Party modal
   const [modalOpen, setModalOpen] = useState(false);
@@ -386,6 +409,7 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
               const matchesParty = (name?: string, mobile?: string) => sameParty({ name, mobile }, selectedCustomer);
               const custInvs = invoices.filter((i) => matchesParty(i.customerName, i.customerMobile));
               const custEstimates = estimates.filter((e) => matchesParty(e.customerName, e.customerMobile));
+              const custQuotes = quoteHistory.filter((q) => matchesParty(q.customer_name, q.mobile));
               const custComps = complaints.filter((c) => matchesParty(c.customerName, c.mobile));
               const custInwards = inwardRecords.filter((r) => matchesParty(r.customerName, r.phoneNumber));
               const custOutwards = outwardRecords.filter((r) => matchesParty(r.customerName, r.phoneNumber));
@@ -457,6 +481,12 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
                   <div className="space-y-2">
                     <h4 className="text-xs font-bold text-white uppercase tracking-wider">Estimates / Quotations ({custEstimates.length})</h4>
                     {custEstimates.length === 0 ? <p className="text-xs italic text-gray-500">No estimates recorded.</p> : <div className="divide-y divide-gray-800 border border-gray-800 rounded-xl overflow-hidden bg-gray-950">{custEstimates.map((e) => <div key={e.id} className="p-3 text-xs flex items-center justify-between gap-3"><div><p className="font-mono font-bold text-cyan-300">{e.estimateNo}</p><p className="text-[10px] text-gray-500">Date: {e.estimateDate} • Valid until: {e.validUntil}</p></div><div className="text-right"><p className="font-bold text-white">₹{Number(e.totalAmount||0).toLocaleString('en-IN')}</p><p className="text-[10px] text-gray-500">{e.items?.length||0} item(s)</p></div></div>)}</div>}
+                  </div>
+
+                  {/* Customer quote request history */}
+                  <div className="space-y-2">
+                    <h4 className="text-xs font-bold text-white uppercase tracking-wider">Customer Quote Requests ({custQuotes.length})</h4>
+                    {custQuotes.length === 0 ? <p className="text-xs italic text-gray-500">No customer quote requests recorded.</p> : <div className="divide-y divide-gray-800 border border-gray-800 rounded-xl overflow-hidden bg-gray-950">{custQuotes.map((q) => <div key={q.id} className="p-3 text-xs flex items-center justify-between gap-3"><div><p className="font-mono font-bold text-cyan-300">{q.id}</p><p className="text-[10px] text-gray-500">{q.created_at ? new Date(q.created_at).toLocaleString('en-IN') : ''} • {q.status || 'New'}</p><p className="text-gray-300">{(q.items||[]).map(item=>item.name+' × '+(item.quantity||1)).join(', ')}</p></div><div className="text-right font-bold text-white">₹{Number(q.subtotal||0).toLocaleString('en-IN')}</div></div>)}</div>}
                   </div>
 
                   {/* Accounts transactions */}
