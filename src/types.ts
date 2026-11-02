@@ -282,6 +282,8 @@ export type AppTab =
   | 'sales'
   | 'profit'
   | 'accounts'
+  | 'payment-in'
+  | 'payment-out'
   | 'reports'
   | 'settings'
   | 'antivirus'
