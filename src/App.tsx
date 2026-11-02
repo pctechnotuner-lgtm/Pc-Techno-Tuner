@@ -1247,6 +1247,8 @@ export default function App() {
             outwardRecords={outwardRecords}
             lang={lang}
             onSaveTransaction={handleSaveTransaction}
+            onSaveOutwardRecord={handleSaveOutwardRecord}
+            onSaveInvoice={handleSaveInvoice}
             onDeleteTransaction={handleDeleteTransaction}
             onExportCsv={exportAccountingCsv}
           />
