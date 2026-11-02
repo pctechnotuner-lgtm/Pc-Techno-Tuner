@@ -4,10 +4,16 @@ import { Product } from './types';
 // Stock and prices are intentionally zero: these are enquiry catalogue entries,
 // not a claim that PC TECHNO TUNER currently holds inventory.
 const image = 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=600&h=450&fit=crop';
+// Official manufacturer product photos for keyboard models verified against product pages.
+const keyboardImages: Record<string, string> = {
+  'K5002MW': 'https://shop.zebronics.com/cdn/shop/files/Zeb-K5002MW-pic1_b20858ce-1b0c-4973-b3c6-2a824d76bf4c.jpg?v=1729670202&width=2000',
+  'K4001M Nitro Plus': 'https://zebronics.com/cdn/shop/files/Zeb-Nitro-plus-pic-4.jpg?v=1720252972&width=2000',
+  'K6000MW Nitro Pro': 'https://cdn.shopify.com/s/files/1/0356/9850/7909/files/Nitro-pro-banner2.jpg?v=1676977815',
+};
 const now = '2026-11-02T00:00:00.000Z';
 
 const entries: Array<[string, string, string, string, string]> = [
-  ['Keyboard','Zebronics','K5002MW','Bluetooth multimedia keyboard; exact variant/color to be confirmed.','Computer Accessories'],
+  ['Keyboard','Zebronics','K5002MW','Bluetooth multimedia keyboard; exact variant/color to be confirmed.','Computer Accessories'],\n  ['Keyboard','TVS Electronics','Gold Prime','104-key dust-resistant mechanical USB keyboard; laser-etched keycaps rated up to 50 million keystrokes.','Computer Accessories'],
   ['Keyboard','Zebronics','K4001M Nitro Plus','Mechanical USB wired keyboard.','Computer Accessories'],
   ['Keyboard','Zebronics','K6000MW Nitro Pro','Mechanical USB wired keyboard.','Computer Accessories'],
   ['Keyboard','Zebronics','Max Ninja 104W','104-key mechanical keyboard; wireless/rechargeable.','Computer Accessories'],
