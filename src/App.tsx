@@ -1068,6 +1068,10 @@ export default function App() {
             customers={customers}
             invoices={invoices}
             transactions={transactions}
+            inwardRecords={inwardRecords}
+            outwardRecords={outwardRecords}
+            antivirusLicenses={antivirusLicenses}
+            estimates={estimates}
             profile={profile}
             lang={lang}
             onNavigateTab={setActiveTab}
