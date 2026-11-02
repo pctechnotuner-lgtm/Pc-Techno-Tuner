@@ -33,6 +33,7 @@ interface CatalogueViewProps {
   profile: CompanyProfile;
   lang: Language;
   onNavigateToComplaint: () => void;
+  onNavigateToQuote: () => void;
 }
 
 export const CatalogueView: React.FC<CatalogueViewProps> = ({
@@ -40,6 +41,7 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
   profile,
   lang,
   onNavigateToComplaint,
+  onNavigateToQuote,
 }) => {
   const t = getT(lang);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
@@ -87,7 +89,7 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
 
   const handleEnquireWhatsApp = (_product: Product) => openWhatsAppBusiness(profile.whatsapp);
 
-  const handleRequestQuoteWhatsApp = (_product?: Product) => openWhatsAppBusiness(profile.whatsapp);
+  const handleRequestQuoteWhatsApp = (_product?: Product) => onNavigateToQuote();
 
   return (
     <div className="space-y-8 animate-fadeIn">
