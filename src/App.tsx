@@ -1255,7 +1255,8 @@ export default function App() {
             onDeleteTransaction={handleDeleteTransaction}
             onExportCsv={exportAccountingCsv}
             initialEntryType={activeTab === 'payment-out' ? 'EXPENSE' : 'INCOME'}
-            openEntryOnMount={activeTab !== 'accounts'}
+            openEntryOnMount={false}
+            partyPickerMode={activeTab !== 'accounts'}
           />
         )}
 
