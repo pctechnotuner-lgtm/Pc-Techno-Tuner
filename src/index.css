@@ -189,3 +189,33 @@ button, a, [role="button"] { touch-action: manipulation; }
   main { padding-left: 12px !important; padding-right: 12px !important; }
   header { padding-top: env(safe-area-inset-top); }
 }
+
+
+/* PC TECHNO TUNER quotation print layout */
+.quote-print-area { display: none !important; }
+@media print {
+  @page { size: A4 portrait; margin: 14mm; }
+  html, body, #root { background: #fff !important; color: #111 !important; }
+  body * { visibility: hidden !important; }
+  .quote-print-area[data-print-active="true"],
+  .quote-print-area[data-print-active="true"] * { visibility: visible !important; }
+  .quote-print-area[data-print-active="true"] {
+    display: block !important; position: fixed !important; left: 0 !important; top: 0 !important;
+    width: 100% !important; padding: 0 !important; margin: 0 !important;
+    background: #fff !important; color: #111 !important; z-index: 2147483647 !important;
+  }
+  .quote-print-sheet { display: block !important; width: 100% !important; font-family: Arial,Helvetica,sans-serif !important; font-size: 11px !important; line-height: 1.45 !important; color: #111 !important; background: #fff !important; }
+  .quote-print-header { display:flex !important; justify-content:space-between !important; align-items:center !important; border-bottom:2px solid #164b82 !important; padding-bottom:12px !important; margin-bottom:16px !important; }
+  .quote-print-header h1 { font-size:22px !important; margin:0 !important; color:#164b82 !important; }
+  .quote-print-header p { margin:4px 0 !important; color:#333 !important; }
+  .quote-print-header strong { font-size:18px !important; color:#111 !important; }
+  .quote-print-meta { display:flex !important; justify-content:space-between !important; gap:10px !important; margin:12px 0 !important; color:#111 !important; }
+  .quote-print-sheet h3 { display:block !important; background:#edf3fa !important; color:#111 !important; padding:7px !important; margin:14px 0 8px !important; font-size:12px !important; }
+  .quote-print-sheet p { color:#111 !important; margin:6px 0 !important; }
+  .quote-print-sheet table { display:table !important; width:100% !important; border-collapse:collapse !important; margin-top:8px !important; color:#111 !important; }
+  .quote-print-sheet th, .quote-print-sheet td { border:1px solid #999 !important; padding:8px !important; text-align:left !important; color:#111 !important; }
+  .quote-print-sheet th { background:#edf3fa !important; }
+  .quote-print-total { text-align:right !important; font-weight:bold !important; font-size:14px !important; margin-top:12px !important; }
+  .quote-print-foot { border-top:1px solid #aaa !important; padding-top:12px !important; margin-top:28px !important; font-size:10px !important; }
+  * { -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
+}
