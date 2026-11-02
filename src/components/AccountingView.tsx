@@ -68,6 +68,7 @@ export const AccountingView: React.FC<AccountingViewProps> = ({
   const [filterCategory, setFilterCategory] = useState<string>('ALL');
   const [search, setSearch] = useState('');
   const [dateRange, setDateRange] = useState('');
+  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
 
   // Form State
   const [formType, setFormType] = useState<'INCOME' | 'EXPENSE'>('INCOME');
@@ -319,7 +320,7 @@ export const AccountingView: React.FC<AccountingViewProps> = ({
             </thead>
             <tbody className="divide-y divide-gray-800">
               {filtered.map((tx) => (
-                <tr key={tx.id} className="hover:bg-gray-800/40 transition">
+                <tr key={tx.id} onClick={() => setSelectedTransaction(tx)} className="cursor-pointer hover:bg-blue-950/30 transition">
                   <td className="py-3 px-4 text-gray-400 font-mono">{tx.date}</td>
                   <td className="py-3 px-4">
                     <span
@@ -354,7 +355,8 @@ export const AccountingView: React.FC<AccountingViewProps> = ({
                   </td>
                   <td className="py-3 px-4 text-right">
                     {!tx.id.startsWith('auto-invoice-payment-') && !tx.id.startsWith('auto-outward-payment-') && <button
-                      onClick={() => {
+                      onClick={(event) => {
+                        event.stopPropagation();
                         if (confirm('Delete this accounting entry?')) onDeleteTransaction(tx.id);
                       }}
                       className="text-gray-500 hover:text-rose-400 text-xs transition"
@@ -368,6 +370,46 @@ export const AccountingView: React.FC<AccountingViewProps> = ({
           </table>
         </div>
       </div>
+
+
+      {selectedTransaction && (() => {
+        const isOutward = selectedTransaction.id.startsWith('auto-outward-payment-');
+        const isInvoice = selectedTransaction.id.startsWith('auto-invoice-payment-');
+        const sourceId = selectedTransaction.id.replace(/^auto-(?:outward|invoice)-payment-/, '');
+        const outward = isOutward ? outwardRecords.find((r) => r.id === sourceId) : undefined;
+        const invoice = isInvoice ? invoices.find((r) => r.id === sourceId) : undefined;
+        const rows: [string, string][] = outward ? [
+          ['Outward ID', outward.id], ['Inward ID', outward.inwardRecordId], ['Product / Device', outward.productName],
+          ['Customer', outward.customerName], ['Mobile', outward.phoneNumber], ['Inward Date', outward.inwardDate],
+          ['Outward Date', outward.outDate], ['Reported Problem', outward.inwardProblem], ['Work / Solution', outward.solution],
+          ['Estimate Amount', '₹' + Number(outward.estimateAmount || 0).toLocaleString('en-IN')],
+          ['Amount Collected', '₹' + Number(outward.amountCollected || 0).toLocaleString('en-IN')],
+          ['Settlement', outward.settlementApplied ? 'Settled / balance waived' : 'Not settled'],
+          ['Settlement Note', outward.settlementNote || '—'], ['Delivered By', outward.deliveryBy || '—']
+        ] : [];
+        return (
+          <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4" onClick={() => setSelectedTransaction(null)}>
+            <section role="dialog" aria-modal="true" className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl border border-cyan-500/30 bg-gray-950 text-white shadow-2xl" onClick={(event) => event.stopPropagation()}>
+              <header className="flex items-start justify-between gap-3 border-b border-gray-800 bg-gray-900 p-5">
+                <div><p className="text-xs font-bold uppercase tracking-widest text-cyan-300">PC TECHNO TUNER • Payment Details</p>
+                  <h2 className="mt-1 text-xl font-black">{isOutward ? 'Outward Service Payment' : isInvoice ? 'Sales Bill / Invoice Payment' : selectedTransaction.type === 'INCOME' ? 'Income Entry' : 'Expense Entry'}</h2>
+                  <p className="mt-1 text-sm text-gray-400">{selectedTransaction.partyName}</p></div>
+                <button type="button" onClick={() => setSelectedTransaction(null)} className="rounded-lg border border-gray-700 p-2"><X className="h-5 w-5"/></button>
+              </header>
+              <div className="grid grid-cols-2 gap-3 p-5 sm:grid-cols-3">
+                {([['Date',selectedTransaction.date],['Payment Type',isOutward ? 'Outward' : isInvoice ? 'Sales Bill / Invoice' : selectedTransaction.type],['Method',selectedTransaction.paymentMethod],['Amount Received','₹' + Number(selectedTransaction.amount || 0).toLocaleString('en-IN')],['Reference ID',selectedTransaction.referenceId || '—'],['Category',selectedTransaction.category]] as [string,string][]).map(([label,value]) => <div key={label} className="rounded-xl border border-gray-800 bg-gray-900 p-3"><p className="text-xs text-gray-400">{label}</p><p className="mt-1 break-words text-sm font-bold">{value}</p></div>)}
+              </div>
+              {outward && <div className="px-5 pb-5"><h3 className="mb-2 font-bold text-cyan-300">Outward / Service Details</h3><div className="rounded-xl border border-gray-800 p-4">{rows.map(([label,value]) => <div key={label} className="flex flex-wrap justify-between gap-2 border-b border-gray-800 py-2 text-sm"><span className="text-gray-400">{label}</span><strong className="max-w-[65%] break-words text-right">{value}</strong></div>)}</div></div>}
+              {invoice && <div className="px-5 pb-5"><h3 className="mb-2 font-bold text-cyan-300">Sales Bill / Invoice Details</h3><div className="rounded-xl border border-gray-800 p-4">
+                {([['Invoice No.',invoice.invoiceNo],['Invoice Date',invoice.invoiceDate],['Customer',invoice.customerName],['Mobile',invoice.customerMobile],['Address',invoice.customerAddress],['GSTIN',invoice.customerGstin || '—'],['Subtotal','₹' + Number(invoice.subtotal || 0).toLocaleString('en-IN')],['Tax','₹' + Number(invoice.taxAmount || 0).toLocaleString('en-IN')],['Discount','₹' + Number(invoice.discount || 0).toLocaleString('en-IN')],['Invoice Total','₹' + Number(invoice.totalAmount || 0).toLocaleString('en-IN')],['Total Paid','₹' + Number(invoice.amountPaid || 0).toLocaleString('en-IN')],['Balance Due','₹' + Number(invoice.balanceDue || 0).toLocaleString('en-IN')]] as [string,string][]).map(([label,value]) => <div key={label} className="flex justify-between gap-2 border-b border-gray-800 py-2 text-sm"><span className="text-gray-400">{label}</span><strong>{value}</strong></div>)}
+                <h4 className="mt-4 font-bold text-cyan-300">Bill Items</h4><div className="mt-2 overflow-x-auto"><table className="w-full text-left text-xs"><thead><tr><th className="p-2">Item</th><th className="p-2">Qty</th><th className="p-2">Rate</th><th className="p-2">Total</th></tr></thead><tbody>{invoice.items.map((item,index) => <tr key={index} className="border-t border-gray-800"><td className="p-2">{item.description}</td><td className="p-2">{item.quantity}</td><td className="p-2">₹{Number(item.unitPrice || 0).toLocaleString('en-IN')}</td><td className="p-2">₹{Number(item.lineTotal || 0).toLocaleString('en-IN')}</td></tr>)}</tbody></table></div>
+              </div></div>}
+              {!outward && !invoice && <div className="px-5 pb-5"><div className="rounded-xl border border-gray-800 p-4"><h3 className="mb-2 font-bold text-cyan-300">Entry Notes</h3><p className="text-sm text-gray-300">{selectedTransaction.notes || 'No additional details recorded.'}</p></div></div>}
+              <footer className="flex justify-end border-t border-gray-800 p-4"><button type="button" onClick={() => setSelectedTransaction(null)} className="rounded-xl border border-gray-700 px-5 py-2.5 text-sm font-bold">Close</button></footer>
+            </section>
+          </div>
+        );
+      })()}
 
       {/* Add Transaction Modal */}
       {modalOpen && (
