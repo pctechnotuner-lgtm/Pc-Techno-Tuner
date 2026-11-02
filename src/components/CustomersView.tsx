@@ -463,13 +463,15 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
               const custOutwards = outwardRecords.filter((r) => matchesParty(r.customerName, r.phoneNumber));
               const custTransactions = transactions.filter((tx) => matchesParty(tx.partyName));
               const custAntivirus = antivirusLicenses.filter((license) => matchesParty(license.customerName, license.mobile));
-              const totalBilled = custInvs.reduce((s, i) => s + i.totalAmount, 0);
-              const totalPaid = custInvs.reduce((s, i) => s + i.amountPaid, 0);
+              const serviceBilled = custOutwards.reduce((sum, outward) => sum + Number(outward.estimateAmount || custInwards.find((record) => record.id === outward.inwardRecordId)?.estimateAmount || 0), 0);
+              const servicePaid = custOutwards.reduce((sum, outward) => sum + Number(outward.amountCollected || 0), 0);
               const serviceDue = custOutwards.reduce((sum, outward) => {
                 const inward = custInwards.find((record) => record.id === outward.inwardRecordId);
                 const estimate = Number(outward.estimateAmount || inward?.estimateAmount || 0);
                 return sum + Math.max(0, estimate - Number(outward.amountCollected || 0));
               }, 0);
+              const totalBilled = custInvs.reduce((s, i) => s + i.totalAmount, 0) + serviceBilled;
+              const totalPaid = custInvs.reduce((s, i) => s + i.amountPaid, 0) + servicePaid;
               const due = custInvs.reduce((s, i) => s + i.balanceDue, 0) + serviceDue;
 
               return (
