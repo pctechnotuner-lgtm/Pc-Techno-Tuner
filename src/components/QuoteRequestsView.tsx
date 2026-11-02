@@ -23,7 +23,8 @@ const money = (value: number) => '₹' + value.toLocaleString('en-IN', { maximum
 
 export const QuoteRequestsView: React.FC<QuoteRequestsViewProps> = ({ isAdmin, products = [] }) => {
   const [catalogue,setCatalogue]=useState<Product[]>(products);
-  useEffect(()=>{ if(!isAdmin) void supabase.from('quote_catalogue').select('id,name,selling_price').eq('active',true).order('name').then(({data,error})=>{ if(!error&&data) setCatalogue(data.map((p:any)=>({id:p.id,name:p.name,sellingPrice:Number(p.selling_price)} as Product))); }); },[isAdmin]);\n  const [name,setName]=useState(''); const [mobile,setMobile]=useState('');
+  useEffect(()=>{ if(!isAdmin) void supabase.from('quote_catalogue').select('id,name,selling_price').eq('active',true).order('name').then(({data,error})=>{ if(!error&&data) setCatalogue(data.map((p:any)=>({id:p.id,name:p.name,sellingPrice:Number(p.selling_price)} as Product))); }); },[isAdmin]);
+  const [name,setName]=useState(''); const [mobile,setMobile]=useState('');
   const [business,setBusiness]=useState(''); const [email,setEmail]=useState('');
   const [details,setDetails]=useState('');
   const [selectedProduct,setSelectedProduct]=useState('');
