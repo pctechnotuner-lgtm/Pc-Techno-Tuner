@@ -1113,11 +1113,11 @@ export default function App() {
 
 
         {activeTab === 'quote' && (
-          <QuoteRequestsView isAdmin={false} products={products} />
+          <QuoteRequestsView isAdmin={false} products={products} profile={profile} />
         )}
 
         {activeTab === 'quotes' && isAdmin && (
-          <QuoteRequestsView isAdmin={true} products={products} />
+          <QuoteRequestsView isAdmin={true} products={products} profile={profile} />
         )}
 
         {activeTab === 'complaint' && (
