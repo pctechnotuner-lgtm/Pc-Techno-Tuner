@@ -1015,6 +1015,18 @@ export default function App() {
             </button>
           </div>
         )}
+        {activeTab === 'catalogue' && (
+          <div id="pt-services">
+          <CatalogueView
+            products={products}
+            profile={profile}
+            lang={lang}
+            onNavigateToComplaint={() => setActiveTab('complaint')}
+          />
+          </div>
+        )}
+
+
         {!isNativeApp && !isAdmin && activeTab === 'catalogue' && (
           <section className="relative isolate w-full min-h-[calc(100svh-5rem)] overflow-hidden bg-[#030817]">
             <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_18%_20%,rgba(0,190,255,.24),transparent_38%),radial-gradient(ellipse_at_85%_75%,rgba(50,70,210,.28),transparent_42%),linear-gradient(135deg,#030817,#081a36_55%,#10113b)]" />
@@ -1069,17 +1081,6 @@ export default function App() {
             </div>
           </section>
         )}
-        {activeTab === 'catalogue' && (
-          <div id="pt-services">
-          <CatalogueView
-            products={products}
-            profile={profile}
-            lang={lang}
-            onNavigateToComplaint={() => setActiveTab('complaint')}
-          />
-          </div>
-        )}
-
         {activeTab === 'complaint' && (
           <ComplaintFormView
             profile={profile}
