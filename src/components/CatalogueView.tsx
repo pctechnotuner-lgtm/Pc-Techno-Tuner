@@ -92,7 +92,7 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
   return (
     <div className="space-y-8 animate-fadeIn">
       {/* High Impact Hero Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-blue-950 to-gray-950 border border-blue-900/50 shadow-2xl p-6 sm:p-10">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-blue-950 to-gray-950 border border-blue-900/50 shadow-2xl p-4 sm:p-5">
         <div className="absolute -right-20 -top-20 w-80 h-80 bg-blue-600/15 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute right-10 bottom-0 opacity-10 pointer-events-none">
           <Monitor className="w-64 h-64 text-blue-400" />
@@ -104,7 +104,7 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
             <span>Authorized IT Products & AMC Services • Ahmedabad</span>
           </div>
 
-          <h1 className="text-2xl sm:text-4xl md:text-5xl font-black text-white tracking-tight leading-tight">
+          <h1 className="text-lg sm:text-2xl md:text-3xl font-black text-white tracking-tight leading-tight">
             Premium IT Hardware & CCTV Security for Your Business
           </h1>
 
@@ -114,6 +114,13 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
 
           <div className="flex flex-wrap gap-3 pt-2">
             <button
+              onClick={onNavigateToComplaint}
+              className="px-5 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 border border-cyan-300 font-black text-xs sm:text-sm transition flex items-center gap-2 shadow-lg shadow-cyan-400/40 animate-pulse shadow-lg shadow-cyan-500/30 animate-pulse"
+            >
+              <Wrench className="w-4 h-4 text-slate-900" />
+              <span>{t.bookComplaint}</span>
+            </button>
+            <button
               onClick={() => handleRequestQuoteWhatsApp()}
               className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-blue-500/30 transition flex items-center gap-2"
             >
@@ -121,13 +128,7 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
               <span>{t.requestQuote}</span>
             </button>
 
-            <button
-              onClick={onNavigateToComplaint}
-              className="px-5 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 border border-cyan-300 font-black text-xs sm:text-sm transition flex items-center gap-2 shadow-lg shadow-cyan-500/30 animate-pulse"
-            >
-              <Wrench className="w-4 h-4 text-blue-400" />
-              <span>{t.bookComplaint}</span>
-            </button>
+
 
             <a
               href={`tel:${profile.mobile}`}
