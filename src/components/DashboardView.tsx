@@ -27,6 +27,10 @@ import {
   Language,
   Product,
   Transaction,
+  InwardRecord,
+  OutwardRecord,
+  AntivirusLicense,
+  Estimate,
 } from '../types';
 import { getT } from '../i18n';
 
@@ -36,6 +40,10 @@ interface DashboardViewProps {
   customers: Customer[];
   invoices: Invoice[];
   transactions: Transaction[];
+  inwardRecords: InwardRecord[];
+  outwardRecords: OutwardRecord[];
+  antivirusLicenses: AntivirusLicense[];
+  estimates: Estimate[];
   profile: CompanyProfile;
   lang: Language;
   onNavigateTab: (tab: AppTab) => void;
@@ -52,6 +60,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   customers,
   invoices,
   transactions,
+  inwardRecords,
+  outwardRecords,
+  antivirusLicenses,
+  estimates,
   profile,
   lang,
   onNavigateTab,
@@ -150,6 +162,48 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </button>
         </div>
       </div>
+
+      {/* Admin module shortcuts with live entry counts */}
+      <section className="space-y-3">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <h2 className="text-base font-black text-white">Admin Quick Access</h2>
+            <p className="text-xs text-gray-400">Har module ki total entries — click karke seedha open karein</p>
+          </div>
+          <span className="text-[10px] font-bold rounded-full border border-blue-800 bg-blue-950 px-2.5 py-1 text-blue-300">LIVE COUNTS</span>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3">
+          {([
+            { label: 'Parties', count: customers.length, detail: 'Company / Party records', tab: 'customers' as AppTab, icon: Users, color: 'text-cyan-300' },
+            { label: 'Products', count: products.length, detail: 'Items in inventory', tab: 'products' as AppTab, icon: Package, color: 'text-blue-300' },
+            { label: 'Inward Entries', count: inwardRecords.length, detail: 'Received service items', tab: 'inward' as AppTab, icon: Package, color: 'text-amber-300' },
+            { label: 'Outward Entries', count: outwardRecords.length, detail: 'Delivered service items', tab: 'outward' as AppTab, icon: CheckCircle2, color: 'text-emerald-300' },
+            { label: 'Complaints', count: complaints.length, detail: 'Service tickets', tab: 'complaints' as AppTab, icon: Wrench, color: 'text-orange-300' },
+            { label: 'Invoices', count: invoices.length, detail: 'Bills and invoices', tab: 'sales' as AppTab, icon: Receipt, color: 'text-violet-300' },
+            { label: 'Payments', count: transactions.length, detail: 'Income + expense entries', tab: 'accounts' as AppTab, icon: DollarSign, color: 'text-green-300' },
+            { label: 'Antivirus Licenses', count: antivirusLicenses.length, detail: 'License records', tab: 'antivirus' as AppTab, icon: Database, color: 'text-fuchsia-300' },
+            { label: 'Estimates', count: estimates.length, detail: 'Quotation records', tab: 'profit' as AppTab, icon: Receipt, color: 'text-sky-300' },
+            { label: 'Reports', count: invoices.length + transactions.length + complaints.length, detail: 'Records included in reports', tab: 'reports' as AppTab, icon: TrendingUp, color: 'text-pink-300' },
+          ]).map((item) => {
+            const Icon = item.icon;
+            return (
+              <button key={item.label} type="button" onClick={() => onNavigateTab(item.tab)} className="group min-h-[112px] rounded-2xl border border-slate-700/80 bg-gradient-to-br from-[#111c30] to-[#0b1220] p-4 text-left shadow-lg shadow-black/10 transition hover:-translate-y-0.5 hover:border-blue-500/70 hover:bg-blue-950/30 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <div className="flex items-center justify-between gap-2">
+                  <Icon className={`h-5 w-5 ${item.color}`} />
+                  <ArrowRight className="h-4 w-4 text-slate-500 transition group-hover:translate-x-1 group-hover:text-blue-300" />
+                </div>
+                <div className="mt-3 flex items-end justify-between gap-2">
+                  <div>
+                    <div className="text-sm font-bold text-white">{item.label}</div>
+                    <div className="mt-0.5 text-[10px] text-slate-400">{item.detail}</div>
+                  </div>
+                  <div className="text-2xl font-black tabular-nums text-white">{item.count}</div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </section>
 
       {/* KPI Summary Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
