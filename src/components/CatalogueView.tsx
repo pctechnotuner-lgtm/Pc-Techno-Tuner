@@ -260,7 +260,11 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
                   </div>
 
                   <div className="absolute top-2.5 right-2.5">
-                    {product.stockQuantity > 0 ? (
+                    {product.specifications.includes('Catalogue listing only') ? (
+                      <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-blue-950/80 backdrop-blur-md text-blue-200 border border-blue-800/40">
+                        Enquire Availability
+                      </span>
+                    ) : product.stockQuantity > 0 ? (
                       <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-950/80 backdrop-blur-md text-emerald-300 border border-emerald-800/40">
                         {t.inStock}
                       </span>
