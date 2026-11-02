@@ -32,6 +32,8 @@ interface AccountingViewProps {
   outwardRecords: OutwardRecord[];
   lang: Language;
   onSaveTransaction: (transaction: Transaction) => void;
+  onSaveOutwardRecord: (record: OutwardRecord) => void;
+  onSaveInvoice: (invoice: Invoice) => void;
   onDeleteTransaction: (id: string) => void;
   onExportCsv: () => void;
 }
@@ -59,6 +61,8 @@ export const AccountingView: React.FC<AccountingViewProps> = ({
   outwardRecords,
   lang,
   onSaveTransaction,
+  onSaveOutwardRecord,
+  onSaveInvoice,
   onDeleteTransaction,
   onExportCsv,
 }) => {
@@ -69,6 +73,10 @@ export const AccountingView: React.FC<AccountingViewProps> = ({
   const [search, setSearch] = useState('');
   const [dateRange, setDateRange] = useState('');
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+  const [sourceEditAmount, setSourceEditAmount] = useState('');
+  const [sourceEditDate, setSourceEditDate] = useState('');
+  const [sourceEditMethod, setSourceEditMethod] = useState<PaymentMethod>('UPI');
+  const [sourceEditMode, setSourceEditMode] = useState(false);
 
   // Form State
   const [formType, setFormType] = useState<'INCOME' | 'EXPENSE'>('INCOME');
@@ -90,6 +98,32 @@ export const AccountingView: React.FC<AccountingViewProps> = ({
     setFormNotes('');
     setFormRef('');
     setModalOpen(true);
+  };
+
+  const editSourcePayment = () => {
+    if (!selectedTransaction) return;
+    setSourceEditAmount(String(selectedTransaction.amount || 0));
+    setSourceEditDate(selectedTransaction.date);
+    setSourceEditMethod(selectedTransaction.paymentMethod);
+    setSourceEditMode(true);
+  };
+  const saveSourcePayment = () => {
+    if (!selectedTransaction || Number(sourceEditAmount) < 0 || !sourceEditDate) return;
+    const isOutward = selectedTransaction.id.startsWith('auto-outward-payment-');
+    const isInvoice = selectedTransaction.id.startsWith('auto-invoice-payment-');
+    const sourceId = selectedTransaction.id.replace(/^auto-(?:outward|invoice)-payment-/, '');
+    if (isOutward) {
+      const record = outwardRecords.find((r) => r.id === sourceId);
+      if (!record) return alert('Outward record not found.');
+      onSaveOutwardRecord({ ...record, amountCollected: Number(sourceEditAmount), outDate: sourceEditDate, paymentMethod: sourceEditMethod as 'UPI' | 'Cash' });
+    } else if (isInvoice) {
+      const invoice = invoices.find((r) => r.id === sourceId);
+      if (!invoice) return alert('Invoice not found.');
+      const paid = Number(sourceEditAmount);
+      onSaveInvoice({ ...invoice, amountPaid: paid, balanceDue: Math.max(0, Number(invoice.totalAmount || 0) - paid), paymentStatus: paid >= Number(invoice.totalAmount || 0) ? 'PAID' : paid > 0 ? 'PARTIAL' : 'UNPAID', invoiceDate: sourceEditDate, paymentMethod: sourceEditMethod });
+    }
+    setSourceEditMode(false);
+    setSelectedTransaction(null);
   };
 
   const editSelectedTransaction = () => {
@@ -440,9 +474,10 @@ export const AccountingView: React.FC<AccountingViewProps> = ({
                 <h4 className="mt-4 font-bold text-cyan-300">Bill Items</h4><div className="mt-2 overflow-x-auto"><table className="w-full text-left text-xs"><thead><tr><th className="p-2">Item</th><th className="p-2">Qty</th><th className="p-2">Rate</th><th className="p-2">Total</th></tr></thead><tbody>{invoice.items.map((item,index) => <tr key={index} className="border-t border-gray-800"><td className="p-2">{item.description}</td><td className="p-2">{item.quantity}</td><td className="p-2">₹{Number(item.unitPrice || 0).toLocaleString('en-IN')}</td><td className="p-2">₹{Number(item.lineTotal || 0).toLocaleString('en-IN')}</td></tr>)}</tbody></table></div>
               </div></div>}
               {!outward && !invoice && <div className="px-5 pb-5"><div className="rounded-xl border border-gray-800 p-4"><h3 className="mb-2 font-bold text-cyan-300">Entry Notes</h3><p className="text-sm text-gray-300">{selectedTransaction.notes || 'No additional details recorded.'}</p></div></div>}
+              {sourceEditMode && <div className="mx-5 mb-4 rounded-xl border border-amber-500/30 bg-amber-950/20 p-4"><h3 className="mb-3 font-bold text-amber-200">Edit Received Payment</h3><div className="grid grid-cols-1 gap-3 sm:grid-cols-3"><label className="text-xs text-gray-300">Amount Received<input type="number" min="0" value={sourceEditAmount} onChange={(e) => setSourceEditAmount(e.target.value)} className="mt-1 w-full rounded-lg border border-gray-700 bg-gray-900 p-2 text-sm text-white"/></label><label className="text-xs text-gray-300">Payment Date<input type="date" value={sourceEditDate} onChange={(e) => setSourceEditDate(e.target.value)} className="mt-1 w-full rounded-lg border border-gray-700 bg-gray-900 p-2 text-sm text-white"/></label><label className="text-xs text-gray-300">Method<select value={sourceEditMethod} onChange={(e) => setSourceEditMethod(e.target.value as PaymentMethod)} className="mt-1 w-full rounded-lg border border-gray-700 bg-gray-900 p-2 text-sm text-white"><option value="UPI">UPI</option><option value="Cash">Cash</option><option value="Bank Transfer">Bank Transfer</option><option value="Card">Card</option></select></label></div><div className="mt-3 flex justify-end gap-2"><button type="button" onClick={() => setSourceEditMode(false)} className="rounded-lg border border-gray-700 px-3 py-2 text-sm">Cancel</button><button type="button" onClick={saveSourcePayment} className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-bold">Save Changes</button></div></div>}
               <footer className="flex flex-wrap justify-between gap-2 border-t border-gray-800 p-4">
                 <div className="flex flex-wrap gap-2"><button type="button" onClick={printSelectedTransaction} className="rounded-xl bg-cyan-500 px-4 py-2.5 text-sm font-bold text-gray-950">Print / Save PDF</button>
-                {!selectedTransaction.id.startsWith('auto-') && <button type="button" onClick={editSelectedTransaction} className="rounded-xl border border-amber-500/40 px-4 py-2.5 text-sm font-bold text-amber-300">Edit Entry</button>}</div>
+                {selectedTransaction.id.startsWith('auto-') ? <button type="button" onClick={editSourcePayment} className="rounded-xl border border-amber-500/40 px-4 py-2.5 text-sm font-bold text-amber-300">Edit Payment</button> : <button type="button" onClick={editSelectedTransaction} className="rounded-xl border border-amber-500/40 px-4 py-2.5 text-sm font-bold text-amber-300">Edit Entry</button>}</div>
                 <button type="button" onClick={() => setSelectedTransaction(null)} className="rounded-xl border border-gray-700 px-5 py-2.5 text-sm font-bold">Close</button>
               </footer>
             </section>
