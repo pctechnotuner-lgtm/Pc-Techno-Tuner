@@ -170,7 +170,7 @@ export const QuoteRequestsView: React.FC<QuoteRequestsViewProps> = ({ isAdmin, p
             <div className="text-right text-lg font-black text-cyan-300">Grand Total: {money(draftItems.reduce((sum,item)=>sum+(item.lineTotal||0),0))}</div>
           </div>
           <label className="block space-y-1 text-xs text-slate-400">Additional Details<textarea rows={4} value={draft.details||''} onChange={e=>updateDraftField('details',e.target.value)} className="w-full rounded-lg border border-slate-700 bg-slate-950 p-3 text-sm text-white"/></label>
-          <div className="flex flex-wrap gap-2"><button type="button" disabled={busy} onClick={()=>void saveEdit()} className="rounded-lg bg-violet-600 px-5 py-3 text-sm font-bold text-white disabled:opacity-50">{busy?'Saving...':'Save Changes'}</button><button type="button" onClick={()=>setPrintQuoteId(selectedQuote.id)} className="rounded-lg border border-cyan-700 px-5 py-3 text-sm font-bold text-cyan-200">Save as PDF</button></div>
+          <div className="flex flex-wrap gap-2"><button type="button" disabled={busy} onClick={()=>void saveEdit()} className="rounded-lg bg-violet-600 px-5 py-3 text-sm font-bold text-white disabled:opacity-50">{busy?'Saving...':'Save Changes'}</button><button type="button" onClick={()=>printQuoteDocument(selectedQuote,draft)} className="rounded-lg border border-cyan-700 px-5 py-3 text-sm font-bold text-cyan-200">Save as PDF</button></div>
           <p className="text-[11px] text-slate-500">Request received: {new Date(selectedQuote.created_at).toLocaleString('en-IN')}</p>
         </div>
 
