@@ -23,7 +23,7 @@ const money = (value: number) => '₹' + value.toLocaleString('en-IN', { maximum
 
 export const QuoteRequestsView: React.FC<QuoteRequestsViewProps> = ({ isAdmin, products = [], profile }) => {
   const [catalogue,setCatalogue]=useState<Product[]>(products);
-  useEffect(()=>{ if(!isAdmin) void supabase.from('quote_catalogue').select('id,name,selling_price').eq('active',true).order('name').then(({data,error})=>{ if(!error&&data) setCatalogue(data.map((p:any)=>({id:p.id,name:p.name,sellingPrice:Number(p.selling_price)} as Product))); }); },[isAdmin]);
+  useEffect(()=>{ if(!isAdmin) void supabase.from('quote_catalogue').select('id,name').eq('active',true).order('name').then(({data,error})=>{ if(!error&&data) setCatalogue(data.map((p:any)=>({id:p.id,name:p.name,sellingPrice:0} as Product))); }); },[isAdmin]);
   const [name,setName]=useState(''); const [mobile,setMobile]=useState('');
   const [business,setBusiness]=useState(''); const [email,setEmail]=useState('');
   const [details,setDetails]=useState('');
@@ -50,8 +50,8 @@ export const QuoteRequestsView: React.FC<QuoteRequestsViewProps> = ({ isAdmin, p
     if(!product) return;
     setCart(old=>{
       const existing=old.find(item=>item.productId===product.id);
-      if(existing) return old.map(item=>item.productId===product.id?{...item,quantity:item.quantity+quantity,lineTotal:(item.quantity+quantity)*item.unitPrice!}:item);
-      return [...old,{productId:product.id,name:product.name,quantity,unitPrice:product.sellingPrice,lineTotal:product.sellingPrice*quantity,custom:false}];
+      if(existing) return old.map(item=>item.productId===product.id?{...item,quantity:item.quantity+quantity}:item);
+      return [...old,{productId:product.id,name:product.name,quantity,unitPrice:null,lineTotal:null,custom:false}];
     });
     setSelectedProduct(''); setQuantity(1);
   };
@@ -190,7 +190,7 @@ export const QuoteRequestsView: React.FC<QuoteRequestsViewProps> = ({ isAdmin, p
   }
 
   if(saved) return <div className="mx-auto max-w-xl rounded-2xl border border-emerald-700 bg-slate-900 p-8 text-center space-y-3"><CheckCircle2 className="mx-auto h-12 w-12 text-emerald-400"/><h1 className="text-xl font-black text-white">Quote Request Saved!</h1><p className="text-sm text-slate-300">Thank you. PC TECHNO TUNER will contact you soon.</p></div>;
-  return <div className="mx-auto max-w-2xl space-y-5"><div className="rounded-2xl border border-cyan-900 bg-slate-900 p-5"><div className="flex items-center gap-3"><FileText className="h-7 w-7 text-cyan-300"/><div><h1 className="text-xl font-black text-white">Request a Quote</h1><p className="text-xs text-slate-400">Items add karein; listed items ki price automatic calculate hogi.</p></div></div></div>
+  return <div className="mx-auto max-w-2xl space-y-5"><div className="rounded-2xl border border-cyan-900 bg-slate-900 p-5"><div className="flex items-center gap-3"><FileText className="h-7 w-7 text-cyan-300"/><div><h1 className="text-xl font-black text-white">Request a Quote</h1><p className="text-xs text-slate-400">Products select karein. Price customer ko nahi dikhegi; PC TECHNO TUNER team quotation bhejegi.</p></div></div></div>
     <form onSubmit={submit} className="grid grid-cols-1 sm:grid-cols-2 gap-4 rounded-2xl border border-slate-800 bg-slate-900 p-5">
       <label className="space-y-1 text-xs text-slate-300">Customer Name *<input required value={name} onChange={e=>setName(e.target.value)} className="w-full rounded-lg border border-slate-700 bg-slate-950 p-3 text-sm text-white"/></label>
       <label className="space-y-1 text-xs text-slate-300">Mobile Number *<input required inputMode="tel" value={mobile} onChange={e=>setMobile(e.target.value)} className="w-full rounded-lg border border-slate-700 bg-slate-950 p-3 text-sm text-white"/></label>
@@ -199,7 +199,7 @@ export const QuoteRequestsView: React.FC<QuoteRequestsViewProps> = ({ isAdmin, p
       <div className="sm:col-span-2 rounded-xl border border-slate-700 p-3 space-y-3">
         <h2 className="text-sm font-bold text-white">Add Items from Our Catalogue</h2>
         <div className="grid grid-cols-1 sm:grid-cols-[1fr_100px_auto] gap-2">
-          <select value={selectedProduct} onChange={e=>setSelectedProduct(e.target.value)} className="min-w-0 rounded-lg border border-slate-700 bg-slate-950 p-3 text-sm text-white"><option value="">Select item / service</option>{catalogue.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(p=><option key={p.id} value={p.id}>{p.name} — {money(p.sellingPrice)}</option>)}</select>
+          <select value={selectedProduct} onChange={e=>setSelectedProduct(e.target.value)} className="min-w-0 rounded-lg border border-slate-700 bg-slate-950 p-3 text-sm text-white"><option value="">Select item / service</option>{catalogue.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select>
           <input type="number" min="1" value={quantity} onChange={e=>setQuantity(Math.max(1,Number(e.target.value)||1))} className="rounded-lg border border-slate-700 bg-slate-950 p-3 text-sm text-white" aria-label="Quantity"/>
           <button type="button" onClick={addProduct} disabled={!selectedProduct} className="inline-flex items-center justify-center gap-1 rounded-lg bg-blue-600 px-4 py-3 text-sm font-bold text-white disabled:opacity-40"><Plus className="h-4 w-4"/> Add</button>
         </div>
@@ -211,7 +211,7 @@ export const QuoteRequestsView: React.FC<QuoteRequestsViewProps> = ({ isAdmin, p
             <button type="button" onClick={addCustom} disabled={!customName.trim()} className="inline-flex items-center justify-center gap-1 rounded-lg border border-amber-700 px-4 py-3 text-sm font-bold text-amber-200 disabled:opacity-40"><Plus className="h-4 w-4"/> Add Other</button>
           </div>
         </div>
-        {cart.length>0&&<div className="space-y-2 pt-2">{cart.map((item,index)=><div key={index} className="flex flex-wrap items-center gap-2 rounded-lg bg-slate-950 p-3"><div className="min-w-0 flex-1"><p className="text-sm font-semibold text-white">{item.name}</p><p className="text-[11px] text-slate-400">{item.unitPrice===null?'Price will be provided by our team':money(item.unitPrice)+' each'}</p></div><input type="number" min="1" value={item.quantity} onChange={e=>changeQuantity(index,Math.max(1,Number(e.target.value)||1))} className="w-20 rounded-lg border border-slate-700 bg-slate-900 p-2 text-sm text-white" aria-label="Item quantity"/><strong className="w-24 text-right text-sm text-cyan-300">{item.lineTotal===null?'Pending':money(item.lineTotal)}</strong><button type="button" onClick={()=>setCart(old=>old.filter((_,i)=>i!==index))} aria-label="Remove item" className="rounded p-2 text-rose-300"><Trash2 className="h-4 w-4"/></button></div>)}
+        {cart.length>0&&<div className="space-y-2 pt-2">{cart.map((item,index)=><div key={index} className="flex flex-wrap items-center gap-2 rounded-lg bg-slate-950 p-3"><div className="min-w-0 flex-1"><p className="text-sm font-semibold text-white">{item.name}</p><p className="text-[11px] text-slate-400">Price will be provided by our team</p></div><input type="number" min="1" value={item.quantity} onChange={e=>changeQuantity(index,Math.max(1,Number(e.target.value)||1))} className="w-20 rounded-lg border border-slate-700 bg-slate-900 p-2 text-sm text-white" aria-label="Item quantity"/><strong className="w-24 text-right text-sm text-cyan-300">{item.lineTotal===null?'Pending':money(item.lineTotal)}</strong><button type="button" onClick={()=>setCart(old=>old.filter((_,i)=>i!==index))} aria-label="Remove item" className="rounded p-2 text-rose-300"><Trash2 className="h-4 w-4"/></button></div>)}
           <div className="text-right text-base font-black text-white">Grand Total: {money(subtotal)}{cart.some(item=>item.unitPrice===null)&&<p className="text-[11px] font-normal text-amber-300">Other item(s) price will be quoted separately.</p>}</div>
         </div>}
       </div>
