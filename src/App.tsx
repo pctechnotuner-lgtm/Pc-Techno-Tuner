@@ -1244,6 +1244,7 @@ export default function App() {
           <AccountingView
             transactions={transactions}
             invoices={invoices}
+            outwardRecords={outwardRecords}
             lang={lang}
             onSaveTransaction={handleSaveTransaction}
             onDeleteTransaction={handleDeleteTransaction}
