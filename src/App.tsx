@@ -1150,6 +1150,9 @@ export default function App() {
           <CustomersView
             customers={customers}
             invoices={invoices}
+            estimates={estimates}
+            transactions={transactions}
+            antivirusLicenses={antivirusLicenses}
             complaints={complaints}
             inwardRecords={inwardRecords}
             outwardRecords={outwardRecords}
