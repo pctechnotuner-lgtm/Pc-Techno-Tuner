@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Wallet,
   Plus,
@@ -38,6 +38,8 @@ interface AccountingViewProps {
   onSaveInvoice: (invoice: Invoice) => void;
   onDeleteTransaction: (id: string) => void;
   onExportCsv: () => void;
+  initialEntryType?: 'INCOME' | 'EXPENSE';
+  openEntryOnMount?: boolean;
 }
 
 const INCOME_CATEGORIES: IncomeCategory[] = [
@@ -68,6 +70,8 @@ export const AccountingView: React.FC<AccountingViewProps> = ({
   onSaveInvoice,
   onDeleteTransaction,
   onExportCsv,
+  initialEntryType,
+  openEntryOnMount = false,
 }) => {
   const t = getT(lang);
   const [modalOpen, setModalOpen] = useState(false);
@@ -106,6 +110,10 @@ export const AccountingView: React.FC<AccountingViewProps> = ({
     setSelectedBillId('');
     setModalOpen(true);
   };
+
+  useEffect(() => {
+    if (openEntryOnMount && initialEntryType) openAddModal(initialEntryType);
+  }, [openEntryOnMount, initialEntryType]);
 
   const editSourcePayment = () => {
     if (!selectedTransaction) return;
@@ -553,13 +561,13 @@ export const AccountingView: React.FC<AccountingViewProps> = ({
                 </button>
               </div>
 
+              <div>
+                <label className="block text-gray-400 mb-1 font-semibold">Party / Customer / Vendor Name</label>
+                <input list="accounting-customer-options" value={formParty} onChange={(e) => setFormParty(e.target.value)} placeholder="Party ka naam ya mobile likhkar search karein..." className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-white"/>
+                <datalist id="accounting-customer-options">{customers.flatMap((customer) => [<option key={customer.id+'-name'} value={customer.name}/>, ...(customer.businessName ? [<option key={customer.id+'-business'} value={customer.businessName}/>] : []), <option key={customer.id+'-mobile'} value={customer.mobile}/>])}</datalist>
+                {matchedCustomer && <div className="mt-2 rounded-lg border border-cyan-500/30 bg-cyan-950/20 p-3 text-xs"><b className="text-cyan-200">{matchedCustomer.name}</b><p className="mt-1 text-gray-300">{matchedCustomer.businessName || 'Individual'} • {matchedCustomer.mobile}</p><p className="text-gray-400">{matchedCustomer.address}</p>{matchedCustomer.gstin && <p className="text-gray-400">GSTIN: {matchedCustomer.gstin}</p>}</div>}
+              </div>
               {formType === 'INCOME' && <>
-                <div>
-                  <label className="block text-gray-400 mb-1 font-semibold">Party / Customer Name</label>
-                  <input list="accounting-customer-options" value={formParty} onChange={(e) => setFormParty(e.target.value)} placeholder="Type party name or mobile to search..." className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-white"/>
-                  <datalist id="accounting-customer-options">{customers.flatMap((customer) => [<option key={customer.id+'-name'} value={customer.name}/>, ...(customer.businessName ? [<option key={customer.id+'-business'} value={customer.businessName}/>] : []), <option key={customer.id+'-mobile'} value={customer.mobile}/>])}</datalist>
-                  {matchedCustomer && <div className="mt-2 rounded-lg border border-cyan-500/30 bg-cyan-950/20 p-3 text-xs"><b className="text-cyan-200">{matchedCustomer.name}</b><p className="mt-1 text-gray-300">{matchedCustomer.businessName || 'Individual'} • {matchedCustomer.mobile}</p><p className="text-gray-400">{matchedCustomer.address}</p>{matchedCustomer.gstin && <p className="text-gray-400">GSTIN: {matchedCustomer.gstin}</p>}</div>}
-                </div>
                 <div className="rounded-xl border border-emerald-500/30 bg-emerald-950/10 p-3 space-y-2">
                   <label className="block text-gray-300 font-bold">Payment kis liye mila?</label>
                   <div className="grid grid-cols-2 gap-2">
@@ -645,17 +653,6 @@ export const AccountingView: React.FC<AccountingViewProps> = ({
                     className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-white font-mono focus:outline-none focus:border-blue-500"
                   />
                 </div>
-              </div>
-
-              <div>
-                <label className="block text-gray-400 mb-1 font-semibold">Party / Customer / Vendor</label>
-                <input
-                  type="text"
-                  value={formParty}
-                  onChange={(e) => setFormParty(e.target.value)}
-                  placeholder="e.g. Torrent Power / Redington / Walk-in Customer"
-                  className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-blue-500"
-                />
               </div>
 
               <div>
