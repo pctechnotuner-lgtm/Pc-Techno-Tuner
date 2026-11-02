@@ -269,16 +269,20 @@ export const AccountingView: React.FC<AccountingViewProps> = ({
   const netCashFlow = totalIncome - totalExpense;
 
   // Filtered list
+  const normalizedSearch = search.trim().toLocaleLowerCase();
+  const accountingCategories = Array.from(new Set([...INCOME_CATEGORIES, ...EXPENSE_CATEGORIES, ...allTransactions.map((tx) => tx.category).filter(Boolean)])).sort((a, b) => a.localeCompare(b));
   const filtered = allTransactions.filter((tx) => {
     const matchesType = filterType === 'ALL' || tx.type === filterType;
     const matchesCat = filterCategory === 'ALL' || tx.category === filterCategory;
     const matchesDate = !dateRange || tx.date === dateRange;
-    const q = search.toLowerCase();
-    const matchesSearch =
-      tx.category.toLowerCase().includes(q) ||
-      tx.partyName.toLowerCase().includes(q) ||
-      (tx.notes && tx.notes.toLowerCase().includes(q)) ||
-      (tx.referenceId && tx.referenceId.toLowerCase().includes(q));
+    const linkedCustomer = customers.find((customer) =>
+      [customer.name, customer.businessName, customer.mob].some((value) =>
+        String(value || '').trim().toLocaleLowerCase() === String(tx.partyName || '').trim().toLocaleLowerCase()
+      )
+    );
+    const searchableText = [tx.category, tx.partyName, tx.notes, tx.referenceId, linkedCustomer?.name, linkedCustomer?.businessName, linkedCustomer?.mob]
+      .map((value) => String(value || '').toLocaleLowerCase()).join(' ');
+    const matchesSearch = !normalizedSearch || searchableText.includes(normalizedSearch);
     return matchesType && matchesCat && matchesDate && matchesSearch;
   });
 
@@ -379,20 +383,9 @@ export const AccountingView: React.FC<AccountingViewProps> = ({
             className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-blue-500"
           >
             <option value="ALL">All Accounting Categories</option>
-            <optgroup label="Income Categories">
-              {INCOME_CATEGORIES.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </optgroup>
-            <optgroup label="Expense Categories">
-              {EXPENSE_CATEGORIES.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </optgroup>
+            {accountingCategories.map((category) => (
+              <option key={category} value={category}>{category}</option>
+            ))}
           </select>
         </div>
 
