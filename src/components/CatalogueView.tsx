@@ -187,10 +187,10 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
         </div>
 
         {/* Categories Chip Carousel */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+        <div className="flex flex-wrap items-center gap-2 pb-2 w-full">
           <button
             onClick={() => setSelectedCategory('All')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition flex items-center gap-1.5 ${
+            className={`max-w-full px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 ${
               selectedCategory === 'All'
                 ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
                 : 'bg-gray-900 border border-gray-800 text-gray-400 hover:text-white'
@@ -213,7 +213,7 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
                 }`}
               >
                 {getCategoryIcon(cat)}
-                <span>{cat}</span>
+                <span className="whitespace-normal text-left leading-tight">{cat}</span>
                 <span className="text-[10px] opacity-75">({count})</span>
               </button>
             );
