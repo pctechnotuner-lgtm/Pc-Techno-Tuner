@@ -47,6 +47,75 @@ const entries: Array<[string, string, string, string, string]> = [
   ['USB Hub','Zebronics','USB Mini Hub Series','USB hub range; port count/interface to confirm.','Computer Accessories'],
 ];
 
+
+  // GIGABYTE motherboards — official model specifications / variants.
+  {
+    id: 'gigabyte-b760m-ds3h-ax-ddr5', name: 'GIGABYTE B760M DS3H AX DDR5 Motherboard',
+    category: 'Desktop Computers', brand: 'GIGABYTE', model: 'B760M DS3H AX (DDR5)',
+    specifications: 'Intel B760 chipset, LGA1700 socket; supports 14th/13th/12th Gen Intel Core processors; 4 DDR5 DIMM slots, dual-channel; 2 PCIe 4.0 M.2 connectors; Wi-Fi 6E and 2.5GbE LAN. Check revision and CPU/RAM compatibility before order.',
+    purchasePrice: 0, sellingPrice: 0, stockQuantity: 0, minStockAlert: 0, warrantyMonths: 0,
+    imageUrl: 'https://static.gigabyte.com/StaticFile/Image/Global/38746857c457e1b5197902af9cdd1ba8/ProductRemoveBg/33475',
+    createdAt: now,
+  },
+  {
+    id: 'gigabyte-b760m-ds3h-ax-ddr4', name: 'GIGABYTE B760M DS3H AX DDR4 Motherboard',
+    category: 'Desktop Computers', brand: 'GIGABYTE', model: 'B760M DS3H AX DDR4',
+    specifications: 'Intel B760 chipset, LGA1700 socket; supports 14th/13th/12th Gen Intel Core processors; 4 DDR4 DIMM slots, dual-channel; PCIe 4.0 M.2 storage; Wi-Fi 6E and 2.5GbE LAN. Check revision and CPU/RAM compatibility before order.',
+    purchasePrice: 0, sellingPrice: 0, stockQuantity: 0, minStockAlert: 0, warrantyMonths: 0,
+    imageUrl: 'https://static.gigabyte.com/StaticFile/Image/Global/38746857c457e1b5197902af9cdd1ba8/ProductRemoveBg/33475',
+    createdAt: now,
+  },
+  // Biometric attendance devices — official manufacturer specifications.
+  {
+    id: 'zkteco-mb20', name: 'ZKTeco MB20 Face & Fingerprint Attendance Machine',
+    category: 'Biometric and Attendance Machines', brand: 'ZKTeco', model: 'MB20',
+    specifications: 'Face, fingerprint, RFID card and password verification; up to 500 fingerprints, 1,000 cards/users and 50,000 records; 2.8-inch TFT display; TCP/IP, USB Host and optional Wi-Fi; access-control relay.',
+    purchasePrice: 0, sellingPrice: 0, stockQuantity: 0, minStockAlert: 0, warrantyMonths: 0,
+    imageUrl: 'https://zktecoua.com/files/MB20.png',
+    createdAt: now,
+  },
+  {
+    id: 'essl-k90-pro', name: 'eSSL K90 Pro Fingerprint Attendance Machine',
+    category: 'Biometric and Attendance Machines', brand: 'eSSL', model: 'K90 Pro',
+    specifications: '800 fingerprint capacity, 800 card capacity, 80,000 transaction storage; TCP/IP and USB Host; inbuilt battery backup; 500 DPI optical sensor; eTimeTrackLite support.',
+    purchasePrice: 0, sellingPrice: 0, stockQuantity: 0, minStockAlert: 0, warrantyMonths: 0,
+    imageUrl: 'https://www.esslsecurity.com/storage/app/media/fingerprint/K90-Pro.jpg',
+    createdAt: now,
+  },
+  {
+    id: 'essl-f22-id-wifi', name: 'eSSL F22 ID Wi-Fi Attendance & Access Control',
+    category: 'Biometric and Attendance Machines', brand: 'eSSL', model: 'F22 ID Wi-Fi',
+    specifications: 'Fingerprint time-attendance and access-control terminal with Wi-Fi; verify exact card, capacity and firmware variant with supplier.',
+    purchasePrice: 0, sellingPrice: 0, stockQuantity: 0, minStockAlert: 0, warrantyMonths: 0,
+    imageUrl: 'https://www.esslsecurity.com/storage/app/media/fingerprint/K90-Pro.jpg',
+    createdAt: now,
+  },
+  // Network firewall appliances — quote-only catalogue listings.
+  {
+    id: 'fortinet-fortigate-40f', name: 'Fortinet FortiGate 40F Next-Generation Firewall',
+    category: 'Firewall and Antivirus Software', brand: 'Fortinet', model: 'FG-40F',
+    specifications: 'Next-generation firewall with integrated SD-WAN and FortiOS security; branch-office appliance; 1 Gbps firewall throughput, 800 Mbps IPS and 600 Mbps threat protection (datasheet figures; subscription/services sold separately).',
+    purchasePrice: 0, sellingPrice: 0, stockQuantity: 0, minStockAlert: 0, warrantyMonths: 0,
+    imageUrl: 'https://www.fortinet.com/content/dam/fortinet/assets/images/products/fortigate-40f.png',
+    createdAt: now,
+  },
+  {
+    id: 'fortinet-fortigate-60f', name: 'Fortinet FortiGate 60F Next-Generation Firewall',
+    category: 'Firewall and Antivirus Software', brand: 'Fortinet', model: 'FG-60F',
+    specifications: 'Next-generation firewall appliance for business networks; security policies, VPN and network protection through FortiOS; FortiGuard subscriptions are separate and configuration-dependent.',
+    purchasePrice: 0, sellingPrice: 0, stockQuantity: 0, minStockAlert: 0, warrantyMonths: 0,
+    imageUrl: 'https://www.fortinet.com/content/dam/fortinet/assets/images/products/fortigate-40f.png',
+    createdAt: now,
+  },
+  {
+    id: 'sophos-xgs-87', name: 'Sophos XGS 87 Firewall Appliance',
+    category: 'Firewall and Antivirus Software', brand: 'Sophos', model: 'XGS 87',
+    specifications: 'Desktop next-generation firewall; 4 x Gigabit Ethernet copper ports and 1 x SFP; firewall throughput up to 3,850 Mbps and IPS throughput up to 1,200 Mbps (manufacturer datasheet).',
+    purchasePrice: 0, sellingPrice: 0, stockQuantity: 0, minStockAlert: 0, warrantyMonths: 0,
+    imageUrl: 'https://assets.sophos.com/X24WTUEQ/at/p42v957zxf35vv45smkhhkbv/sophos-xg-series-hardware-br.pdf',
+    createdAt: now,
+  },
+
 export const ZEBRONICS_CATALOGUE: Product[] = entries.map(([name, brand, model, specifications, category], index) => ({
   id: `zebronics-${String(index + 1).padStart(3, '0')}`,
   name: `Zebronics ${name}`,
