@@ -121,6 +121,7 @@ export default function App() {
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [selectedComplaintForEdit, setSelectedComplaintForEdit] =
     useState<Complaint | null>(null);
+  const [selectedHomeService, setSelectedHomeService] = useState<string | null>(null);
 
   const [syncReady, setSyncReady] = useState(false);
   const [syncStatus, setSyncStatus] = useState('Login required');
@@ -1077,9 +1078,9 @@ export default function App() {
                   </div>
                   <div className="mt-3 grid max-w-2xl grid-cols-2 gap-2 sm:grid-cols-4">
                     {['IT Hardware','CCTV Security','Laptop Repairs','AMC Support'].map((item) => (
-                      <div key={item} className="rounded-xl border border-white/10 bg-white/[.06] px-3 py-4 text-center text-sm font-semibold text-slate-200 backdrop-blur">
-                        {item}
-                      </div>
+                      <button key={item} type="button" onClick={() => setSelectedHomeService(item)} aria-label={`View ${item} service details`} className="group rounded-xl border border-white/10 bg-white/[.06] px-3 py-4 text-center text-sm font-semibold text-slate-200 backdrop-blur transition hover:-translate-y-0.5 hover:border-cyan-300/60 hover:bg-cyan-300/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-cyan-300">
+                        {item}<span className="mt-1 block text-[10px] font-medium text-cyan-200 opacity-80 group-hover:opacity-100">View Details ↗</span>
+                      </button>
                     ))}
                   </div>
                 </div>
@@ -1305,6 +1306,29 @@ export default function App() {
         </nav>
       )}
 
+      {selectedHomeService && (() => {
+        const serviceDetails: Record<string, { intro: string; items: string[] }> = {
+          'IT Hardware': { intro: 'Complete hardware supply, installation and support for homes, shops and offices.', items: ['Desktop computers, laptops and branded accessories', 'Printers, scanners, UPS, RAM, SSD and components', 'Server hardware, upgrades and new system setup', 'Hardware troubleshooting, maintenance and AMC'] },
+          'CCTV Security': { intro: 'Plan, install and maintain CCTV surveillance systems to help protect your premises.', items: ['IP and HD CCTV camera installation', 'DVR / NVR setup, recording and playback support', 'Remote viewing on mobile and desktop', 'Camera networking, cabling and repair / maintenance'] },
+          'Laptop Repairs': { intro: 'Practical laptop diagnosis, repair and upgrade support for personal and business devices.', items: ['Laptop diagnosis and hardware troubleshooting', 'Screen, keyboard, battery and charging repairs', 'SSD / RAM upgrades and operating-system installation', 'Software, driver, data-transfer and performance support'] },
+          'AMC Support': { intro: 'Planned IT maintenance and ongoing technical support to keep business systems running smoothly.', items: ['Regular preventive computer maintenance', 'Desktop, laptop, printer and network support', 'Troubleshooting and service-visit coordination', 'AMC plans tailored to business requirements'] },
+        };
+        const details = serviceDetails[selectedHomeService];
+        return (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-sm" onClick={() => setSelectedHomeService(null)}>
+            <section role="dialog" aria-modal="true" aria-labelledby="home-service-title" className="w-full max-w-xl overflow-hidden rounded-2xl border border-cyan-300/25 bg-[#0b1730] shadow-2xl" onClick={(event) => event.stopPropagation()}>
+              <div className="flex items-start justify-between gap-4 border-b border-white/10 bg-gradient-to-r from-cyan-400/10 to-blue-500/10 p-5">
+                <div><p className="text-xs font-bold uppercase tracking-[.2em] text-cyan-200">PC TECHNO TUNER • Our Services</p><h2 id="home-service-title" className="mt-2 text-2xl font-black text-white">{selectedHomeService}</h2><p className="mt-2 text-sm leading-6 text-slate-300">{details.intro}</p></div>
+                <button type="button" onClick={() => setSelectedHomeService(null)} aria-label="Close service details" className="rounded-lg border border-white/15 px-3 py-2 text-lg text-slate-200 hover:bg-white/10">✕</button>
+              </div>
+              <div className="p-5"><h3 className="mb-3 text-sm font-bold text-cyan-200">What we offer</h3><ul className="space-y-3">{details.items.map((item) => <li key={item} className="flex gap-3 text-sm leading-6 text-slate-200"><span className="mt-0.5 text-cyan-300">✓</span><span>{item}</span></li>)}</ul>
+                <div className="mt-6 flex flex-wrap gap-3"><a href={`https://wa.me/917383871195?text=${encodeURIComponent('Hello PC TECHNO TUNER, I need information about ' + selectedHomeService)}`} target="_blank" rel="noopener noreferrer" className="rounded-xl bg-cyan-400 px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-cyan-300">Enquire on WhatsApp ↗</a><a href="tel:7383871195" className="rounded-xl border border-white/20 px-5 py-3 text-sm font-bold text-white hover:bg-white/10">Call 73838 71195</a></div>
+                <p className="mt-4 text-xs text-slate-400">Serving Ahmedabad, Gujarat • info@pctechnotuner.com</p>
+              </div>
+            </section>
+          </div>
+        );
+      })()}
       <AdminLoginModal
         isOpen={loginModalOpen}
         onClose={() => setLoginModalOpen(false)}
