@@ -90,7 +90,7 @@ export const ProductsAdminView: React.FC<ProductsAdminViewProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formName.trim() || formSellingPrice <= 0) {
+    if (!formName.trim() || formSellingPrice < 0) {
       alert('Please enter valid product name and selling price');
       return;
     }
@@ -135,7 +135,7 @@ export const ProductsAdminView: React.FC<ProductsAdminViewProps> = ({
             <span>Product Inventory Management</span>
           </h1>
           <p className="text-xs text-gray-400">
-            Control 11 product categories, private cost prices, and minimum stock alerts.
+            Manage products across all categories, private cost prices, and minimum stock alerts.
           </p>
         </div>
 
