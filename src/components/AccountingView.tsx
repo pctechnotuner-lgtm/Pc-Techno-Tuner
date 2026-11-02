@@ -353,14 +353,14 @@ export const AccountingView: React.FC<AccountingViewProps> = ({
                     <span className="line-clamp-1">{tx.notes || '-'}</span>
                   </td>
                   <td className="py-3 px-4 text-right">
-                    <button
+                    {!tx.id.startsWith('auto-invoice-payment-') && !tx.id.startsWith('auto-outward-payment-') && <button
                       onClick={() => {
                         if (confirm('Delete this accounting entry?')) onDeleteTransaction(tx.id);
                       }}
                       className="text-gray-500 hover:text-rose-400 text-xs transition"
                     >
                       Delete
-                    </button>
+                    </button>}
                   </td>
                 </tr>
               ))}
