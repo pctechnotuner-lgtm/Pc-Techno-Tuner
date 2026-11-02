@@ -66,8 +66,13 @@ export default function App() {
     email: BUSINESS_EMAIL,
   }));
   const mergeZebronicsCatalogue = (items: Product[]) => {
-    const existingIds = new Set(items.map((item) => item.id));
-    return [...items, ...ZEBRONICS_CATALOGUE.filter((item) => !existingIds.has(item.id))];
+    const merged = [...INITIAL_PRODUCTS, ...items];
+    const seen = new Set<string>();
+    return [...merged, ...ZEBRONICS_CATALOGUE].filter((item) => {
+      if (seen.has(item.id)) return false;
+      seen.add(item.id);
+      return true;
+    });
   };
   const [products, setProducts] = useState<Product[]>(() => mergeZebronicsCatalogue(storage.getProducts()));
   const [complaints, setComplaints] = useState<Complaint[]>(
