@@ -133,4 +133,7 @@ export const ZEBRONICS_CATALOGUE: Product[] = [...entries.map(([name, brand, mod
   warrantyMonths: 0,
   imageUrl: image,
   createdAt: now,
-})), ...additionalProducts];
+})), ...additionalProducts.map((product) => ({
+  ...product,
+  specifications: `${product.specifications} Catalogue listing only — confirm current availability before order.`,
+}))];
