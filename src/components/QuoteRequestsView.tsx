@@ -34,6 +34,7 @@ export const QuoteRequestsView: React.FC<QuoteRequestsViewProps> = ({ isAdmin, p
   const [cart,setCart]=useState<QuoteItem[]>([]);
   const [rows,setRows]=useState<QuoteRow[]>([]); const [busy,setBusy]=useState(false);
   const [saved,setSaved]=useState(false); const [error,setError]=useState('');
+  const [expandedQuoteId,setExpandedQuoteId]=useState<string|null>(null);
 
   const subtotal = useMemo(() => cart.reduce((sum,item)=>sum+(item.lineTotal||0),0),[cart]);
   const load = async () => {
@@ -79,17 +80,39 @@ export const QuoteRequestsView: React.FC<QuoteRequestsViewProps> = ({ isAdmin, p
     if(error){setError(error.message);return;} setRows(old=>old.map(r=>r.id===id?{...r,status}:r));
   };
 
-  if(isAdmin) return <div className="space-y-5">
-    <div className="flex items-center justify-between gap-3"><div><h1 className="text-xl font-black text-white">Quote Requests</h1><p className="text-xs text-slate-400">Customer quote enquiries and selected items</p></div><button onClick={()=>void load().catch(e=>setError(e.message))} className="inline-flex items-center gap-2 rounded-lg border border-slate-700 px-3 py-2 text-xs text-slate-200"><RefreshCw className="h-4 w-4"/> Refresh</button></div>
+  if(isAdmin) return <div className="space-y-4">
+    <div className="flex items-center justify-between gap-3"><div><h1 className="text-xl font-black text-white">Quote Requests</h1><p className="text-xs text-slate-400">Customer enquiries — click a row to view full details</p></div><button onClick={()=>void load().catch(e=>setError(e.message))} className="inline-flex items-center gap-2 rounded-lg border border-slate-700 px-3 py-2 text-xs text-slate-200"><RefreshCw className="h-4 w-4"/> Refresh</button></div>
     {error&&<p className="rounded-lg border border-rose-800 bg-rose-950/40 p-3 text-xs text-rose-300">{error}</p>}
-    {rows.length===0?<div className="rounded-xl border border-slate-800 bg-slate-900 p-8 text-center text-sm text-slate-400">No quote requests yet.</div>:<div className="space-y-3">{rows.map(r=>{
+    {rows.length===0?<div className="rounded-xl border border-slate-800 bg-slate-900 p-8 text-center text-sm text-slate-400">No quote requests yet.</div>:<div className="space-y-2">{rows.map(r=>{
       const items=r.items||[];
-      return <div key={r.id} className="rounded-xl border border-slate-800 bg-slate-900 p-4 space-y-3">
-        <div className="flex flex-wrap justify-between gap-2"><strong className="text-white">{r.customer_name}</strong><span className="text-[11px] text-cyan-300">{r.id}</span></div>
-        <p className="text-xs text-slate-400">Mobile: {r.mobile}{r.business_name?' • '+r.business_name:''}{r.email?' • '+r.email:''}</p>
-        {items.length>0?<div className="overflow-x-auto"><table className="w-full text-xs"><thead className="text-slate-500"><tr><th className="py-2 text-left">Item</th><th className="py-2 text-center">Qty</th><th className="py-2 text-right">Price</th><th className="py-2 text-right">Total</th></tr></thead><tbody>{items.map((item,i)=><tr key={i} className="border-t border-slate-800"><td className="py-2 text-slate-200">{item.name}{item.custom&&<span className="ml-2 text-amber-300">Price to be quoted</span>}</td><td className="py-2 text-center text-slate-300">{item.quantity}</td><td className="py-2 text-right text-slate-300">{item.unitPrice===null?'—':money(item.unitPrice)}</td><td className="py-2 text-right text-white">{item.lineTotal===null?'Pending':money(item.lineTotal)}</td></tr>)}</tbody></table><div className="pt-2 text-right text-sm font-bold text-cyan-300">Known-price subtotal: {money(Number(r.subtotal||0))}</div></div>:<p className="text-xs text-slate-300">{r.item_or_service}</p>}
-        {r.details&&<p className="whitespace-pre-wrap text-xs text-slate-300">{r.details}</p>}
-        <div className="flex flex-wrap items-center justify-between gap-2"><span className="text-[10px] text-slate-500">{new Date(r.created_at).toLocaleString('en-IN')}</span><select value={r.status} onChange={e=>void updateStatus(r.id,e.target.value as QuoteRow['status'])} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-white"><option>New</option><option>Contacted</option><option>Quoted</option><option>Closed</option></select></div>
+      const isExpanded=expandedQuoteId===r.id;
+      const itemNames=items.length?items.map(item=>item.name).join(', '):r.item_or_service;
+      return <div key={r.id} className="overflow-hidden rounded-xl border border-slate-800 bg-slate-900">
+        <div className="flex items-center gap-2 px-3 py-3 sm:px-4">
+          <button type="button" onClick={()=>setExpandedQuoteId(isExpanded?null:r.id)} aria-expanded={isExpanded} className="min-w-0 flex-1 text-left">
+            <div className="flex min-w-0 items-center gap-2">
+              <span className="shrink-0 text-xs font-bold text-white">{r.customer_name}</span>
+              <span className="hidden sm:inline text-[11px] text-slate-400">{r.mobile}</span>
+              <span className="min-w-0 flex-1 truncate text-[11px] text-slate-400">{itemNames}</span>
+              <span className="shrink-0 text-[10px] text-cyan-300">{r.id}</span>
+              <span className="shrink-0 text-slate-400">{isExpanded?'▴':'▾'}</span>
+            </div>
+            <div className="mt-1 flex items-center gap-2 text-[10px] text-slate-500 sm:hidden"><span>{r.mobile}</span><span>•</span><span>{new Date(r.created_at).toLocaleDateString('en-IN')}</span></div>
+          </button>
+          <select aria-label={'Status for '+r.customer_name} value={r.status} onChange={e=>void updateStatus(r.id,e.target.value as QuoteRow['status'])} className="shrink-0 rounded-lg border border-slate-700 bg-slate-950 px-2 py-2 text-[11px] text-white"><option>New</option><option>Contacted</option><option>Quoted</option><option>Closed</option></select>
+        </div>
+        {isExpanded&&<div className="space-y-3 border-t border-slate-800 bg-slate-950/50 p-4">
+          <div className="grid grid-cols-1 gap-2 text-xs sm:grid-cols-2">
+            <p className="text-slate-300"><span className="text-slate-500">Customer:</span> {r.customer_name}</p>
+            <p className="text-slate-300"><span className="text-slate-500">Mobile:</span> {r.mobile}</p>
+            <p className="text-slate-300"><span className="text-slate-500">Business:</span> {r.business_name||'—'}</p>
+            <p className="text-slate-300"><span className="text-slate-500">Email:</span> {r.email||'—'}</p>
+            <p className="text-slate-300 sm:col-span-2"><span className="text-slate-500">Request ID:</span> {r.id}</p>
+          </div>
+          {items.length>0?<div className="overflow-x-auto"><table className="w-full text-xs"><thead className="text-slate-500"><tr><th className="py-2 text-left">Item</th><th className="py-2 text-center">Qty</th><th className="py-2 text-right">Price</th><th className="py-2 text-right">Total</th></tr></thead><tbody>{items.map((item,i)=><tr key={i} className="border-t border-slate-800"><td className="py-2 text-slate-200">{item.name}{item.custom&&<span className="ml-2 text-amber-300">Price to be quoted</span>}</td><td className="py-2 text-center text-slate-300">{item.quantity}</td><td className="py-2 text-right text-slate-300">{item.unitPrice===null?'—':money(item.unitPrice)}</td><td className="py-2 text-right text-white">{item.lineTotal===null?'Pending':money(item.lineTotal)}</td></tr>)}</tbody></table><div className="pt-2 text-right text-sm font-bold text-cyan-300">Known-price subtotal: {money(Number(r.subtotal||0))}</div></div>:<p className="text-xs text-slate-300">{r.item_or_service}</p>}
+          {r.details&&<div className="rounded-lg border border-slate-800 bg-slate-900 p-3"><p className="mb-1 text-[10px] font-bold uppercase text-slate-500">Additional Details</p><p className="whitespace-pre-wrap text-xs text-slate-300">{r.details}</p></div>}
+          <p className="text-[10px] text-slate-500">Submitted: {new Date(r.created_at).toLocaleString('en-IN')}</p>
+        </div>}
       </div>;
     })}</div>}
   </div>;
