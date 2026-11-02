@@ -1167,6 +1167,7 @@ export default function App() {
         {activeTab === 'accounts' && isAdmin && (
           <AccountingView
             transactions={transactions}
+            invoices={invoices}
             lang={lang}
             onSaveTransaction={handleSaveTransaction}
             onDeleteTransaction={handleDeleteTransaction}
