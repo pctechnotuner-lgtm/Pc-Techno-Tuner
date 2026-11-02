@@ -112,7 +112,11 @@ export const AccountingView: React.FC<AccountingViewProps> = ({
   };
 
   useEffect(() => {
-    if (openEntryOnMount && initialEntryType) openAddModal(initialEntryType);
+    if (openEntryOnMount && initialEntryType) {
+      setFormType(initialEntryType);
+      setFormCategory(initialEntryType === 'INCOME' ? INCOME_CATEGORIES[0] : EXPENSE_CATEGORIES[0]);
+      setModalOpen(false);
+    }
   }, [openEntryOnMount, initialEntryType]);
 
   const editSourcePayment = () => {
@@ -519,22 +523,22 @@ export const AccountingView: React.FC<AccountingViewProps> = ({
       })()}
 
       {/* Add Transaction Modal */}
-      {modalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-          <div className="w-full max-w-md bg-gray-900 border border-gray-800 rounded-2xl p-6 space-y-4 my-8 shadow-2xl animate-scaleUp">
+      {(modalOpen || openEntryOnMount) && (
+        <div className={openEntryOnMount ? 'w-full' : 'fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto'}>
+          <div className={openEntryOnMount ? 'w-full max-w-3xl bg-gray-900/70 border border-gray-800 rounded-2xl p-5 sm:p-6 space-y-4' : 'w-full max-w-md bg-gray-900 border border-gray-800 rounded-2xl p-6 space-y-4 my-8 shadow-2xl animate-scaleUp'}>
             <div className="flex items-center justify-between border-b border-gray-800 pb-3">
               <h3 className="text-base font-bold text-white flex items-center gap-2">
                 <Wallet className="w-4 h-4 text-blue-400" />
-                <span>New Accounting Entry</span>
+                <span>{openEntryOnMount ? (initialEntryType === 'EXPENSE' ? 'Payment Out Entry' : 'Payment In Entry') : 'New Accounting Entry'}</span>
               </h3>
-              <button onClick={() => setModalOpen(false)} className="text-gray-400 hover:text-white">
+              {!openEntryOnMount && <button onClick={() => setModalOpen(false)} className="text-gray-400 hover:text-white">
                 <X className="w-5 h-5" />
-              </button>
+              </button>}
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-3.5 text-xs">
-              {/* Type toggle */}
-              <div className="grid grid-cols-2 gap-2 bg-gray-950 p-1 rounded-xl border border-gray-800">
+              {/* Type toggle is only needed in the combined Accounts popup */}
+              {!openEntryOnMount && <div className="grid grid-cols-2 gap-2 bg-gray-950 p-1 rounded-xl border border-gray-800">
                 <button
                   type="button"
                   onClick={() => handleTypeChange('INCOME')}
@@ -559,7 +563,7 @@ export const AccountingView: React.FC<AccountingViewProps> = ({
                   <ArrowDownRight className="w-4 h-4" />
                   <span>Expense Outflow</span>
                 </button>
-              </div>
+              </div>}
 
               <div>
                 <label className="block text-gray-400 mb-1 font-semibold">Party / Customer / Vendor Name</label>
