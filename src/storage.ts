@@ -215,6 +215,21 @@ export const INITIAL_PRODUCTS: Product[] = [
     imageUrl: 'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=600&h=450&fit=crop',
     createdAt: '2026-03-22T08:30:00Z',
   },
+  {
+    id: 'prod-012',
+    name: 'TVS Gold Bharat Wired Mechanical Keyboard',
+    category: 'Computer Accessories',
+    brand: 'TVS Electronics',
+    model: 'TVSGOLD',
+    specifications: '104-key full-size bilingual mechanical keyboard, USB wired connectivity, Indian Rupee symbol, long-life mechanical switches, laser-etched keycaps, plug-and-play. Black.',
+    purchasePrice: 0,
+    sellingPrice: 2530,
+    stockQuantity: 0,
+    minStockAlert: 1,
+    warrantyMonths: 12,
+    imageUrl: 'https://files.vplak.com/500-images/tvs/GOLDBHARAT/black/image-2.jpg',
+    createdAt: '2026-11-02T00:00:00Z',
+  },
 ];
 
 export const INITIAL_CUSTOMERS: Customer[] = [
