@@ -42,6 +42,7 @@ import { AdminLoginModal } from './components/AdminLoginModal';
 import { AntivirusView } from './components/AntivirusView';
 import { InwardView } from './components/InwardView';
 import { OutwardView } from './components/OutwardView';
+import { MoreView } from './components/MoreView';
 
 export default function App() {
   const isNativeApp = Capacitor.isNativePlatform();
@@ -1182,6 +1183,15 @@ export default function App() {
             products={products}
             lang={lang}
             onExportCsv={exportAccountingCsv}
+          />
+        )}
+
+        {activeTab === 'more' && isAdmin && (
+          <MoreView
+            onOpenNewProduct={() => setActiveTab('products')}
+            onOpenNewInvoice={() => setActiveTab('sales')}
+            onOpenNewTransaction={() => setActiveTab('accounts')}
+            onExportBackup={handleExportBackup}
           />
         )}
 
