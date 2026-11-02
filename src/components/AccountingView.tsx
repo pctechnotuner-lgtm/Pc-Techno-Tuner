@@ -558,23 +558,22 @@ export const AccountingView: React.FC<AccountingViewProps> = ({
                 </button>
               </div>}
 
-              <div>
-                <label className="block text-gray-400 mb-1 font-semibold">Party / Customer / Vendor Name</label>
-                <input list="accounting-customer-options" value={formParty} onChange={(e) => setFormParty(e.target.value)} placeholder="Party ka naam ya mobile likhkar search karein..." className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-white"/>
-                <datalist id="accounting-customer-options">{customers.flatMap((customer) => [<option key={customer.id+'-name'} value={customer.name}/>, ...(customer.businessName ? [<option key={customer.id+'-business'} value={customer.businessName}/>] : []), <option key={customer.id+'-mobile'} value={customer.mobile}/>])}</datalist>
-                {matchedCustomer && <div className="mt-2 rounded-lg border border-cyan-500/30 bg-cyan-950/20 p-3 text-xs"><b className="text-cyan-200">{matchedCustomer.name}</b><p className="mt-1 text-gray-300">{matchedCustomer.businessName || 'Individual'} • {matchedCustomer.mobile}</p><p className="text-gray-400">{matchedCustomer.address}</p>{matchedCustomer.gstin && <p className="text-gray-400">GSTIN: {matchedCustomer.gstin}</p>}</div>}
-              </div>
-              {formType === 'INCOME' && <>
-                <div className="rounded-xl border border-emerald-500/30 bg-emerald-950/10 p-3 space-y-2">
-                  <label className="block text-gray-300 font-bold">Payment kis liye mila?</label>
-                  <div className="grid grid-cols-2 gap-2">
-                    <button type="button" onClick={() => {setCustomerPaymentKind('ADVANCE');setSelectedBillId('');}} className={`rounded-lg border p-2 text-xs font-bold ${customerPaymentKind==='ADVANCE'?'border-emerald-400 bg-emerald-600/20 text-emerald-200':'border-gray-700 text-gray-400'}`}>Advance Payment</button>
-                    <button type="button" onClick={() => setCustomerPaymentKind('OLD_BILL')} className={`rounded-lg border p-2 text-xs font-bold ${customerPaymentKind==='OLD_BILL'?'border-emerald-400 bg-emerald-600/20 text-emerald-200':'border-gray-700 text-gray-400'}`}>Old Bill Payment</button>
-                  </div>
-                  {customerPaymentKind === 'OLD_BILL' && <div><label className="block text-gray-400 mb-1 text-xs">Select Pending Bill</label><select value={selectedBillId} onChange={(e) => setSelectedBillId(e.target.value)} className="w-full rounded-lg border border-gray-700 bg-gray-950 p-2 text-white"><option value="">Select party name first, then bill</option>{customerOpenBills.map((bill) => <option key={bill.id} value={bill.id}>{bill.invoiceNo} • Due ₹{Number(bill.balanceDue).toLocaleString('en-IN')} • {bill.invoiceDate}</option>)}</select></div>}
-                  {customerPaymentKind === 'ADVANCE' && <p className="text-xs text-gray-400">Ye payment party ke advance balance ke roop mein save hoga.</p>}
+              <div className={formType === 'INCOME' ? 'grid grid-cols-1 md:grid-cols-2 gap-3 items-start' : ''}>
+                <div>
+                  <label className="block text-gray-400 mb-1 font-semibold">Party / Customer / Vendor Name</label>
+                  <input list="accounting-customer-options" value={formParty} onChange={(e) => {setFormParty(e.target.value);setSelectedBillId('');}} placeholder="Party ka naam ya mobile likhkar search karein..." className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-white"/>
+                  <datalist id="accounting-customer-options">{customers.flatMap((customer) => [<option key={customer.id+'-name'} value={customer.name}/>, ...(customer.businessName ? [<option key={customer.id+'-business'} value={customer.businessName}/>] : []), <option key={customer.id+'-mobile'} value={customer.mobile}/>])}</datalist>
                 </div>
-              </>}
+                {formType === 'INCOME' && formParty.trim() && <div>
+                  <label className="block text-gray-400 mb-1 font-semibold">Payment Type</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button type="button" onClick={() => {setCustomerPaymentKind('ADVANCE');setSelectedBillId('');}} className={`rounded-lg border p-2.5 text-xs font-bold ${customerPaymentKind==='ADVANCE'?'border-emerald-400 bg-emerald-600/20 text-emerald-200':'border-gray-700 text-gray-400'}`}>Advance</button>
+                    <button type="button" onClick={() => setCustomerPaymentKind('OLD_BILL')} className={`rounded-lg border p-2.5 text-xs font-bold ${customerPaymentKind==='OLD_BILL'?'border-emerald-400 bg-emerald-600/20 text-emerald-200':'border-gray-700 text-gray-400'}`}>Old Bill</button>
+                  </div>
+                </div>}
+                {matchedCustomer && <div className="md:col-span-2 rounded-lg border border-cyan-500/30 bg-cyan-950/20 p-3 text-xs"><b className="text-cyan-200">{matchedCustomer.name}</b><p className="mt-1 text-gray-300">{matchedCustomer.businessName || 'Individual'} • {matchedCustomer.mobile}</p><p className="text-gray-400">{matchedCustomer.address}</p>{matchedCustomer.gstin && <p className="text-gray-400">GSTIN: {matchedCustomer.gstin}</p>}</div>}
+                {formType === 'INCOME' && customerPaymentKind === 'OLD_BILL' && formParty.trim() && <div className="md:col-span-2"><label className="block text-gray-400 mb-1 text-xs">Select Pending Bill</label><select value={selectedBillId} onChange={(e) => setSelectedBillId(e.target.value)} className="w-full rounded-lg border border-gray-700 bg-gray-950 p-2 text-white"><option value="">Select pending bill</option>{customerOpenBills.map((bill) => <option key={bill.id} value={bill.id}>{bill.invoiceNo} • Due ₹{Number(bill.balanceDue).toLocaleString('en-IN')} • {bill.invoiceDate}</option>)}</select></div>}
+              </div>
               <div>
                 <label className="block text-gray-400 mb-1 font-semibold">Category *</label>
                 <select
