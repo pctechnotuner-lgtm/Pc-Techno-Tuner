@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { supabase } from '../lib/supabaseClient';
 import {
   AlertCircle,
   TrendingUp,
@@ -17,6 +18,7 @@ import {
   Database,
   Phone,
   MessageCircle,
+  FileText,
 } from 'lucide-react';
 import {
   AppTab,
@@ -74,6 +76,28 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   onExportBackup,
 }) => {
   const t = getT(lang);
+  const [quoteRequestsCount, setQuoteRequestsCount] = useState(0);
+
+  useEffect(() => {
+    let active = true;
+    const loadQuoteCount = async () => {
+      const { count, error } = await supabase
+        .from('quote_requests')
+        .select('id', { count: 'exact', head: true });
+      if (!error && active) setQuoteRequestsCount(count ?? 0);
+    };
+    void loadQuoteCount();
+    const channel = supabase
+      .channel('dashboard-quote-requests-count')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'quote_requests' }, () => {
+        void loadQuoteCount();
+      })
+      .subscribe();
+    return () => {
+      active = false;
+      void supabase.removeChannel(channel);
+    };
+  }, []);
 
   // Complaints breakdown
   const newComplaints = complaints.filter((c) => c.status === 'New').length;
@@ -134,6 +158,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             { label: 'Payments', count: transactions.length, detail: 'Income + expense entries', tab: 'accounts' as AppTab, icon: DollarSign, color: 'text-green-300' },
             { label: 'Antivirus Licenses', count: antivirusLicenses.length, detail: 'License records', tab: 'antivirus' as AppTab, icon: Database, color: 'text-fuchsia-300' },
             { label: 'Estimates', count: estimates.length, detail: 'Quotation records', tab: 'profit' as AppTab, icon: Receipt, color: 'text-sky-300' },
+            { label: 'Quote Requests', count: quoteRequestsCount, detail: 'Customer quote enquiries', tab: 'quotes' as AppTab, icon: FileText, color: 'text-cyan-300' },
             { label: 'Reports', count: invoices.length + transactions.length + complaints.length, detail: 'Records included in reports', tab: 'reports' as AppTab, icon: TrendingUp, color: 'text-pink-300' },
           ]).map((item) => {
             const Icon = item.icon;
