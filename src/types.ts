@@ -285,4 +285,6 @@ export type AppTab =
   | 'antivirus'
   | 'inward'
   | 'outward'
-  | 'more';
+  | 'more'
+  | 'quote'
+  | 'quotes';
