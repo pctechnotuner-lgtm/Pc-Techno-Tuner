@@ -27,6 +27,7 @@ import {
   Wrench,
   ShieldCheck,
   LogOut,
+  FileText,
 } from 'lucide-react';
 import { AppTab, CompanyProfile, Language } from '../types';
 import { getT } from '../i18n';
