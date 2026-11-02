@@ -1192,6 +1192,7 @@ export default function App() {
             complaints={complaints}
             inwardRecords={inwardRecords}
             outwardRecords={outwardRecords}
+            customers={customers}
             lang={lang}
             onSaveCustomer={handleSaveCustomer}
             onDeleteCustomer={handleDeleteCustomer}
