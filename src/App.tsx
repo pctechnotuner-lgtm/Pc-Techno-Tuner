@@ -1233,7 +1233,7 @@ export default function App() {
         )}
         <footer className="mt-8 border-t border-slate-800/80 py-4 text-center">
           <p className="text-[11px] font-semibold tracking-wider text-slate-500">
-            Powered by <span className="text-cyan-400">PC TECHNO TUNER</span>
+            Powered by <a href="https://pctechnotuner-lgtm.github.io/Pc-Techno-Tuner/" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:text-cyan-300 hover:underline">PC TECHNO TUNER</a>
           </p>
         </footer>
       </main>
