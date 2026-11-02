@@ -34,7 +34,7 @@ export const QuoteRequestsView: React.FC<QuoteRequestsViewProps> = ({ isAdmin, p
   const [cart,setCart]=useState<QuoteItem[]>([]);
   const [rows,setRows]=useState<QuoteRow[]>([]); const [busy,setBusy]=useState(false);
   const [saved,setSaved]=useState(false); const [error,setError]=useState('');
-  const [expandedQuoteId,setExpandedQuoteId]=useState<string|null>(null);
+  const [selectedQuoteId,setSelectedQuoteId]=useState<string|null>(null);
   const [editingQuoteId,setEditingQuoteId]=useState<string|null>(null);
   const [editDraft,setEditDraft]=useState<QuoteRow|null>(null);
   const [printQuoteId,setPrintQuoteId]=useState<string|null>(null);
@@ -90,59 +90,60 @@ export const QuoteRequestsView: React.FC<QuoteRequestsViewProps> = ({ isAdmin, p
   };
 
 <style>{`.quote-print-area{display:none}@media print{@page{size:A4;margin:14mm}body *{visibility:hidden!important}.quote-print-area[data-print-active="true"],.quote-print-area[data-print-active="true"] *{visibility:visible!important}.quote-print-area[data-print-active="true"]{display:block!important;position:absolute!important;left:0;top:0;width:100%;color:#111!important;background:#fff!important}.quote-print-sheet{font-family:Arial,sans-serif;color:#111;font-size:11px}.quote-print-header{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #164b82;padding-bottom:12px;margin-bottom:16px}.quote-print-header h1{font-size:22px;margin:0;color:#164b82}.quote-print-header p{margin:4px 0}.quote-print-header strong{font-size:18px}.quote-print-meta{display:flex;justify-content:space-between;gap:10px;margin:12px 0}.quote-print-sheet h3{background:#edf3fa;padding:7px;margin:14px 0 8px;font-size:12px}.quote-print-sheet p{margin:6px 0}.quote-print-sheet table{width:100%;border-collapse:collapse;margin-top:8px}.quote-print-sheet th,.quote-print-sheet td{border:1px solid #999;padding:8px;text-align:left}.quote-print-sheet th{background:#edf3fa}.quote-print-total{text-align:right;font-weight:bold;font-size:14px;margin-top:12px!important}.quote-print-foot{border-top:1px solid #aaa;padding-top:12px;margin-top:28px!important;font-size:10px}}`}</style>
-  if(isAdmin) return <div className="space-y-4">
-    <div className="flex items-center justify-between gap-3"><div><h1 className="text-xl font-black text-white">Quote Requests</h1><p className="text-xs text-slate-400">Customer enquiries — click a row to view full details</p></div><button onClick={()=>void load().catch(e=>setError(e.message))} className="inline-flex items-center gap-2 rounded-lg border border-slate-700 px-3 py-2 text-xs text-slate-200"><RefreshCw className="h-4 w-4"/> Refresh</button></div>
-    {error&&<p className="rounded-lg border border-rose-800 bg-rose-950/40 p-3 text-xs text-rose-300">{error}</p>}
-    {rows.length===0?<div className="rounded-xl border border-slate-800 bg-slate-900 p-8 text-center text-sm text-slate-400">No quote requests yet.</div>:<div className="space-y-2">{rows.map(r=>{
-      const items=r.items||[];
-      const isExpanded=expandedQuoteId===r.id;
-      const itemNames=items.length?items.map(item=>item.name).join(', '):r.item_or_service;
-      return <div key={r.id} className="overflow-hidden rounded-xl border border-slate-800 bg-slate-900">
-        <div className="flex items-center gap-2 px-3 py-3 sm:px-4">
-          <button type="button" onClick={()=>setExpandedQuoteId(isExpanded?null:r.id)} aria-expanded={isExpanded} className="min-w-0 flex-1 text-left">
-            <div className="flex min-w-0 items-center gap-2">
-              <span className="shrink-0 text-xs font-bold text-white">{r.customer_name}</span>
-              <span className="hidden sm:inline text-[11px] text-slate-400">{r.mobile}</span>
-              <span className="min-w-0 flex-1 truncate text-[11px] text-slate-400">{itemNames}</span>
-              <span className="shrink-0 text-[10px] text-cyan-300">{r.id}</span>
-              <span className="shrink-0 text-slate-400">{isExpanded?'▴':'▾'}</span>
-            </div>
-            <div className="mt-1 flex items-center gap-2 text-[10px] text-slate-500 sm:hidden"><span>{r.mobile}</span><span>•</span><span>{new Date(r.created_at).toLocaleDateString('en-IN')}</span></div>
-          </button>
-          <select aria-label={'Status for '+r.customer_name} value={r.status} onChange={e=>void updateStatus(r.id,e.target.value as QuoteRow['status'])} className="shrink-0 rounded-lg border border-slate-700 bg-slate-950 px-2 py-2 text-[11px] text-white"><option>New</option><option>Contacted</option><option>Quoted</option><option>Closed</option></select>
+  if(isAdmin) {
+    const selectedQuote=rows.find(row=>row.id===selectedQuoteId);
+    if(selectedQuote) {
+      const draft=editDraft?.id===selectedQuote.id?editDraft:selectedQuote;
+      const draftItems=draft.items||[];
+      return <div className="space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-3"><button type="button" onClick={()=>{setSelectedQuoteId(null);setEditDraft(null);setError('');}} className="rounded-lg border border-slate-700 px-3 py-2 text-sm text-white">← Back</button><div><h1 className="text-xl font-black text-white">Quote Details</h1><p className="text-xs text-slate-400">{selectedQuote.id}</p></div></div>
+          <div className="flex flex-wrap items-center gap-2"><select aria-label="Quote status" value={selectedQuote.status} onChange={e=>void updateStatus(selectedQuote.id,e.target.value as QuoteRow['status'])} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-white"><option>New</option><option>Contacted</option><option>Quoted</option><option>Closed</option></select><button type="button" onClick={()=>setPrintQuoteId(selectedQuote.id)} className="rounded-lg border border-cyan-700 px-3 py-2 text-xs font-bold text-cyan-200">Save / Print PDF</button></div>
         </div>
-        {isExpanded&&<div className="space-y-3 border-t border-slate-800 bg-slate-950/50 p-4">
-          {editingQuoteId===r.id&&editDraft?<>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <label className="space-y-1 text-xs text-slate-400">Customer Name<input value={editDraft.customer_name} onChange={e=>updateDraftField('customer_name',e.target.value)} className="w-full rounded-lg border border-slate-700 bg-slate-900 p-2 text-sm text-white"/></label>
-              <label className="space-y-1 text-xs text-slate-400">Mobile<input value={editDraft.mobile} onChange={e=>updateDraftField('mobile',e.target.value)} className="w-full rounded-lg border border-slate-700 bg-slate-900 p-2 text-sm text-white"/></label>
-              <label className="space-y-1 text-xs text-slate-400">Business<input value={editDraft.business_name||''} onChange={e=>updateDraftField('business_name',e.target.value)} className="w-full rounded-lg border border-slate-700 bg-slate-900 p-2 text-sm text-white"/></label>
-              <label className="space-y-1 text-xs text-slate-400">Email<input value={editDraft.email||''} onChange={e=>updateDraftField('email',e.target.value)} className="w-full rounded-lg border border-slate-700 bg-slate-900 p-2 text-sm text-white"/></label>
-            </div>
-            <div className="space-y-2"><div className="text-xs font-bold text-slate-300">Edit Items — quantity and price</div>
-              {(editDraft.items||[]).map((item,index)=><div key={index} className="grid grid-cols-1 gap-2 rounded-lg border border-slate-800 bg-slate-900 p-3 sm:grid-cols-[minmax(0,1fr)_75px_110px_auto]"><input value={item.name} onChange={e=>updateDraftItem(index,'name',e.target.value)} aria-label="Item name" className="min-w-0 rounded-lg border border-slate-700 bg-slate-950 p-2 text-xs text-white"/><input type="number" min="1" value={item.quantity} onChange={e=>updateDraftItem(index,'quantity',e.target.value)} aria-label="Quantity" className="rounded-lg border border-slate-700 bg-slate-950 p-2 text-xs text-white"/><input type="number" min="0" step="0.01" value={item.unitPrice??''} onChange={e=>updateDraftItem(index,'unitPrice',e.target.value)} placeholder="Set price" aria-label="Unit price" className="rounded-lg border border-slate-700 bg-slate-950 p-2 text-xs text-white"/><button type="button" onClick={()=>removeDraftItem(index)} className="rounded-lg bg-rose-950 px-3 py-2 text-xs text-rose-200">Remove</button><p className="text-[11px] text-cyan-300 sm:col-span-4">Total: {item.lineTotal===null?'Pending':money(item.lineTotal)}</p></div>)}
-              <p className="text-right text-sm font-black text-cyan-300">Grand Total: {money(editDraft.items?.reduce((sum,item)=>sum+(item.lineTotal||0),0)||0)}</p>
-            </div>
-            <label className="block space-y-1 text-xs text-slate-400">Additional Details<textarea rows={3} value={editDraft.details||''} onChange={e=>updateDraftField('details',e.target.value)} className="w-full rounded-lg border border-slate-700 bg-slate-900 p-2 text-sm text-white"/></label>
-            <div className="flex flex-wrap gap-2"><button type="button" disabled={busy} onClick={()=>void saveEdit()} className="rounded-lg bg-violet-600 px-4 py-2 text-xs font-bold text-white disabled:opacity-50">{busy?'Saving...':'Save Changes'}</button><button type="button" onClick={()=>{setEditingQuoteId(null);setEditDraft(null);}} className="rounded-lg bg-slate-800 px-4 py-2 text-xs text-white">Cancel Edit</button></div>
-          </>:<>
-            <div className="grid grid-cols-1 gap-2 text-xs sm:grid-cols-2"><p className="text-slate-300"><span className="text-slate-500">Customer:</span> {r.customer_name}</p><p className="text-slate-300"><span className="text-slate-500">Mobile:</span> {r.mobile}</p><p className="text-slate-300"><span className="text-slate-500">Business:</span> {r.business_name||'—'}</p><p className="text-slate-300"><span className="text-slate-500">Email:</span> {r.email||'—'}</p><p className="text-slate-300 sm:col-span-2"><span className="text-slate-500">Request ID:</span> {r.id}</p></div>
-            {items.length>0?<div className="overflow-x-auto"><table className="w-full text-xs"><thead className="text-slate-500"><tr><th className="py-2 text-left">Item</th><th className="py-2 text-center">Qty</th><th className="py-2 text-right">Price</th><th className="py-2 text-right">Total</th></tr></thead><tbody>{items.map((item,i)=><tr key={i} className="border-t border-slate-800"><td className="py-2 text-slate-200">{item.name}{item.custom&&<span className="ml-2 text-amber-300">Price to be quoted</span>}</td><td className="py-2 text-center text-slate-300">{item.quantity}</td><td className="py-2 text-right text-slate-300">{item.unitPrice===null?'—':money(item.unitPrice)}</td><td className="py-2 text-right text-white">{item.lineTotal===null?'Pending':money(item.lineTotal)}</td></tr>)}</tbody></table><div className="pt-2 text-right text-sm font-bold text-cyan-300">Known-price subtotal: {money(Number(r.subtotal||0))}</div></div>:<p className="text-xs text-slate-300">{r.item_or_service}</p>}
-            {r.details&&<div className="rounded-lg border border-slate-800 bg-slate-900 p-3"><p className="mb-1 text-[10px] font-bold uppercase text-slate-500">Additional Details</p><p className="whitespace-pre-wrap text-xs text-slate-300">{r.details}</p></div>}
-            <p className="text-[10px] text-slate-500">Submitted: {new Date(r.created_at).toLocaleString('en-IN')}</p>
-            <div className="flex flex-wrap gap-2"><button type="button" onClick={()=>startEdit(r)} className="rounded-lg bg-violet-600 px-4 py-2 text-xs font-bold text-white">Edit Quote</button><button type="button" onClick={()=>setPrintQuoteId(r.id)} className="rounded-lg border border-cyan-700 px-4 py-2 text-xs font-bold text-cyan-200">Save / Print PDF</button></div>
-          </>}
-        <div className="quote-print-area" data-print-active={printQuoteId===r.id?'true':'false'}><div className="quote-print-sheet">
+        {error&&<p className="rounded-lg border border-rose-800 bg-rose-950/40 p-3 text-xs text-rose-300">{error}</p>}
+        <div className="rounded-xl border border-slate-800 bg-slate-900 p-4 sm:p-6 space-y-5">
+          <div><h2 className="text-sm font-bold text-white">Customer Information</h2><p className="text-xs text-slate-500">Details edit karke Save Changes karein.</p></div>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <label className="space-y-1 text-xs text-slate-400">Customer Name<input value={draft.customer_name} onChange={e=>updateDraftField('customer_name',e.target.value)} className="w-full rounded-lg border border-slate-700 bg-slate-950 p-3 text-sm text-white"/></label>
+            <label className="space-y-1 text-xs text-slate-400">Mobile Number<input value={draft.mobile} onChange={e=>updateDraftField('mobile',e.target.value)} className="w-full rounded-lg border border-slate-700 bg-slate-950 p-3 text-sm text-white"/></label>
+            <label className="space-y-1 text-xs text-slate-400">Company / Business<input value={draft.business_name||''} onChange={e=>updateDraftField('business_name',e.target.value)} className="w-full rounded-lg border border-slate-700 bg-slate-950 p-3 text-sm text-white"/></label>
+            <label className="space-y-1 text-xs text-slate-400">Email<input value={draft.email||''} onChange={e=>updateDraftField('email',e.target.value)} className="w-full rounded-lg border border-slate-700 bg-slate-950 p-3 text-sm text-white"/></label>
+          </div>
+          <div className="space-y-3"><div className="flex items-center justify-between"><h2 className="text-sm font-bold text-white">Items / Services</h2><span className="text-xs text-slate-400">{draftItems.length} items</span></div>
+            {draftItems.map((item,index)=><div key={index} className="grid grid-cols-1 gap-2 rounded-lg border border-slate-800 bg-slate-950 p-3 sm:grid-cols-[minmax(0,1fr)_90px_130px_120px_auto]">
+              <label className="text-[11px] text-slate-500">Item Name<input value={item.name} onChange={e=>updateDraftItem(index,'name',e.target.value)} className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-900 p-2 text-sm text-white"/></label>
+              <label className="text-[11px] text-slate-500">Quantity<input type="number" min="1" value={item.quantity} onChange={e=>updateDraftItem(index,'quantity',e.target.value)} className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-900 p-2 text-sm text-white"/></label>
+              <label className="text-[11px] text-slate-500">Unit Price<input type="number" min="0" step="0.01" value={item.unitPrice??''} onChange={e=>updateDraftItem(index,'unitPrice',e.target.value)} placeholder="Enter price" className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-900 p-2 text-sm text-white"/></label>
+              <div className="flex items-end pb-2 text-xs font-bold text-cyan-300">{item.lineTotal===null?'Price Pending':money(item.lineTotal)}</div>
+              <button type="button" onClick={()=>removeDraftItem(index)} className="self-end rounded-lg bg-rose-950 px-3 py-2 text-xs text-rose-200">Remove</button>
+            </div>)}
+            <div className="text-right text-lg font-black text-cyan-300">Grand Total: {money(draftItems.reduce((sum,item)=>sum+(item.lineTotal||0),0))}</div>
+          </div>
+          <label className="block space-y-1 text-xs text-slate-400">Additional Details<textarea rows={4} value={draft.details||''} onChange={e=>updateDraftField('details',e.target.value)} className="w-full rounded-lg border border-slate-700 bg-slate-950 p-3 text-sm text-white"/></label>
+          <div className="flex flex-wrap gap-2"><button type="button" disabled={busy} onClick={()=>void saveEdit()} className="rounded-lg bg-violet-600 px-5 py-3 text-sm font-bold text-white disabled:opacity-50">{busy?'Saving...':'Save Changes'}</button><button type="button" onClick={()=>setPrintQuoteId(selectedQuote.id)} className="rounded-lg border border-cyan-700 px-5 py-3 text-sm font-bold text-cyan-200">Save as PDF</button></div>
+          <p className="text-[11px] text-slate-500">Request received: {new Date(selectedQuote.created_at).toLocaleString('en-IN')}</p>
+        </div>
+        <div className="quote-print-area" data-print-active={printQuoteId===selectedQuote.id?'true':'false'}><div className="quote-print-sheet">
           <div className="quote-print-header"><div><h1>PC TECHNO TUNER</h1><p>IT Hardware • CCTV Surveillance • Laptop Repairs & AMC Solutions</p></div><strong>QUOTATION</strong></div>
-          <div className="quote-print-meta"><span><b>Quote ID:</b> {r.id}</span><span><b>Date:</b> {new Date(r.created_at).toLocaleDateString('en-IN')}</span><span><b>Status:</b> {r.status}</span></div>
-          <h3>Customer Details</h3><p><b>Name:</b> {r.customer_name}　 <b>Mobile:</b> {r.mobile}</p><p><b>Business:</b> {r.business_name||'—'}　 <b>Email:</b> {r.email||'—'}</p>
-          <h3>Items / Services</h3><table><thead><tr><th>Item</th><th>Qty</th><th>Unit Price</th><th>Total</th></tr></thead><tbody>{items.map((item,i)=><tr key={i}><td>{item.name}</td><td>{item.quantity}</td><td>{item.unitPrice===null?'To be quoted':money(item.unitPrice)}</td><td>{item.lineTotal===null?'Pending':money(item.lineTotal)}</td></tr>)}</tbody></table>
-          <p className="quote-print-total">Known-price subtotal: {money(Number(r.subtotal||0))}</p>{r.details&&<><h3>Additional Details</h3><p>{r.details}</p></>}<p className="quote-print-foot">This is a quotation enquiry / estimate. Final pricing and availability will be confirmed by PC TECHNO TUNER.</p>
+          <div className="quote-print-meta"><span><b>Quote ID:</b> {selectedQuote.id}</span><span><b>Date:</b> {new Date(selectedQuote.created_at).toLocaleDateString('en-IN')}</span><span><b>Status:</b> {selectedQuote.status}</span></div>
+          <h3>Customer Details</h3><p><b>Name:</b> {draft.customer_name}　 <b>Mobile:</b> {draft.mobile}</p><p><b>Business:</b> {draft.business_name||'—'}　 <b>Email:</b> {draft.email||'—'}</p>
+          <h3>Items / Services</h3><table><thead><tr><th>Item</th><th>Qty</th><th>Unit Price</th><th>Total</th></tr></thead><tbody>{draftItems.map((item,i)=><tr key={i}><td>{item.name}</td><td>{item.quantity}</td><td>{item.unitPrice===null?'To be quoted':money(item.unitPrice)}</td><td>{item.lineTotal===null?'Pending':money(item.lineTotal)}</td></tr>)}</tbody></table>
+          <p className="quote-print-total">Grand Total: {money(draftItems.reduce((sum,item)=>sum+(item.lineTotal||0),0))}</p>{draft.details&&<><h3>Additional Details</h3><p>{draft.details}</p></>}<p className="quote-print-foot">PC TECHNO TUNER • Quotation</p>
         </div></div>
-        </div>}
       </div>;
-    })}</div>}
-  </div>;
+    }
+    return <div className="space-y-4">
+      <div className="flex items-center justify-between gap-3"><div><h1 className="text-xl font-black text-white">Quote Requests</h1><p className="text-xs text-slate-400">Customer name par click karke alag details form kholen</p></div><button onClick={()=>void load().catch(e=>setError(e.message))} className="inline-flex items-center gap-2 rounded-lg border border-slate-700 px-3 py-2 text-xs text-slate-200"><RefreshCw className="h-4 w-4"/> Refresh</button></div>
+      {error&&<p className="rounded-lg border border-rose-800 bg-rose-950/40 p-3 text-xs text-rose-300">{error}</p>}
+      {rows.length===0?<div className="rounded-xl border border-slate-800 bg-slate-900 p-8 text-center text-sm text-slate-400">No quote requests yet.</div>:<div className="space-y-2">{rows.map(r=><div key={r.id} className="flex items-center gap-2 rounded-xl border border-slate-800 bg-slate-900 px-3 py-3 sm:px-4">
+        <button type="button" onClick={()=>{setSelectedQuoteId(r.id);setEditDraft({...r,items:(r.items||[]).map(item=>({...item}))});setError('');}} className="min-w-0 flex-1 text-left">
+          <div className="flex min-w-0 items-center gap-2"><span className="shrink-0 text-xs font-bold text-white hover:text-cyan-300">{r.customer_name}</span><span className="hidden sm:inline text-[11px] text-slate-400">{r.mobile}</span><span className="min-w-0 flex-1 truncate text-[11px] text-slate-400">{(r.items||[]).map(item=>item.name).join(', ')||r.item_or_service}</span><span className="shrink-0 text-[10px] text-cyan-300">{r.id}</span></div>
+          <div className="mt-1 text-[10px] text-slate-500">{new Date(r.created_at).toLocaleDateString('en-IN')}</div>
+        </button>
+        <select aria-label={'Status for '+r.customer_name} value={r.status} onChange={e=>void updateStatus(r.id,e.target.value as QuoteRow['status'])} className="shrink-0 rounded-lg border border-slate-700 bg-slate-950 px-2 py-2 text-[11px] text-white"><option>New</option><option>Contacted</option><option>Quoted</option><option>Closed</option></select>
+      </div>)}</div>}
+    </div>;
+  }
 
   if(saved) return <div className="mx-auto max-w-xl rounded-2xl border border-emerald-700 bg-slate-900 p-8 text-center space-y-3"><CheckCircle2 className="mx-auto h-12 w-12 text-emerald-400"/><h1 className="text-xl font-black text-white">Quote Request Saved!</h1><p className="text-sm text-slate-300">Thank you. PC TECHNO TUNER will contact you soon.</p></div>;
   return <div className="mx-auto max-w-2xl space-y-5"><div className="rounded-2xl border border-cyan-900 bg-slate-900 p-5"><div className="flex items-center gap-3"><FileText className="h-7 w-7 text-cyan-300"/><div><h1 className="text-xl font-black text-white">Request a Quote</h1><p className="text-xs text-slate-400">Items add karein; listed items ki price automatic calculate hogi.</p></div></div></div>
