@@ -311,26 +311,15 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
                       </div>
                     </div>
 
-                    {/* Customer Action Buttons */}
-                    <div className="grid grid-cols-2 gap-2 pt-1">
-                      <button
-                        onClick={() => handleEnquireWhatsApp(product)}
-                        className="w-full py-2 px-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition flex items-center justify-center gap-1.5 shadow"
-                        title="Enquire directly on WhatsApp"
-                      >
-                        <MessageCircle className="w-3.5 h-3.5" />
-                        <span>Enquire</span>
-                      </button>
-
-                      <button
-                        onClick={() => handleRequestQuoteWhatsApp(product)}
-                        className="w-full py-2 px-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-200 border border-gray-700 text-xs font-bold transition flex items-center justify-center gap-1"
-                        title="Request official GST quotation"
-                      >
-                        <FileText className="w-3.5 h-3.5 text-blue-400" />
-                        <span>Quote</span>
-                      </button>
-                    </div>
+                    {/* Single Ask for Price action opens the quotation flow */}
+                    <button
+                      onClick={() => handleRequestQuoteWhatsApp(product)}
+                      className="w-full py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold transition flex items-center justify-center gap-2 shadow"
+                      title="Open quotation request"
+                    >
+                      <FileText className="w-4 h-4" />
+                      <span>Ask for Price</span>
+                    </button>
                   </div>
                 </div>
               </div>
