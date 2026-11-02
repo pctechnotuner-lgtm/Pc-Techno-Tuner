@@ -92,6 +92,40 @@ export const AccountingView: React.FC<AccountingViewProps> = ({
     setModalOpen(true);
   };
 
+  const editSelectedTransaction = () => {
+    if (!selectedTransaction || selectedTransaction.id.startsWith('auto-')) return;
+    setFormType(selectedTransaction.type);
+    setFormCategory(selectedTransaction.category);
+    setFormAmount(selectedTransaction.amount);
+    setFormDate(selectedTransaction.date);
+    setFormMethod(selectedTransaction.paymentMethod);
+    setFormParty(selectedTransaction.partyName);
+    setFormNotes(selectedTransaction.notes || '');
+    setFormRef(selectedTransaction.referenceId || '');
+    setSelectedTransaction(null);
+    setModalOpen(true);
+  };
+
+  const printSelectedTransaction = () => {
+    if (!selectedTransaction) return;
+    const isOutward = selectedTransaction.id.startsWith('auto-outward-payment-');
+    const isInvoice = selectedTransaction.id.startsWith('auto-invoice-payment-');
+    const sourceId = selectedTransaction.id.replace(/^auto-(?:outward|invoice)-payment-/, '');
+    const outward = isOutward ? outwardRecords.find((r) => r.id === sourceId) : undefined;
+    const invoice = isInvoice ? invoices.find((r) => r.id === sourceId) : undefined;
+    const esc = (v: unknown) => String(v ?? '—').replace(/[&<>"]/g, (ch) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch] || ch));
+    const rows: [string, unknown][] = outward ? [
+      ['Outward ID',outward.id],['Inward ID',outward.inwardRecordId],['Product',outward.productName],['Customer',outward.customerName],['Mobile',outward.phoneNumber],['Inward Date',outward.inwardDate],['Outward Date',outward.outDate],['Problem',outward.inwardProblem],['Work / Solution',outward.solution],['Estimate',outward.estimateAmount],['Received',outward.amountCollected],['Settlement',outward.settlementApplied ? 'Settled' : 'Not settled'],['Settlement Note',outward.settlementNote]
+    ] : invoice ? [
+      ['Invoice No.',invoice.invoiceNo],['Invoice Date',invoice.invoiceDate],['Customer',invoice.customerName],['Mobile',invoice.customerMobile],['Address',invoice.customerAddress],['GSTIN',invoice.customerGstin],['Subtotal',invoice.subtotal],['Tax',invoice.taxAmount],['Discount',invoice.discount],['Invoice Total',invoice.totalAmount],['Paid',invoice.amountPaid],['Balance Due',invoice.balanceDue]
+    ] : [['Notes',selectedTransaction.notes]];
+    const itemRows = invoice?.items.map(item => '<tr><td>'+esc(item.description)+'</td><td>'+esc(item.quantity)+'</td><td>₹'+esc(item.unitPrice)+'</td><td>₹'+esc(item.lineTotal)+'</td></tr>').join('') || '';
+    const win = window.open('', '_blank', 'width=900,height=750');
+    if (!win) { alert('Please allow pop-ups to print.'); return; }
+    win.document.write('<!doctype html><html><head><title>PC TECHNO TUNER Payment</title><style>body{font:14px Arial;color:#172033;padding:28px}.sheet{max-width:780px;margin:auto}h1{font-size:22px}.brand{color:#087e9b;font-weight:bold;letter-spacing:1px;border-bottom:2px solid #0e7490;padding-bottom:12px}.row{display:flex;justify-content:space-between;border-bottom:1px solid #ddd;padding:9px 0;gap:20px}.row span{color:#64748b}table{width:100%;border-collapse:collapse;margin-top:12px}td,th{padding:9px;border:1px solid #ddd;text-align:left}@media print{body{padding:0}}</style></head><body><main class="sheet"><div class="brand">PC TECHNO TUNER • PAYMENT RECEIPT / DETAILS</div><h1>'+esc(isOutward?'Outward Service Payment':isInvoice?'Sales Invoice Payment':selectedTransaction.type+' Entry')+'</h1><p>'+esc(selectedTransaction.partyName)+' • '+esc(selectedTransaction.date)+'</p><div class="row"><span>Amount Received</span><b>₹'+esc(Number(selectedTransaction.amount).toLocaleString('en-IN'))+'</b></div><div class="row"><span>Payment Method</span><b>'+esc(selectedTransaction.paymentMethod)+'</b></div><div class="row"><span>Reference</span><b>'+esc(selectedTransaction.referenceId)+'</b></div>'+rows.map(([k,v])=>'<div class="row"><span>'+esc(k)+'</span><b>'+esc(v)+'</b></div>').join('')+(itemRows?'<h3>Invoice Items</h3><table><tr><th>Item</th><th>Qty</th><th>Rate</th><th>Total</th></tr>'+itemRows+'</table>':'')+'<p style="margin-top:30px;color:#64748b">info@pctechnotuner.com • www.pctechnotuner.com • 7383871195</p></main><script>window.onload=()=>setTimeout(()=>window.print(),250)</script></body></html>');
+    win.document.close();
+  };
+
   const handleTypeChange = (type: 'INCOME' | 'EXPENSE') => {
     setFormType(type);
     setFormCategory(type === 'INCOME' ? INCOME_CATEGORIES[0] : EXPENSE_CATEGORIES[0]);
@@ -105,7 +139,7 @@ export const AccountingView: React.FC<AccountingViewProps> = ({
     }
 
     const newTx: Transaction = {
-      id: `tr-${Date.now()}`,
+      id: selectedTransaction && !selectedTransaction.id.startsWith('auto-') ? selectedTransaction.id : `tr-${Date.now()}`,
       type: formType,
       category: formCategory,
       amount: Number(formAmount),
@@ -119,6 +153,7 @@ export const AccountingView: React.FC<AccountingViewProps> = ({
 
     onSaveTransaction(newTx);
     setModalOpen(false);
+    setSelectedTransaction(null);
   };
 
   // Automatically include money actually received against invoices and outward service jobs.
@@ -405,7 +440,11 @@ export const AccountingView: React.FC<AccountingViewProps> = ({
                 <h4 className="mt-4 font-bold text-cyan-300">Bill Items</h4><div className="mt-2 overflow-x-auto"><table className="w-full text-left text-xs"><thead><tr><th className="p-2">Item</th><th className="p-2">Qty</th><th className="p-2">Rate</th><th className="p-2">Total</th></tr></thead><tbody>{invoice.items.map((item,index) => <tr key={index} className="border-t border-gray-800"><td className="p-2">{item.description}</td><td className="p-2">{item.quantity}</td><td className="p-2">₹{Number(item.unitPrice || 0).toLocaleString('en-IN')}</td><td className="p-2">₹{Number(item.lineTotal || 0).toLocaleString('en-IN')}</td></tr>)}</tbody></table></div>
               </div></div>}
               {!outward && !invoice && <div className="px-5 pb-5"><div className="rounded-xl border border-gray-800 p-4"><h3 className="mb-2 font-bold text-cyan-300">Entry Notes</h3><p className="text-sm text-gray-300">{selectedTransaction.notes || 'No additional details recorded.'}</p></div></div>}
-              <footer className="flex justify-end border-t border-gray-800 p-4"><button type="button" onClick={() => setSelectedTransaction(null)} className="rounded-xl border border-gray-700 px-5 py-2.5 text-sm font-bold">Close</button></footer>
+              <footer className="flex flex-wrap justify-between gap-2 border-t border-gray-800 p-4">
+                <div className="flex flex-wrap gap-2"><button type="button" onClick={printSelectedTransaction} className="rounded-xl bg-cyan-500 px-4 py-2.5 text-sm font-bold text-gray-950">Print / Save PDF</button>
+                {!selectedTransaction.id.startsWith('auto-') && <button type="button" onClick={editSelectedTransaction} className="rounded-xl border border-amber-500/40 px-4 py-2.5 text-sm font-bold text-amber-300">Edit Entry</button>}</div>
+                <button type="button" onClick={() => setSelectedTransaction(null)} className="rounded-xl border border-gray-700 px-5 py-2.5 text-sm font-bold">Close</button>
+              </footer>
             </section>
           </div>
         );
