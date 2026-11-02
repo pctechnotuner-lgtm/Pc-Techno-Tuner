@@ -22,12 +22,14 @@ import {
   PaymentMethod,
   Transaction,
   Invoice,
+  OutwardRecord,
 } from '../types';
 import { getT } from '../i18n';
 
 interface AccountingViewProps {
   transactions: Transaction[];
   invoices: Invoice[];
+  outwardRecords: OutwardRecord[];
   lang: Language;
   onSaveTransaction: (transaction: Transaction) => void;
   onDeleteTransaction: (id: string) => void;
@@ -54,6 +56,7 @@ const EXPENSE_CATEGORIES: ExpenseCategory[] = [
 export const AccountingView: React.FC<AccountingViewProps> = ({
   transactions,
   invoices,
+  outwardRecords,
   lang,
   onSaveTransaction,
   onDeleteTransaction,
@@ -117,19 +120,49 @@ export const AccountingView: React.FC<AccountingViewProps> = ({
     setModalOpen(false);
   };
 
+  // Automatically include money actually received against invoices and outward service jobs.
+  // These are derived from the saved invoice/outward records; waived settlements are not cash income.
+  const receivedPaymentTransactions: Transaction[] = [
+    ...invoices.filter((invoice) => Number(invoice.amountPaid || 0) > 0).map((invoice) => ({
+      id: 'auto-invoice-payment-' + invoice.id,
+      type: 'INCOME' as const,
+      category: 'Customer invoice payment',
+      amount: Number(invoice.amountPaid || 0),
+      date: invoice.invoiceDate,
+      paymentMethod: invoice.paymentMethod,
+      partyName: invoice.customerName,
+      referenceId: invoice.invoiceNo || invoice.id,
+      notes: 'Auto-added from received invoice payment',
+      createdAt: invoice.createdAt,
+    })),
+    ...outwardRecords.filter((record) => Number(record.amountCollected || 0) > 0).map((record) => ({
+      id: 'auto-outward-payment-' + record.id,
+      type: 'INCOME' as const,
+      category: 'Computer and laptop repair income',
+      amount: Number(record.amountCollected || 0),
+      date: record.outDate,
+      paymentMethod: record.paymentMethod,
+      partyName: record.customerName,
+      referenceId: record.inwardRecordId,
+      notes: 'Auto-added from outward service payment',
+      createdAt: record.createdAt,
+    })),
+  ];
+  const allTransactions = [...transactions, ...receivedPaymentTransactions];
+
   // Metrics
-  const totalIncome = transactions
+  const totalIncome = allTransactions
     .filter((t) => t.type === 'INCOME')
     .reduce((sum, t) => sum + t.amount, 0);
 
-  const totalExpense = transactions
+  const totalExpense = allTransactions
     .filter((t) => t.type === 'EXPENSE')
     .reduce((sum, t) => sum + t.amount, 0);
 
   const netCashFlow = totalIncome - totalExpense;
 
   // Filtered list
-  const filtered = transactions.filter((tx) => {
+  const filtered = allTransactions.filter((tx) => {
     const matchesType = filterType === 'ALL' || tx.type === filterType;
     const matchesCat = filterCategory === 'ALL' || tx.category === filterCategory;
     const matchesDate = !dateRange || tx.date === dateRange;
