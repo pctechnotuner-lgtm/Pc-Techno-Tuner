@@ -118,10 +118,14 @@ export const ProductsAdminView: React.FC<ProductsAdminViewProps> = ({
   const filteredProducts = products.filter((p) => {
     const matchesCat = selectedCategory === 'All' || p.category === selectedCategory;
     const matchesLowStock = !showLowStockOnly || p.stockQuantity <= p.minStockAlert;
+    const query = search.trim().toLowerCase();
     const matchesSearch =
-      p.name.toLowerCase().includes(search.toLowerCase()) ||
-      p.brand.toLowerCase().includes(search.toLowerCase()) ||
-      p.model.toLowerCase().includes(search.toLowerCase());
+      !query ||
+      (p.name || '').toLowerCase().includes(query) ||
+      (p.brand || '').toLowerCase().includes(query) ||
+      (p.model || '').toLowerCase().includes(query) ||
+      (p.category || '').toLowerCase().includes(query) ||
+      (p.specifications || '').toLowerCase().includes(query);
     return matchesCat && matchesLowStock && matchesSearch;
   });
 
