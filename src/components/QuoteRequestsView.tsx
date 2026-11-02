@@ -22,7 +22,7 @@ interface QuoteRequestsViewProps { isAdmin: boolean; products?: Product[]; }
 const money = (value: number) => '₹' + value.toLocaleString('en-IN', { maximumFractionDigits: 2 });
 
 export const QuoteRequestsView: React.FC<QuoteRequestsViewProps> = ({ isAdmin, products = [] }) => {
-  const [name,setName]=useState(''); const [mobile,setMobile]=useState('');
+  const [catalogue,setCatalogue]=useState<Product[]>(products);\n  useEffect(()=>{ if(!isAdmin) void supabase.from('quote_catalogue').select('id,name,selling_price').eq('active',true).order('name').then(({data,error})=>{ if(!error&&data) setCatalogue(data.map((p:any)=>({id:p.id,name:p.name,sellingPrice:Number(p.selling_price)} as Product))); }); },[isAdmin]);\n  const [name,setName]=useState(''); const [mobile,setMobile]=useState('');
   const [business,setBusiness]=useState(''); const [email,setEmail]=useState('');
   const [details,setDetails]=useState('');
   const [selectedProduct,setSelectedProduct]=useState('');
@@ -41,7 +41,7 @@ export const QuoteRequestsView: React.FC<QuoteRequestsViewProps> = ({ isAdmin, p
   useEffect(()=>{ if(isAdmin) void load().catch(e=>setError(e.message||'Could not load quote requests')); },[isAdmin]);
 
   const addProduct = () => {
-    const product=products.find(p=>p.id===selectedProduct);
+    const product=catalogue.find(p=>p.id===selectedProduct);
     if(!product) return;
     setCart(old=>{
       const existing=old.find(item=>item.productId===product.id);
@@ -102,7 +102,7 @@ export const QuoteRequestsView: React.FC<QuoteRequestsViewProps> = ({ isAdmin, p
       <div className="sm:col-span-2 rounded-xl border border-slate-700 p-3 space-y-3">
         <h2 className="text-sm font-bold text-white">Add Items from Our Catalogue</h2>
         <div className="grid grid-cols-1 sm:grid-cols-[1fr_100px_auto] gap-2">
-          <select value={selectedProduct} onChange={e=>setSelectedProduct(e.target.value)} className="min-w-0 rounded-lg border border-slate-700 bg-slate-950 p-3 text-sm text-white"><option value="">Select item / service</option>{products.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(p=><option key={p.id} value={p.id}>{p.name} — {money(p.sellingPrice)}</option>)}</select>
+          <select value={selectedProduct} onChange={e=>setSelectedProduct(e.target.value)} className="min-w-0 rounded-lg border border-slate-700 bg-slate-950 p-3 text-sm text-white"><option value="">Select item / service</option>{catalogue.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(p=><option key={p.id} value={p.id}>{p.name} — {money(p.sellingPrice)}</option>)}</select>
           <input type="number" min="1" value={quantity} onChange={e=>setQuantity(Math.max(1,Number(e.target.value)||1))} className="rounded-lg border border-slate-700 bg-slate-950 p-3 text-sm text-white" aria-label="Quantity"/>
           <button type="button" onClick={addProduct} disabled={!selectedProduct} className="inline-flex items-center justify-center gap-1 rounded-lg bg-blue-600 px-4 py-3 text-sm font-bold text-white disabled:opacity-40"><Plus className="h-4 w-4"/> Add</button>
         </div>
