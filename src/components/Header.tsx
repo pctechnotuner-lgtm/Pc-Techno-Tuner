@@ -19,6 +19,8 @@ import {
   AlertCircle,
   Receipt,
   Wallet,
+  ArrowUpRight,
+  ArrowDownRight,
   BarChart3,
   TrendingUp,
   Settings,
@@ -128,12 +130,6 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           ) : (
             <>
-              <button
-                onClick={() => handleNavClick('accounts')}
-                className="hidden md:inline-flex items-center gap-2 rounded-xl border border-violet-500/40 bg-violet-500/10 px-4 py-2 text-xs font-bold text-violet-200 transition hover:bg-violet-500/20"
-              >
-                <Wallet className="h-4 w-4" /> Accounts
-              </button>
               <button
                 onClick={() => { setIsAdmin(false); setActiveTab('catalogue'); setMobileMenuOpen(false); }}
                 className="inline-flex items-center gap-2 rounded-xl border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-xs font-bold text-rose-200 transition hover:bg-rose-500/20"
@@ -320,6 +316,13 @@ export const Header: React.FC<HeaderProps> = ({
                 >
                   <Wallet className="w-3.5 h-3.5" />
                   <span>{t.accounts}</span>
+                </button>
+
+                <button onClick={() => handleNavClick('payment-in')} className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition w-full text-left ${activeTab === 'payment-in' ? 'bg-emerald-700 text-white' : 'text-emerald-300 hover:bg-gray-800'}`}>
+                  <ArrowUpRight className="w-3.5 h-3.5" /><span>Payment In</span>
+                </button>
+                <button onClick={() => handleNavClick('payment-out')} className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition w-full text-left ${activeTab === 'payment-out' ? 'bg-rose-700 text-white' : 'text-rose-300 hover:bg-gray-800'}`}>
+                  <ArrowDownRight className="w-3.5 h-3.5" /><span>Payment Out</span>
                 </button>
 
                 <button
