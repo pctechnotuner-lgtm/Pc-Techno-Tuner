@@ -451,6 +451,44 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
                     </div>
                   )}
 
+                  {/* Unified date-wise party statement */}
+                  {(() => {
+                    const rows = [
+                      ...custInvs.map((x) => ({ key: 'inv-' + x.id, date: x.invoiceDate, type: 'Invoice', ref: x.invoiceNo, work: x.items.map(i => i.description + ' × ' + i.quantity).join(', '), amount: Number(x.totalAmount || 0), paid: Number(x.amountPaid || 0), due: Number(x.balanceDue || 0), status: x.paymentStatus, detail: x.items.map(i => ({ name: i.description, qty: i.quantity, rate: i.unitPrice, total: i.lineTotal })) })),
+                      ...custEstimates.map((x) => ({ key: 'est-' + x.id, date: x.estimateDate, type: 'Estimate', ref: x.estimateNo, work: x.items.map(i => i.description + ' × ' + i.quantity).join(', '), amount: Number(x.totalAmount || 0), paid: 0, due: 0, status: 'Estimate', detail: x.items.map(i => ({ name: i.description, qty: i.quantity, rate: i.unitPrice, total: i.lineTotal })) })),
+                      ...custInwards.map((x) => ({ key: 'in-' + x.id, date: x.inwardDate, type: 'Inward', ref: x.id, work: x.productName, amount: Number(x.estimateAmount || 0), paid: 0, due: 0, status: 'Received for service', detail: [{ name: 'Problem', value: x.problem }] })),
+                      ...custOutwards.map((x) => ({ key: 'out-' + x.id, date: x.outDate, type: 'Outward', ref: x.inwardRecordId, work: x.productName, amount: Number(x.amountCollected || 0), paid: Number(x.amountCollected || 0), due: 0, status: 'Delivered', detail: [{ name: 'Solution', value: x.solution }, { name: 'Payment', value: x.paymentMethod }] })),
+                      ...custComps.map((x) => ({ key: 'comp-' + x.id, date: x.createdAt?.slice(0,10), type: 'Complaint', ref: x.id, work: x.category + ' • ' + x.complaintType, amount: Number(x.serviceCharges || 0), paid: 0, due: 0, status: x.status, detail: [{ name: 'Description', value: x.description }, { name: 'Service location', value: x.serviceLocation }] })),
+                      ...custTransactions.map((x) => ({ key: 'tx-' + x.id, date: x.date, type: x.type === 'INCOME' ? 'Payment received' : 'Payment / Expense', ref: x.referenceId || x.id, work: x.category, amount: Number(x.amount || 0), paid: x.type === 'INCOME' ? Number(x.amount || 0) : 0, due: 0, status: x.paymentMethod, detail: [{ name: 'Notes', value: x.notes || '—' }] })),
+                      ...custAntivirus.map((x) => ({ key: 'av-' + x.id, date: x.purchaseDate, type: 'Antivirus', ref: x.id, work: x.antivirusCompany, amount: 0, paid: 0, due: 0, status: 'Expiry: ' + x.expiryDate, detail: [{ name: 'License key', value: x.licenseKey }] })),
+                      ...custQuotes.map((x) => ({ key: 'quote-' + x.id, date: x.created_at?.slice(0,10), type: 'Quote request', ref: x.id, work: (x.items || []).map(i => i.name + ' × ' + (i.quantity || 1)).join(', ') || x.customer_name, amount: Number(x.subtotal || 0), paid: 0, due: 0, status: x.status || 'New', detail: x.items || [] })),
+                    ].sort((a,b) => (b.date || '').localeCompare(a.date || ''));
+                    return (
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between gap-2"><h4 className="text-xs font-black uppercase tracking-wider text-cyan-300">Complete Party Ledger — Date Wise</h4><span className="text-[10px] text-gray-400">{rows.length} entries</span></div>
+                        <div className="overflow-x-auto rounded-xl border border-gray-800 bg-gray-950">
+                          <table className="w-full min-w-[760px] text-left text-[11px]">
+                            <thead className="bg-gray-900 text-gray-400"><tr><th className="p-2">Date</th><th className="p-2">Work / Product</th><th className="p-2">Type / ID</th><th className="p-2 text-right">Amount</th><th className="p-2 text-right">Received</th><th className="p-2 text-right">Balance</th><th className="p-2">Status / Details</th></tr></thead>
+                            <tbody className="divide-y divide-gray-800">
+                              {rows.length === 0 ? <tr><td colSpan={7} className="p-5 text-center text-gray-500">No activity found for this party.</td></tr> : rows.map((r) => (
+                                <tr key={r.key} className="align-top hover:bg-gray-900/70">
+                                  <td className="p-2 whitespace-nowrap text-gray-300">{r.date || '—'}</td>
+                                  <td className="p-2 min-w-[180px]"><div className="font-semibold text-white">{r.work || '—'}</div></td>
+                                  <td className="p-2 whitespace-nowrap"><div className="font-semibold text-cyan-300">{r.type}</div><div className="font-mono text-[10px] text-gray-500">{r.ref}</div></td>
+                                  <td className="p-2 text-right whitespace-nowrap text-white">₹{r.amount.toLocaleString('en-IN')}</td>
+                                  <td className="p-2 text-right whitespace-nowrap text-emerald-300">₹{r.paid.toLocaleString('en-IN')}</td>
+                                  <td className="p-2 text-right whitespace-nowrap text-rose-300">₹{r.due.toLocaleString('en-IN')}</td>
+                                  <td className="p-2 min-w-[120px]"><div className="text-gray-300">{r.status || '—'}</div><details className="mt-1"><summary className="cursor-pointer text-cyan-400">Open details</summary><div className="mt-2 space-y-1 text-gray-400">{r.detail.map((d: any, index: number) => <div key={index}>{d.name || d.description || 'Item'}: {d.value || (d.qty ? d.qty + ' × ₹' + Number(d.rate || 0).toLocaleString('en-IN') + ' = ₹' + Number(d.total || 0).toLocaleString('en-IN') : d.name ? d.name : JSON.stringify(d))}</div>)}</div></details></td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                        <p className="text-[10px] text-gray-500">Invoice balance is shown as due. Estimate and inward amounts are not counted as outstanding until an invoice is made. Payment entries are shown separately to avoid double counting.</p>
+                      </div>
+                    );
+                  })()}
+
                   {/* Past Invoices */}
                   <div className="space-y-2">
                     <h4 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
