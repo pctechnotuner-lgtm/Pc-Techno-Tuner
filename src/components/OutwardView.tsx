@@ -20,6 +20,8 @@ export const OutwardView: React.FC<Props> = ({ inwardRecords, outwardRecords, on
   const [solution, setSolution] = useState('');
   const [paymentMethod, setPaymentMethod] = useState<'UPI' | 'Cash'>('UPI');
   const [amountCollected, setAmountCollected] = useState('');
+  const [settlementApplied, setSettlementApplied] = useState(false);
+  const [settlementNote, setSettlementNote] = useState('');
   const [deliveryBy, setDeliveryBy] = useState<'Porter' | 'Engineer'>('Engineer');
   const [porterName, setPorterName] = useState('');
   const [porterPhoneNumber, setPorterPhoneNumber] = useState('');
@@ -43,6 +45,8 @@ export const OutwardView: React.FC<Props> = ({ inwardRecords, outwardRecords, on
     setSolution('');
     setPaymentMethod('UPI');
     setAmountCollected('');
+    setSettlementApplied(false);
+    setSettlementNote('');
     setDeliveryBy('Engineer');
     setPorterName('');
     setPorterPhoneNumber('');
@@ -95,6 +99,8 @@ export const OutwardView: React.FC<Props> = ({ inwardRecords, outwardRecords, on
       solution: solution.trim(),
       paymentMethod,
       amountCollected: Number(amountCollected) || 0,
+      settlementApplied,
+      settlementNote: settlementApplied ? settlementNote.trim() : '',
       deliveryBy,
       porterName: deliveryBy === 'Porter' ? porterName.trim() : '',
       porterPhoneNumber: deliveryBy === 'Porter' ? porterPhoneNumber.trim() : '',
@@ -113,6 +119,8 @@ export const OutwardView: React.FC<Props> = ({ inwardRecords, outwardRecords, on
     setSolution(record.solution);
     setPaymentMethod(record.paymentMethod);
     setAmountCollected(String(record.amountCollected ?? 0));
+    setSettlementApplied(Boolean(record.settlementApplied));
+    setSettlementNote(record.settlementNote || '');
     setDeliveryBy(record.deliveryBy || 'Engineer');
     setPorterName(record.porterName || '');
     setPorterPhoneNumber(record.porterPhoneNumber || '');
@@ -195,6 +203,18 @@ export const OutwardView: React.FC<Props> = ({ inwardRecords, outwardRecords, on
           <label className="space-y-1.5"><span className="flex items-center gap-2 text-sm font-medium text-slate-300"><CalendarDays className="h-4 w-4" /> Out Date *</span><input type="date" value={outDate} onChange={(e) => setOutDate(e.target.value)} required className={fieldClass} /></label>
           <label className="space-y-1.5"><span className="flex items-center gap-2 text-sm font-medium text-slate-300"><IndianRupee className="h-4 w-4" /> Payment Method *</span><select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value as 'UPI' | 'Cash')} className={fieldClass}><option value="UPI">UPI</option><option value="Cash">Cash</option></select></label>
           <label className="space-y-1.5"><span className="flex items-center gap-2 text-sm font-medium text-slate-300"><IndianRupee className="h-4 w-4" /> Amount Collected (₹) *</span><input type="number" min="0" step="0.01" value={amountCollected} onChange={(e) => setAmountCollected(e.target.value)} required placeholder="Enter amount collected" className={fieldClass} /></label>
+          {selectedInward && Number(amountCollected || 0) < Number(selectedInward.estimateAmount || 0) && (
+            <div className="sm:col-span-2 rounded-xl border border-amber-500/30 bg-amber-950/20 p-4">
+              <div className="flex items-start gap-3">
+                <input id="settlement-applied" type="checkbox" checked={settlementApplied} onChange={(e) => setSettlementApplied(e.target.checked)} className="mt-1 h-5 w-5 accent-emerald-500" />
+                <label htmlFor="settlement-applied" className="cursor-pointer">
+                  <span className="block text-sm font-bold text-amber-200">Settle / Close Remaining Balance</span>
+                  <span className="mt-1 block text-xs text-slate-300">Remaining amount: {money(Math.max(0, Number(selectedInward.estimateAmount || 0) - Number(amountCollected || 0)))}. Tick this if you are waiving the balance / giving discount and want the party due to become ₹0.</span>
+                </label>
+              </div>
+              {settlementApplied && <div className="mt-3 space-y-1.5"><label className="text-xs font-semibold text-slate-300" htmlFor="settlement-note">Settlement note (optional)</label><input id="settlement-note" value={settlementNote} onChange={(e) => setSettlementNote(e.target.value)} placeholder="e.g. Discount / goodwill / final settlement" className={fieldClass}/><p className="text-xs font-bold text-emerald-300">After settlement, party outstanding for this service will be ₹0.</p></div>}
+            </div>
+          )}
           <label className="space-y-1.5"><span className="text-sm font-medium text-slate-300">Delivery By *</span><select value={deliveryBy} onChange={(e) => setDeliveryBy(e.target.value as 'Porter' | 'Engineer')} className={fieldClass}><option value="Engineer">Engineer</option><option value="Porter">Porter</option></select></label>
           {deliveryBy === 'Porter' && <>
             <label className="space-y-1.5"><span className="text-sm font-medium text-slate-300">Porter Name *</span><input value={porterName} onChange={(e) => setPorterName(e.target.value)} required placeholder="Enter porter name" className={fieldClass} /></label>
