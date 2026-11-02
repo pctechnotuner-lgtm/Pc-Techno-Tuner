@@ -291,10 +291,12 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
                 filteredMetrics.map(({ customer, invoices: cInvs, complaints: cComps, totalBilled, totalPaid, outstanding }) => (
                   <tr key={customer.id} className="hover:bg-gray-800/40 transition">
                     <td className="py-3 px-4">
-                      <p className="font-bold text-white text-xs">{customer.name}</p>
-                      {customer.businessName && (
-                        <p className="text-[10px] text-blue-400 font-semibold">{customer.businessName}</p>
-                      )}
+                      <button type="button" onClick={() => setSelectedCustomer(customer)} className="block text-left group">
+                        <p className="font-bold text-white text-xs group-hover:text-cyan-300 underline decoration-dotted underline-offset-4 cursor-pointer">{customer.name}</p>
+                        {customer.businessName && (
+                          <p className="text-[10px] text-blue-400 font-semibold group-hover:text-cyan-300 underline decoration-dotted underline-offset-4 cursor-pointer">{customer.businessName}</p>
+                        )}
+                      </button>
                       {customer.gstin && (
                         <p className="text-[10px] text-gray-500 font-mono">GST: {customer.gstin}</p>
                       )}
@@ -387,8 +389,8 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
 
       {/* Customer Ledger History Modal */}
       {selectedCustomer && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-          <div className="w-full max-w-2xl bg-gray-900 border border-gray-800 rounded-2xl p-6 space-y-5 my-8 shadow-2xl animate-scaleUp">
+        <div className="fixed inset-0 z-[100] bg-gray-950 overflow-y-auto">
+          <div className="min-h-screen w-full bg-gray-950 p-4 sm:p-6 lg:p-8 space-y-5 animate-fadeIn">
             <div className="flex items-center justify-between border-b border-gray-800 pb-3">
               <div>
                 <h3 className="text-base font-bold text-white flex items-center gap-2">
