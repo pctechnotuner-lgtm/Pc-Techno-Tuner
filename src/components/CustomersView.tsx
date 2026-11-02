@@ -22,15 +22,22 @@ import {
   Customer,
   Complaint,
   Invoice,
+  Estimate,
+  Transaction,
+  AntivirusLicense,
   InwardRecord,
   OutwardRecord,
   Language,
 } from '../types';
 import { getT } from '../i18n';
+import { sameParty } from '../lib/party';
 
 interface CustomersViewProps {
   customers: Customer[];
   invoices: Invoice[];
+  estimates: Estimate[];
+  transactions: Transaction[];
+  antivirusLicenses: AntivirusLicense[];
   complaints: Complaint[];
   inwardRecords: InwardRecord[];
   outwardRecords: OutwardRecord[];
@@ -43,6 +50,9 @@ interface CustomersViewProps {
 export const CustomersView: React.FC<CustomersViewProps> = ({
   customers,
   invoices,
+  estimates,
+  transactions,
+  antivirusLicenses,
   complaints,
   inwardRecords,
   outwardRecords,
@@ -155,14 +165,14 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
   // Compute metrics per customer
   const customerMetrics = customers.map((c) => {
     const custInvoices = invoices.filter(
-      (inv) => inv.customerMobile === c.mobile || inv.customerName.toLowerCase() === c.name.toLowerCase()
+      (inv) => sameParty({ name: inv.customerName, mobile: inv.customerMobile }, c)
     );
     const totalBilled = custInvoices.reduce((sum, inv) => sum + inv.totalAmount, 0);
     const totalPaid = custInvoices.reduce((sum, inv) => sum + inv.amountPaid, 0);
     const outstanding = custInvoices.reduce((sum, inv) => sum + inv.balanceDue, 0);
 
     const custComplaints = complaints.filter(
-      (comp) => comp.mobile === c.mobile || comp.customerName.toLowerCase() === c.name.toLowerCase()
+      (comp) => sameParty({ name: comp.customerName, mobile: comp.mobile }, c)
     );
 
     return {
@@ -373,13 +383,14 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
 
             {/* Quick Metrics Bar */}
             {(() => {
-              const matchesParty = (name?: string, mobile?: string) =>
-                (!!mobile && mobile.replace(/\D/g, '') === selectedCustomer.mobile.replace(/\D/g, '')) ||
-                (!!name && name.trim().toLowerCase() === selectedCustomer.name.trim().toLowerCase());
+              const matchesParty = (name?: string, mobile?: string) => sameParty({ name, mobile }, selectedCustomer);
               const custInvs = invoices.filter((i) => matchesParty(i.customerName, i.customerMobile));
+              const custEstimates = estimates.filter((e) => matchesParty(e.customerName, e.customerMobile));
               const custComps = complaints.filter((c) => matchesParty(c.customerName, c.mobile));
               const custInwards = inwardRecords.filter((r) => matchesParty(r.customerName, r.phoneNumber));
               const custOutwards = outwardRecords.filter((r) => matchesParty(r.customerName, r.phoneNumber));
+              const custTransactions = transactions.filter((tx) => matchesParty(tx.partyName));
+              const custAntivirus = antivirusLicenses.filter((license) => matchesParty(license.customerName, license.mobile));
               const totalBilled = custInvs.reduce((s, i) => s + i.totalAmount, 0);
               const totalPaid = custInvs.reduce((s, i) => s + i.amountPaid, 0);
               const due = custInvs.reduce((s, i) => s + i.balanceDue, 0);
@@ -440,6 +451,24 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
                         ))}
                       </div>
                     )}
+                  </div>
+
+                  {/* Estimate history */}
+                  <div className="space-y-2">
+                    <h4 className="text-xs font-bold text-white uppercase tracking-wider">Estimates / Quotations ({custEstimates.length})</h4>
+                    {custEstimates.length === 0 ? <p className="text-xs italic text-gray-500">No estimates recorded.</p> : <div className="divide-y divide-gray-800 border border-gray-800 rounded-xl overflow-hidden bg-gray-950">{custEstimates.map((e) => <div key={e.id} className="p-3 text-xs flex items-center justify-between gap-3"><div><p className="font-mono font-bold text-cyan-300">{e.estimateNo}</p><p className="text-[10px] text-gray-500">Date: {e.estimateDate} • Valid until: {e.validUntil}</p></div><div className="text-right"><p className="font-bold text-white">₹{Number(e.totalAmount||0).toLocaleString('en-IN')}</p><p className="text-[10px] text-gray-500">{e.items?.length||0} item(s)</p></div></div>)}</div>}
+                  </div>
+
+                  {/* Accounts transactions */}
+                  <div className="space-y-2">
+                    <h4 className="text-xs font-bold text-white uppercase tracking-wider">Payments / Account Entries ({custTransactions.length})</h4>
+                    {custTransactions.length === 0 ? <p className="text-xs italic text-gray-500">No account entries recorded.</p> : <div className="max-h-56 overflow-y-auto divide-y divide-gray-800 rounded-xl border border-gray-800 bg-gray-950">{custTransactions.slice().sort((a,b)=>(b.date||'').localeCompare(a.date||'')).map((tx)=><div key={tx.id} className="p-3 text-xs flex items-center justify-between gap-3"><div><p className="font-semibold text-white">{tx.category}</p><p className="text-[10px] text-gray-500">{tx.date} • {tx.referenceId||'No reference'} • {tx.paymentMethod}</p></div><div className={tx.type==='INCOME'?'text-right font-bold text-emerald-300':'text-right font-bold text-rose-300'}>{tx.type==='INCOME'?'+':'−'}₹{Number(tx.amount||0).toLocaleString('en-IN')}</div></div>)}</div>}
+                  </div>
+
+                  {/* Antivirus licence history */}
+                  <div className="space-y-2">
+                    <h4 className="text-xs font-bold text-white uppercase tracking-wider">Antivirus Licenses ({custAntivirus.length})</h4>
+                    {custAntivirus.length === 0 ? <p className="text-xs italic text-gray-500">No antivirus licenses recorded.</p> : <div className="divide-y divide-gray-800 rounded-xl border border-gray-800 bg-gray-950">{custAntivirus.map((license)=><div key={license.id} className="p-3 text-xs flex items-center justify-between gap-3"><div><p className="font-semibold text-white">{license.antivirusCompany}</p><p className="text-[10px] text-gray-500">Purchase: {license.purchaseDate} • Expiry: {license.expiryDate}</p></div><span className="font-mono text-cyan-300">{license.licenseKey}</span></div>)}</div>}
                   </div>
 
                   {/* Inward and outward service history for this party */}
