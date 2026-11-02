@@ -111,7 +111,8 @@ export const QuoteRequestsView: React.FC<QuoteRequestsViewProps> = ({ isAdmin, p
           </button>
           <select aria-label={'Status for '+r.customer_name} value={r.status} onChange={e=>void updateStatus(r.id,e.target.value as QuoteRow['status'])} className="shrink-0 rounded-lg border border-slate-700 bg-slate-950 px-2 py-2 text-[11px] text-white"><option>New</option><option>Contacted</option><option>Quoted</option><option>Closed</option></select>
         </div>
-        {isExpanded&&<div className="space-y-3 border-t border-slate-800 bg-slate-950/50 p-4">
+        {isExpanded&&<>
+        <div className="space-y-3 border-t border-slate-800 bg-slate-950/50 p-4">
           {editingQuoteId===r.id&&editDraft?<>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <label className="space-y-1 text-xs text-slate-400">Customer Name<input value={editDraft.customer_name} onChange={e=>updateDraftField('customer_name',e.target.value)} className="w-full rounded-lg border border-slate-700 bg-slate-900 p-2 text-sm text-white"/></label>
@@ -140,6 +141,7 @@ export const QuoteRequestsView: React.FC<QuoteRequestsViewProps> = ({ isAdmin, p
           <h3>Items / Services</h3><table><thead><tr><th>Item</th><th>Qty</th><th>Unit Price</th><th>Total</th></tr></thead><tbody>{items.map((item,i)=><tr key={i}><td>{item.name}</td><td>{item.quantity}</td><td>{item.unitPrice===null?'To be quoted':money(item.unitPrice)}</td><td>{item.lineTotal===null?'Pending':money(item.lineTotal)}</td></tr>)}</tbody></table>
           <p className="quote-print-total">Known-price subtotal: {money(Number(r.subtotal||0))}</p>{r.details&&<><h3>Additional Details</h3><p>{r.details}</p></>}<p className="quote-print-foot">This is a quotation enquiry / estimate. Final pricing and availability will be confirmed by PC TECHNO TUNER.</p>
         </div></div>
+        </>
       </div>;
     })}</div>}
   </div>;
