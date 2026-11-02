@@ -1085,11 +1085,11 @@ export default function App() {
 
 
         {activeTab === 'quote' && (
-          <QuoteRequestsView isAdmin={false} />
+          <QuoteRequestsView isAdmin={false} products={products} />
         )}
 
         {activeTab === 'quotes' && isAdmin && (
-          <QuoteRequestsView isAdmin={true} />
+          <QuoteRequestsView isAdmin={true} products={products} />
         )}
 
         {activeTab === 'complaint' && (
