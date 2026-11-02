@@ -362,6 +362,34 @@ export default function App() {
     };
   }, [isAdmin]);
 
+  // Publish only customer-safe item names and selling prices for the public quote form.
+  useEffect(() => {
+    if (!isAdmin || !syncReady) return;
+    const publishQuoteCatalogue = async () => {
+      const { error: deactivateError } = await supabase
+        .from('quote_catalogue')
+        .update({ active: false, updated_at: new Date().toISOString() })
+        .neq('id', '');
+      if (deactivateError) {
+        console.error('Quote catalogue refresh failed:', deactivateError);
+        return;
+      }
+      if (products.length === 0) return;
+      const { error } = await supabase.from('quote_catalogue').upsert(
+        products.map((product) => ({
+          id: product.id,
+          name: product.name,
+          selling_price: product.sellingPrice,
+          active: true,
+          updated_at: new Date().toISOString(),
+        })),
+        { onConflict: 'id' }
+      );
+      if (error) console.error('Quote catalogue publish failed:', error);
+    };
+    void publishQuoteCatalogue();
+  }, [isAdmin, syncReady, products]);
+
   // Save changes to Supabase after cloud loading is complete.
   // Saves are queued so they do not intentionally overlap.
   useEffect(() => {
