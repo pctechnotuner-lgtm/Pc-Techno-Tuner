@@ -77,6 +77,51 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
   const [search, setSearch] = useState('');
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [selectedLedgerEntry, setSelectedLedgerEntry] = useState<any | null>(null);
+
+  const printLedgerEntry = () => {
+    if (!selectedLedgerEntry || !selectedCustomer) return;
+    const win = window.open('', '_blank', 'width=900,height=750');
+    if (!win) { alert('Please allow pop-ups to print this record.'); return; }
+    const safe = (value: unknown) => String(value ?? '—').replace(/[&<>"]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch] || ch));
+    const details = (selectedLedgerEntry.detail || []).map((d: any) => {
+      const value = d.value ?? (d.qty ? d.qty + ' × ₹' + Number(d.rate || 0).toLocaleString('en-IN') + ' = ₹' + Number(d.total || 0).toLocaleString('en-IN') : d.name || '—');
+      return '<tr><th>' + safe(d.name || d.description || 'Details') + '</th><td>' + safe(value) + '</td></tr>';
+    }).join('');
+    win.document.open();
+    win.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Party Service Record</title><style>
+      *{box-sizing:border-box}body{font:14px Arial,sans-serif;color:#172033;margin:0;padding:32px;background:#fff}
+      .sheet{max-width:780px;margin:auto;border:1px solid #cbd5e1;padding:28px}
+      h1{font-size:22px;margin:0;color:#0f172a}.brand{font-size:12px;letter-spacing:1.5px;color:#087e9b;font-weight:bold}
+      .muted{color:#64748b}.top{border-bottom:2px solid #0e7490;padding-bottom:16px;margin-bottom:20px}
+      .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0}
+      .tile{border:1px solid #cbd5e1;padding:12px;border-radius:7px}.tile small{display:block;color:#64748b;margin-bottom:6px}
+      h2{font-size:15px;margin:22px 0 10px;color:#0e7490}
+      table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:10px;border:1px solid #cbd5e1;vertical-align:top}
+      th{width:32%;background:#f1f5f9}.totals{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px}
+      .total{padding:14px;background:#f1f5f9;border-radius:7px}.total b{display:block;font-size:18px;margin-top:6px}
+      .foot{margin-top:28px;border-top:1px solid #cbd5e1;padding-top:12px;font-size:11px;color:#64748b}
+      @media print{body{padding:0}.sheet{border:0;max-width:none;padding:0}.no-print{display:none}}
+    </style></head><body><main class="sheet">
+      <header class="top"><div class="brand">PC TECHNO TUNER • PARTY SERVICE RECORD</div><h1>${safe(selectedLedgerEntry.work || 'Party Record')}</h1>
+      <p class="muted">${safe(selectedCustomer.name)} • ${safe(selectedCustomer.mobile)}</p></header>
+      <div class="grid">
+        <div class="tile"><small>Date</small><b>${safe(selectedLedgerEntry.date)}</b></div>
+        <div class="tile"><small>Type</small><b>${safe(selectedLedgerEntry.type)}</b></div>
+        <div class="tile"><small>Reference / ID</small><b>${safe(selectedLedgerEntry.ref)}</b></div>
+        <div class="tile"><small>Status</small><b>${safe(selectedLedgerEntry.status)}</b></div>
+      </div>
+      <h2>Work / Product Details</h2><table><tbody>${details || '<tr><td>No extra details recorded.</td></tr>'}</tbody></table>
+      <div class="totals">
+        <div class="total">Amount<b>₹${Number(selectedLedgerEntry.amount || 0).toLocaleString('en-IN')}</b></div>
+        <div class="total">Received<b>₹${Number(selectedLedgerEntry.paid || 0).toLocaleString('en-IN')}</b></div>
+        <div class="total">Balance<b>₹${Number(selectedLedgerEntry.due || 0).toLocaleString('en-IN')}</b></div>
+      </div>
+      <div class="foot">PC TECHNO TUNER • info@pctechnotuner.com • www.pctechnotuner.com • 7383871195</div>
+      <p class="no-print"><button onclick="window.print()">Print / Save PDF</button></p>
+    </main><script>window.onload=()=>setTimeout(()=>window.print(),300);</script></body></html>`);
+    win.document.close();
+  };
+
   const [quoteHistory, setQuoteHistory] = useState<QuoteLedgerRecord[]>([]);
 
   useEffect(() => {
@@ -507,7 +552,7 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
                                 </div>
                               </div>
                               <footer className="flex flex-wrap justify-end gap-2 border-t border-gray-800 p-4">
-                                <button type="button" onClick={() => window.print()} className="inline-flex items-center gap-2 rounded-xl bg-cyan-500 px-5 py-3 text-sm font-bold text-gray-950 hover:bg-cyan-400"><Download className="h-4 w-4"/> Print / Save PDF</button>
+                                <button type="button" onClick={printLedgerEntry} className="inline-flex items-center gap-2 rounded-xl bg-cyan-500 px-5 py-3 text-sm font-bold text-gray-950 hover:bg-cyan-400"><Download className="h-4 w-4"/> Print / Save PDF</button>
                                 <button type="button" onClick={() => setSelectedLedgerEntry(null)} className="rounded-xl border border-gray-700 px-5 py-3 text-sm font-bold text-white hover:bg-gray-800">Close</button>
                               </footer>
                             </section>
