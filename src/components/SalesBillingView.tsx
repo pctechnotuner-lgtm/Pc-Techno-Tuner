@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { openWhatsAppBusiness } from '../lib/whatsapp';
+import { normalizePartyPhone } from '../lib/party';
 import {
   Receipt,
   Plus,
@@ -133,6 +134,20 @@ export const SalesBillingView: React.FC<SalesBillingViewProps> = ({
     if (existing) {
       setCustName(existing.name || value);
       setCustMobile(existing.mobile || '');
+      setCustBusiness(existing.businessName || '');
+      setCustAddress(existing.address || '');
+      setCustGstin(existing.gstin || '');
+    }
+  };
+
+  const handleCustomerMobileInput = (value: string) => {
+    const digits = value.replace(/\D/g, '').slice(-10);
+    setCustMobile(digits);
+    if (digits.length !== 10) return;
+    const existing = customers.find((c) => normalizePartyPhone(c.mobile) === normalizePartyPhone(digits));
+    if (existing) {
+      setCustName(existing.name || '');
+      setCustMobile(existing.mobile || digits);
       setCustBusiness(existing.businessName || '');
       setCustAddress(existing.address || '');
       setCustGstin(existing.gstin || '');
@@ -527,7 +542,7 @@ export const SalesBillingView: React.FC<SalesBillingViewProps> = ({
                       pattern="[0-9]{10}"
                       maxLength={10}
                       value={custMobile}
-                      onChange={(e) => setCustMobile(e.target.value.replace(/\D/g, ''))}
+                      onChange={(e) => handleCustomerMobileInput(e.target.value)}
                       placeholder="10 digit mobile number"
                       className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-1.5 text-white font-mono"
                     />
