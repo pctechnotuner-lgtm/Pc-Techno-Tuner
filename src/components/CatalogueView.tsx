@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { openWhatsAppBusiness, getWhatsAppBusinessUrl } from '../lib/whatsapp';
 import {
   Search,
@@ -47,6 +47,17 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [quoteProduct, setQuoteProduct] = useState<Product | null>(null);
+  const [heroSlide, setHeroSlide] = useState(0);
+  const heroSlides = [
+    { title: 'Desktop Computers', subtitle: 'Powerful business desktops', image: 'https://images.unsplash.com/photo-1587831990711-23ca6441447b?auto=format&fit=crop&w=1100&q=85' },
+    { title: 'Business Laptops', subtitle: 'Work anywhere, stay productive', image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=1100&q=85' },
+    { title: 'CCTV Security', subtitle: 'Smart surveillance for your business', image: 'https://images.unsplash.com/photo-1557591315-4369e4d6f3a3?auto=format&fit=crop&w=1100&q=85' },
+    { title: 'Printers & Scanners', subtitle: 'Reliable office printing solutions', image: 'https://images.unsplash.com/photo-1612815154858-60aa4c59eaa6?auto=format&fit=crop&w=1100&q=85' },
+  ];
+  useEffect(() => {
+    const slideTimer = window.setInterval(() => setHeroSlide((current) => (current + 1) % heroSlides.length), 2000);
+    return () => window.clearInterval(slideTimer);
+  }, []);
 
   // Filter products: only available items shown in catalogue
   const filteredProducts = products.filter((p) => {
@@ -93,55 +104,59 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
 
   return (
     <div className="space-y-8 animate-fadeIn">
-      {/* Centered company name with right-side quick actions */}
+      {/* Brand left, rotating product showcase center, quick actions right */}
       <section className="relative overflow-hidden rounded-2xl border border-blue-900/60 bg-gradient-to-br from-slate-900 via-blue-950 to-slate-950 shadow-2xl">
         <div className="absolute -left-16 -top-20 h-64 w-64 rounded-full bg-cyan-500/10 blur-3xl pointer-events-none" />
-        <div className="absolute right-24 bottom-0 opacity-[0.07] pointer-events-none">
-          <Monitor className="h-56 w-56 text-blue-300" />
-        </div>
-        <div className="relative z-10 grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_250px] items-center gap-6 p-5 sm:p-7 lg:p-8">
-          <div className="min-w-0 text-center">
-            <div className="mx-auto mb-4 inline-flex items-center gap-2 rounded-full border border-blue-400/30 bg-blue-500/10 px-3 py-1.5 text-xs font-semibold text-blue-200">
+        <div className="relative z-10 grid grid-cols-1 items-center gap-6 p-5 sm:p-7 lg:grid-cols-[minmax(0,1fr)_minmax(280px,1.15fr)_250px] lg:gap-7 lg:p-8">
+          <div className="min-w-0 text-center lg:text-left">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-400/30 bg-blue-500/10 px-3 py-1.5 text-xs font-semibold text-blue-200">
               <Sparkles className="h-3.5 w-3.5" />
               <span>Authorized IT Products & AMC Services • Ahmedabad</span>
             </div>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-tight text-white">
+            <h1 className="text-3xl sm:text-4xl lg:text-[2.65rem] font-black tracking-tight leading-tight text-white">
               {profile.name || 'PC TECHNO TUNER'}
             </h1>
-            <p className="mt-3 text-base sm:text-lg font-bold text-cyan-300">
-              Premium IT Hardware & CCTV Security for Your Business
+            <p className="mt-3 text-base font-bold text-cyan-300">
+              IT Hardware • CCTV • Laptop Repairs • AMC
             </p>
-            <p className="mx-auto mt-3 max-w-2xl text-sm sm:text-base leading-relaxed text-slate-300">
-              From high-speed custom office desktops, corporate laptops, and enterprise CCTV surveillance to reliable printers, routers, and servers — tuned and maintained by {profile.name}.
+            <p className="mt-3 text-sm leading-relaxed text-slate-300">
+              Premium technology and dependable support for your business.
             </p>
           </div>
 
-          <div className="relative flex flex-col gap-3 md:border-l md:border-blue-800/70 md:pl-6">
+          <div className="relative mx-auto w-full max-w-xl">
+            <div className="relative h-48 overflow-hidden rounded-2xl border border-blue-400/30 bg-slate-900 shadow-[0_18px_55px_rgba(0,0,0,.4)] sm:h-56 lg:h-64">
+              {heroSlides.map((slide, index) => (
+                <div key={slide.title} className={`absolute inset-0 transition-all duration-700 ${index === heroSlide ? 'opacity-100 scale-100' : 'pointer-events-none opacity-0 scale-105'}`}>
+                  <img src={slide.image} alt={slide.title} className="h-full w-full object-cover" loading={index === 0 ? 'eager' : 'lazy'} />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/10 to-transparent" />
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <p className="text-xl font-black text-white drop-shadow-lg">{slide.title}</p>
+                    <p className="text-xs font-medium text-slate-200">{slide.subtitle}</p>
+                  </div>
+                </div>
+              ))}
+              <div className="absolute bottom-3 right-4 z-10 flex gap-1.5">
+                {heroSlides.map((slide, index) => <button key={slide.title} type="button" aria-label={`Show ${slide.title}`} onClick={() => setHeroSlide(index)} className={`h-2 rounded-full transition-all ${index === heroSlide ? 'w-6 bg-cyan-300' : 'w-2 bg-white/60'}`} />)}
+              </div>
+            </div>
+            <p className="mt-2 text-center text-[10px] font-semibold tracking-wide text-slate-400">COMPUTERS • LAPTOPS • CCTV • PRINTERS</p>
+          </div>
+
+          <div className="relative flex flex-col gap-3 lg:border-l lg:border-blue-800/70 lg:pl-6">
             <p className="mb-1 text-center text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Quick Actions</p>
-            <button
-              onClick={onNavigateToComplaint}
-              className="w-full justify-center rounded-xl border border-cyan-300 bg-cyan-500 px-4 py-3 text-sm font-black text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:bg-cyan-400 flex items-center gap-2"
-            >
-              <Wrench className="h-4 w-4" />
-              <span>{t.bookComplaint}</span>
+            <button onClick={onNavigateToComplaint} className="flex w-full items-center justify-center gap-2 rounded-xl border border-cyan-300 bg-cyan-500 px-4 py-3 text-sm font-black text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:bg-cyan-400">
+              <Wrench className="h-4 w-4" /><span>{t.bookComplaint}</span>
             </button>
-            <button
-              onClick={() => handleRequestQuoteWhatsApp()}
-              className="w-full justify-center rounded-xl bg-blue-600 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-blue-500/20 transition hover:bg-blue-500 flex items-center gap-2"
-            >
-              <MessageCircle className="h-4 w-4" />
-              <span>{t.requestQuote}</span>
+            <button onClick={() => handleRequestQuoteWhatsApp()} className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-blue-500/20 transition hover:bg-blue-500">
+              <MessageCircle className="h-4 w-4" /><span>{t.requestQuote}</span>
             </button>
-            <a
-              href={`tel:${profile.mobile}`}
-              className="w-full justify-center rounded-xl border border-slate-700 bg-slate-900/90 px-4 py-3 text-sm font-bold text-slate-100 transition hover:bg-slate-800 flex items-center gap-2"
-            >
-              <Phone className="h-4 w-4 text-emerald-400" />
-              <span>Call: {profile.mobile}</span>
+            <a href={`tel:${profile.mobile}`} className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-700 bg-slate-900/90 px-4 py-3 text-sm font-bold text-slate-100 transition hover:bg-slate-800">
+              <Phone className="h-4 w-4 text-emerald-400" /><span>Call: {profile.mobile}</span>
             </a>
           </div>
 
-          <div className="md:col-span-2 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 border-t border-slate-700/70 pt-4 text-[11px] text-slate-400">
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 border-t border-slate-700/70 pt-4 text-[11px] text-slate-400 lg:col-span-3">
             <span className="inline-flex items-center gap-1.5"><ShieldCheck className="h-4 w-4 text-blue-400" /> GSTIN: <strong className="font-mono text-slate-200">{profile.gstin}</strong></span>
             <span className="inline-flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-emerald-400" /> PAN: <strong className="font-mono text-slate-200">{profile.pan}</strong></span>
             <span className="inline-flex items-center gap-1.5"><MapPin className="h-4 w-4 text-rose-400" /> Ahmedabad PIN: <strong className="font-mono text-slate-200">{profile.pincode}</strong></span>
