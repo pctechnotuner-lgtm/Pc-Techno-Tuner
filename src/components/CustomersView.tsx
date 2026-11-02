@@ -76,6 +76,7 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
   const t = getT(lang);
   const [search, setSearch] = useState('');
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [selectedLedgerEntry, setSelectedLedgerEntry] = useState<any | null>(null);
   const [quoteHistory, setQuoteHistory] = useState<QuoteLedgerRecord[]>([]);
 
   useEffect(() => {
@@ -480,13 +481,38 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
                                   <td className="p-2 text-right whitespace-nowrap text-white">₹{r.amount.toLocaleString('en-IN')}</td>
                                   <td className="p-2 text-right whitespace-nowrap text-emerald-300">₹{r.paid.toLocaleString('en-IN')}</td>
                                   <td className="p-2 text-right whitespace-nowrap text-rose-300">₹{r.due.toLocaleString('en-IN')}</td>
-                                  <td className="p-2 min-w-[120px]"><div className="text-gray-300">{r.status || '—'}</div><details className="mt-1"><summary className="cursor-pointer text-cyan-400">Open details</summary><div className="mt-2 space-y-1 text-gray-400">{r.detail.map((d: any, index: number) => <div key={index}>{d.name || d.description || 'Item'}: {d.value || (d.qty ? d.qty + ' × ₹' + Number(d.rate || 0).toLocaleString('en-IN') + ' = ₹' + Number(d.total || 0).toLocaleString('en-IN') : d.name ? d.name : JSON.stringify(d))}</div>)}</div></details></td>
+                                  <td className="p-2 min-w-[120px]"><div className="text-gray-300">{r.status || '—'}</div><button type="button" onClick={() => setSelectedLedgerEntry(r)} className="mt-2 inline-flex items-center gap-1 rounded-lg border border-cyan-500/40 bg-cyan-500/10 px-3 py-1.5 text-xs font-bold text-cyan-300 hover:bg-cyan-500/20">Open details ↗</button></td>
                                 </tr>
                               ))}
                             </tbody>
                           </table>
                         </div>
                         <p className="text-[10px] text-gray-500">Invoice balance is shown as due. Estimate and inward amounts are not counted as outstanding until an invoice is made. Payment entries are shown separately to avoid double counting.</p>
+{selectedLedgerEntry && (
+                          <div className="fixed inset-0 z-[130] flex items-center justify-center bg-black/80 p-3 backdrop-blur-sm" onClick={() => setSelectedLedgerEntry(null)}>
+                            <section className="party-ledger-print w-full max-w-2xl max-h-[92vh] overflow-y-auto rounded-2xl border border-cyan-500/30 bg-gray-950 text-white shadow-2xl" role="dialog" aria-modal="true" aria-labelledby="ledger-entry-title" onClick={(event) => event.stopPropagation()}>
+                              <header className="flex items-start justify-between gap-3 border-b border-gray-800 bg-gray-900 p-5">
+                                <div><p className="text-xs font-bold uppercase tracking-widest text-cyan-300">PC TECHNO TUNER • Party Service Record</p><h3 id="ledger-entry-title" className="mt-1 text-xl font-black">{selectedLedgerEntry.work || 'Party Record'}</h3><p className="mt-1 text-sm text-gray-400">{selectedCustomer.name} • {selectedCustomer.mobile}</p></div>
+                                <button type="button" onClick={() => setSelectedLedgerEntry(null)} aria-label="Close details" className="rounded-lg border border-gray-700 p-2 text-gray-300 hover:bg-gray-800"><X className="h-5 w-5"/></button>
+                              </header>
+                              <div className="grid grid-cols-2 gap-3 p-5 sm:grid-cols-4">
+                                {[['Date', selectedLedgerEntry.date || '—'], ['Type', selectedLedgerEntry.type], ['Reference / ID', selectedLedgerEntry.ref || '—'], ['Status', selectedLedgerEntry.status || '—']].map(([label,value]) => <div key={label} className="rounded-xl border border-gray-800 bg-gray-900 p-3"><p className="text-xs text-gray-400">{label}</p><p className="mt-1 break-words text-sm font-bold text-white">{value}</p></div>)}
+                              </div>
+                              <div className="space-y-3 px-5 pb-5">
+                                <div className="rounded-xl border border-gray-800 p-4"><h4 className="mb-3 text-sm font-bold text-cyan-300">Work / Product Details</h4><p className="text-sm text-white">{selectedLedgerEntry.work || '—'}</p>
+                                  {selectedLedgerEntry.detail?.length ? <div className="mt-3 divide-y divide-gray-800">{selectedLedgerEntry.detail.map((d: any,index: number) => <div key={index} className="flex flex-wrap justify-between gap-2 py-2 text-sm"><span className="font-semibold text-gray-300">{d.name || d.description || 'Details'}</span><span className="max-w-full break-words text-right text-gray-100">{d.value ?? (d.qty ? d.qty + ' × ₹' + Number(d.rate || 0).toLocaleString('en-IN') + ' = ₹' + Number(d.total || 0).toLocaleString('en-IN') : d.name || '—')}</span></div>)}</div> : <p className="text-sm text-gray-400">No extra details recorded.</p>}
+                                </div>
+                                <div className="grid grid-cols-3 gap-2">
+                                  {[['Amount',selectedLedgerEntry.amount],['Received',selectedLedgerEntry.paid],['Balance',selectedLedgerEntry.due]].map(([label,value]: any) => <div key={label} className="rounded-xl border border-gray-800 bg-gray-900 p-3"><p className="text-xs text-gray-400">{label}</p><p className="mt-1 text-base font-black">₹{Number(value || 0).toLocaleString('en-IN')}</p></div>)}
+                                </div>
+                              </div>
+                              <footer className="flex flex-wrap justify-end gap-2 border-t border-gray-800 p-4">
+                                <button type="button" onClick={() => window.print()} className="inline-flex items-center gap-2 rounded-xl bg-cyan-500 px-5 py-3 text-sm font-bold text-gray-950 hover:bg-cyan-400"><Download className="h-4 w-4"/> Print / Save PDF</button>
+                                <button type="button" onClick={() => setSelectedLedgerEntry(null)} className="rounded-xl border border-gray-700 px-5 py-3 text-sm font-bold text-white hover:bg-gray-800">Close</button>
+                              </footer>
+                            </section>
+                          </div>
+                        )}
                       </div>
                     );
                   })()}
