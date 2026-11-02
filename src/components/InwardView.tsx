@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { ClipboardList, Plus, Search, Trash2, CalendarDays, UserRound, Phone, Package, IndianRupee, MessageCircle, Printer, Pencil } from 'lucide-react';
-import { InwardRecord } from '../types';
+import { Customer, InwardRecord } from '../types';
 import { openWhatsAppBusiness } from '../lib/whatsapp';
 
 interface Props {
   records: InwardRecord[];
+  customers: Customer[];
   onSaveRecord: (record: InwardRecord) => void;
   onDeleteRecord: (recordId: string) => void;
 }
@@ -26,7 +27,7 @@ const printSticker = (record: InwardRecord) => {
   popup.document.close();
 };
 
-export const InwardView: React.FC<Props> = ({ records, onSaveRecord, onDeleteRecord }) => {
+export const InwardView: React.FC<Props> = ({ records, customers, onSaveRecord, onDeleteRecord }) => {
   const [customerName, setCustomerName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [productName, setProductName] = useState('');
@@ -113,8 +114,8 @@ export const InwardView: React.FC<Props> = ({ records, onSaveRecord, onDeleteRec
       {showForm && <form onSubmit={save} className="rounded-2xl border border-slate-700 bg-slate-900/70 p-4 sm:p-6 shadow-xl">
         <div className="mb-5 flex items-center gap-2"><Plus className="h-5 w-5 text-cyan-300" /><h2 className="text-lg font-bold text-white">{editingId ? `Edit Inward Entry — ${editingId}` : 'New Inward Entry'}</h2></div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <label className="space-y-1.5"><span className="flex items-center gap-2 text-sm font-medium text-slate-300"><UserRound className="h-4 w-4" /> Customer Name *</span><input value={customerName} onChange={(e) => setCustomerName(e.target.value)} required placeholder="Enter customer name" className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-3 text-sm text-white outline-none focus:border-cyan-500" /></label>
-          <label className="space-y-1.5"><span className="flex items-center gap-2 text-sm font-medium text-slate-300"><Phone className="h-4 w-4" /> Phone Number *</span><input type="tel" inputMode="tel" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} required placeholder="Enter phone number" className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-3 text-sm text-white outline-none focus:border-cyan-500" /></label>
+          <label className="space-y-1.5"><span className="flex items-center gap-2 text-sm font-medium text-slate-300"><UserRound className="h-4 w-4" /> Customer Name *</span><input list="inward-party-list" value={customerName} onChange={(e) => { const value=e.target.value; setCustomerName(value); const match=customers.find(c=>c.name.trim().toLowerCase()===value.trim().toLowerCase()||(c.businessName||'').trim().toLowerCase()===value.trim().toLowerCase()); if(match){setCustomerName(match.name);setPhoneNumber(match.mobile); } }} required placeholder="Enter or select party name" className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-3 text-sm text-white outline-none focus:border-cyan-500" /><datalist id="inward-party-list">{customers.map(c=><option key={c.id} value={c.name}>{c.businessName||''} • {c.mobile}</option>)}{customers.filter(c=>c.businessName).map(c=><option key={c.id+'-firm'} value={c.businessName!}>{c.name} • {c.mobile}</option>)}</datalist></label>
+          <label className="space-y-1.5"><span className="flex items-center gap-2 text-sm font-medium text-slate-300"><Phone className="h-4 w-4" /> Phone Number *</span><input type="tel" inputMode="tel" list="inward-party-mobile-list" value={phoneNumber} onChange={(e) => { const value=e.target.value; setPhoneNumber(value); const match=customers.find(c=>c.mobile.replace(/\D/g,'')===value.replace(/\D/g,'')); if(match){setCustomerName(match.name);setPhoneNumber(match.mobile);} }} required placeholder="Enter phone number" className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-3 text-sm text-white outline-none focus:border-cyan-500" /><datalist id="inward-party-mobile-list">{customers.map(c=><option key={c.id} value={c.mobile}>{c.name} • {c.businessName||''}</option>)}</datalist></label>
           <label className="space-y-1.5"><span className="flex items-center gap-2 text-sm font-medium text-slate-300"><Package className="h-4 w-4" /> Product Name *</span><input value={productName} onChange={(e) => setProductName(e.target.value)} required placeholder="Laptop / Desktop / CCTV / Printer..." className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-3 text-sm text-white outline-none focus:border-cyan-500" /></label>
           <label className="space-y-1.5"><span className="flex items-center gap-2 text-sm font-medium text-slate-300"><CalendarDays className="h-4 w-4" /> Inward Date *</span><input type="date" value={inwardDate} onChange={(e) => setInwardDate(e.target.value)} required className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-3 text-sm text-white outline-none focus:border-cyan-500" /></label>
           <label className="space-y-1.5 sm:col-span-2"><span className="text-sm font-medium text-slate-300">Problem / Customer Complaint *</span><textarea value={problem} onChange={(e) => setProblem(e.target.value)} required rows={3} placeholder="Describe the reported problem..." className="w-full resize-y rounded-xl border border-slate-700 bg-slate-950 px-3 py-3 text-sm text-white outline-none focus:border-cyan-500" /></label>
