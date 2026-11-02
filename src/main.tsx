@@ -7,8 +7,9 @@ import './index.css';
 if (!Capacitor.isNativePlatform() && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker
-      .register(new URL('sw.js', document.baseURI).toString())
+      .register(new URL('sw.js', document.baseURI).toString(), { updateViaCache: 'none' })
       .then((reg) => {
+        reg.update().catch(() => undefined);
         console.log('PWA ServiceWorker registered successfully:', reg.scope);
       })
       .catch((err) => {
