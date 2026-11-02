@@ -554,7 +554,7 @@ export const AccountingView: React.FC<AccountingViewProps> = ({
 
             <form onSubmit={handleSubmit} className="space-y-3.5 text-xs">
               {/* Type toggle is only needed in the combined Accounts popup */}
-              {!openEntryOnMount && <div className="grid grid-cols-2 gap-2 bg-gray-950 p-1 rounded-xl border border-gray-800">
+              {!openEntryOnMount && !partyPickerMode && <div className="grid grid-cols-2 gap-2 bg-gray-950 p-1 rounded-xl border border-gray-800">
                 <button
                   type="button"
                   onClick={() => handleTypeChange('INCOME')}
