@@ -13,7 +13,8 @@ const keyboardImages: Record<string, string> = {
 const now = '2026-11-02T00:00:00.000Z';
 
 const entries: Array<[string, string, string, string, string]> = [
-  ['Keyboard','Zebronics','K5002MW','Bluetooth multimedia keyboard; exact variant/color to be confirmed.','Computer Accessories'],\n  ['Keyboard','Zebronics','K4001M Nitro Plus','Mechanical USB wired keyboard.','Computer Accessories'],
+  ['Keyboard','Zebronics','K5002MW','Bluetooth multimedia keyboard; exact variant/color to be confirmed.','Computer Accessories'],
+  ['Keyboard','Zebronics','K4001M Nitro Plus','Mechanical USB wired keyboard.','Computer Accessories'],
   ['Keyboard','Zebronics','K6000MW Nitro Pro','Mechanical USB wired keyboard.','Computer Accessories'],
   ['Keyboard','Zebronics','Max Ninja 104W','104-key mechanical keyboard; wireless/rechargeable.','Computer Accessories'],
   ['Keyboard','Zebronics','Magnus','Multimedia USB keyboard.','Computer Accessories'],
