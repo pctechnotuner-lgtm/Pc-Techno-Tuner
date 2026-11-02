@@ -1271,6 +1271,7 @@ export default function App() {
 
         {activeTab === 'more' && isAdmin && (
           <MoreView
+            profile={profile}
             onOpenNewProduct={() => setActiveTab('products')}
             onOpenNewInvoice={() => setActiveTab('sales')}
             onOpenNewTransaction={() => setActiveTab('accounts')}
