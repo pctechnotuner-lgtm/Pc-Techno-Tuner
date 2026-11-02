@@ -116,6 +116,130 @@ const additionalProducts: Product[] = [
     imageUrl: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=600&h=450&fit=crop',
     createdAt: now,
   },
+,
+
+  // Printers — representative Canon, HP and Epson models; confirm regional variant.
+  {
+    id: 'canon-pixma-g3770', name: 'Canon PIXMA G3770 MegaTank Wi-Fi Printer', category: 'Printers and Scanners', brand: 'Canon', model: 'PIXMA G3770',
+    specifications: 'Colour ink-tank all-in-one printer: print, scan and copy; Wi-Fi connectivity; suitable for home and small-office use. Confirm current regional bundle and ink compatibility.',
+    purchasePrice: 0, sellingPrice: 0, stockQuantity: 0, minStockAlert: 0, warrantyMonths: 0, imageUrl: 'https://images.unsplash.com/photo-1612815154858-60aa4c59eaa6?w=600&h=450&fit=crop', createdAt: now,
+  },
+  {
+    id: 'canon-lbp6030b', name: 'Canon imageCLASS LBP6030B Mono Laser Printer', category: 'Printers and Scanners', brand: 'Canon', model: 'LBP6030B',
+    specifications: 'Monochrome laser single-function printer; USB connectivity; compact personal / small-office printing. Check operating-system and toner availability.',
+    purchasePrice: 0, sellingPrice: 0, stockQuantity: 0, minStockAlert: 0, warrantyMonths: 0, imageUrl: 'https://images.unsplash.com/photo-1612815154858-60aa4c59eaa6?w=600&h=450&fit=crop', createdAt: now,
+  },
+  {
+    id: 'canon-mf3010', name: 'Canon imageCLASS MF3010 Mono Laser MFP', category: 'Printers and Scanners', brand: 'Canon', model: 'MF3010',
+    specifications: 'Monochrome laser all-in-one: print, scan and copy; USB connection. Confirm current availability and compatible cartridge.',
+    purchasePrice: 0, sellingPrice: 0, stockQuantity: 0, minStockAlert: 0, warrantyMonths: 0, imageUrl: 'https://images.unsplash.com/photo-1612815154858-60aa4c59eaa6?w=600&h=450&fit=crop', createdAt: now,
+  },
+  {
+    id: 'hp-smart-tank-585', name: 'HP Smart Tank 585 All-in-One Printer', category: 'Printers and Scanners', brand: 'HP', model: 'Smart Tank 585',
+    specifications: 'Colour ink-tank all-in-one printer with print, scan and copy; Wi-Fi and mobile printing features. Confirm exact connectivity/region variant.',
+    purchasePrice: 0, sellingPrice: 0, stockQuantity: 0, minStockAlert: 0, warrantyMonths: 0, imageUrl: 'https://images.unsplash.com/photo-1612815154858-60aa4c59eaa6?w=600&h=450&fit=crop', createdAt: now,
+  },
+  {
+    id: 'hp-laserjet-mfp-m236sdw', name: 'HP LaserJet MFP M236sdw Mono Printer', category: 'Printers and Scanners', brand: 'HP', model: 'LaserJet MFP M236sdw',
+    specifications: 'Monochrome laser multifunction printer with print, scan and copy; automatic two-sided printing and wireless/network connectivity. Verify exact SKU before order.',
+    purchasePrice: 0, sellingPrice: 0, stockQuantity: 0, minStockAlert: 0, warrantyMonths: 0, imageUrl: 'https://images.unsplash.com/photo-1612815154858-60aa4c59eaa6?w=600&h=450&fit=crop', createdAt: now,
+  },
+  {
+    id: 'epson-ecotank-l3250', name: 'Epson EcoTank L3250 Wi-Fi All-in-One Printer', category: 'Printers and Scanners', brand: 'Epson', model: 'EcoTank L3250',
+    specifications: 'Colour ink-tank all-in-one printer: print, scan and copy; Wi-Fi and Wi-Fi Direct. Confirm regional variant and included ink set.',
+    purchasePrice: 0, sellingPrice: 0, stockQuantity: 0, minStockAlert: 0, warrantyMonths: 0, imageUrl: 'https://images.unsplash.com/photo-1612815154858-60aa4c59eaa6?w=600&h=450&fit=crop', createdAt: now,
+  },
+  {
+    id: 'epson-ecotank-l3210', name: 'Epson EcoTank L3210 All-in-One Printer', category: 'Printers and Scanners', brand: 'Epson', model: 'EcoTank L3210',
+    specifications: 'Colour ink-tank all-in-one printer: print, scan and copy; USB connectivity. Confirm exact regional package and ink compatibility.',
+    purchasePrice: 0, sellingPrice: 0, stockQuantity: 0, minStockAlert: 0, warrantyMonths: 0, imageUrl: 'https://images.unsplash.com/photo-1612815154858-60aa4c59eaa6?w=600&h=450&fit=crop', createdAt: now,
+  },
+
+  // Laptop catalogue — configurations are selectable quote options, not live stock claims.
+  {
+    id: 'lenovo-v15-g4', name: 'Lenovo V15 G4 Business Laptop', category: 'Laptops', brand: 'Lenovo', model: 'V15 G4',
+    specifications: 'Configuration options: Intel Core i3 / i5 or AMD Ryzen 3 / 5 (model-dependent); 8GB / 16GB RAM; 256GB / 512GB NVMe SSD; 15.6-inch Full HD display; Windows 11. Exact CPU, RAM upgradeability and ports depend on MTM.',
+    purchasePrice: 0, sellingPrice: 0, stockQuantity: 0, minStockAlert: 0, warrantyMonths: 0, imageUrl: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600&h=450&fit=crop', createdAt: now,
+  },
+  {
+    id: 'lenovo-thinkpad-e14-gen6', name: 'Lenovo ThinkPad E14 Gen 6 Business Laptop', category: 'Laptops', brand: 'Lenovo', model: 'ThinkPad E14 Gen 6',
+    specifications: 'Configuration options vary by platform: Intel Core Ultra 5 / Ultra 7 or AMD Ryzen 5 / 7; 16GB / 32GB RAM; 512GB / 1TB SSD; 14-inch WUXGA display; Windows 11 Pro options. Confirm exact MTM.',
+    purchasePrice: 0, sellingPrice: 0, stockQuantity: 0, minStockAlert: 0, warrantyMonths: 0, imageUrl: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600&h=450&fit=crop', createdAt: now,
+  },
+  {
+    id: 'hp-15-fd-series', name: 'HP 15 Laptop (15-fd Series)', category: 'Laptops', brand: 'HP', model: '15-fd Series',
+    specifications: 'Configuration options: Intel Core i3 / i5 / i7 depending on SKU; 8GB / 16GB RAM; 512GB SSD options; 15.6-inch Full HD display; Windows 11. Confirm processor generation, display and ports by product number.',
+    purchasePrice: 0, sellingPrice: 0, stockQuantity: 0, minStockAlert: 0, warrantyMonths: 0, imageUrl: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600&h=450&fit=crop', createdAt: now,
+  },
+  {
+    id: 'hp-probook-440-g11', name: 'HP ProBook 440 G11 Business Laptop', category: 'Laptops', brand: 'HP', model: 'ProBook 440 G11',
+    specifications: 'Business configuration options: Intel Core Ultra 5 / Ultra 7; 16GB / 32GB RAM; 512GB / 1TB SSD; 14-inch WUXGA display; Windows 11 Pro options. Exact panel, memory and WWAN options depend on SKU.',
+    purchasePrice: 0, sellingPrice: 0, stockQuantity: 0, minStockAlert: 0, warrantyMonths: 0, imageUrl: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600&h=450&fit=crop', createdAt: now,
+  },
+  {
+    id: 'dell-inspiron-15-3530', name: 'Dell Inspiron 15 3530 Laptop', category: 'Laptops', brand: 'Dell', model: 'Inspiron 15 3530',
+    specifications: 'Configuration options vary: Intel Core i3 / i5 / i7; 8GB / 16GB RAM; 512GB SSD options; 15.6-inch Full HD display; Windows 11. Confirm CPU generation and display refresh by SKU.',
+    purchasePrice: 0, sellingPrice: 0, stockQuantity: 0, minStockAlert: 0, warrantyMonths: 0, imageUrl: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600&h=450&fit=crop', createdAt: now,
+  },
+  {
+    id: 'dell-latitude-3450', name: 'Dell Latitude 3450 Business Laptop', category: 'Laptops', brand: 'Dell', model: 'Latitude 3450',
+    specifications: 'Business configuration options: Intel Core i5 / i7 (SKU-dependent); 8GB / 16GB / 32GB RAM; 512GB / 1TB SSD; 14-inch Full HD display; Windows 11 Pro options. Confirm exact service tag configuration.',
+    purchasePrice: 0, sellingPrice: 0, stockQuantity: 0, minStockAlert: 0, warrantyMonths: 0, imageUrl: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600&h=450&fit=crop', createdAt: now,
+  },
+  {
+    id: 'asus-vivobook-15-x1504', name: 'ASUS Vivobook 15 Laptop', category: 'Laptops', brand: 'ASUS', model: 'Vivobook 15 X1504',
+    specifications: 'Configuration options: Intel Core i3 / i5 / i7 depending on SKU; 8GB / 16GB RAM; 512GB SSD; 15.6-inch Full HD display; Windows 11. Confirm exact CPU suffix, RAM and display variant.',
+    purchasePrice: 0, sellingPrice: 0, stockQuantity: 0, minStockAlert: 0, warrantyMonths: 0, imageUrl: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600&h=450&fit=crop', createdAt: now,
+  },
+  {
+    id: 'acer-aspire-lite-al15', name: 'Acer Aspire Lite AL15 Laptop', category: 'Laptops', brand: 'Acer', model: 'Aspire Lite AL15 Series',
+    specifications: 'Configuration options vary by SKU: Intel Core i3 / i5 or AMD Ryzen 5; 8GB / 16GB RAM; 512GB SSD; 15.6-inch Full HD display; Windows 11. Confirm processor generation and exact AL15 model number.',
+    purchasePrice: 0, sellingPrice: 0, stockQuantity: 0, minStockAlert: 0, warrantyMonths: 0, imageUrl: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600&h=450&fit=crop', createdAt: now,
+  },
+
+  // Dell, HP and Logitech mouse options.
+  {
+    id: 'dell-ms116', name: 'Dell Optical Mouse', category: 'Computer Accessories', brand: 'Dell', model: 'MS116',
+    specifications: 'Wired USB optical mouse; 1000 DPI; 3 buttons; ambidextrous design. Confirm color/packaging.',
+    purchasePrice: 0, sellingPrice: 0, stockQuantity: 0, minStockAlert: 0, warrantyMonths: 0, imageUrl: 'https://images.unsplash.com/photo-1527814050087-3793815479db?w=600&h=450&fit=crop', createdAt: now,
+  },
+  {
+    id: 'hp-150-wired-mouse', name: 'HP 150 Wired Mouse', category: 'Computer Accessories', brand: 'HP', model: '150',
+    specifications: 'Wired USB optical mouse; 3-button design with scroll wheel; check exact regional model and DPI specification.',
+    purchasePrice: 0, sellingPrice: 0, stockQuantity: 0, minStockAlert: 0, warrantyMonths: 0, imageUrl: 'https://images.unsplash.com/photo-1527814050087-3793815479db?w=600&h=450&fit=crop', createdAt: now,
+  },
+  {
+    id: 'logitech-b100', name: 'Logitech B100 Optical USB Mouse', category: 'Computer Accessories', brand: 'Logitech', model: 'B100',
+    specifications: 'Wired USB optical mouse; 800 DPI; 3 buttons; plug-and-play.',
+    purchasePrice: 0, sellingPrice: 0, stockQuantity: 0, minStockAlert: 0, warrantyMonths: 0, imageUrl: 'https://images.unsplash.com/photo-1527814050087-3793815479db?w=600&h=450&fit=crop', createdAt: now,
+  },
+  {
+    id: 'logitech-m185', name: 'Logitech M185 Wireless Mouse', category: 'Computer Accessories', brand: 'Logitech', model: 'M185',
+    specifications: '2.4GHz wireless optical mouse with USB nano receiver; compact ambidextrous shape; battery life depends on usage.',
+    purchasePrice: 0, sellingPrice: 0, stockQuantity: 0, minStockAlert: 0, warrantyMonths: 0, imageUrl: 'https://images.unsplash.com/photo-1527814050087-3793815479db?w=600&h=450&fit=crop', createdAt: now,
+  },
+
+  // Lenovo ThinkSystem server range.
+  {
+    id: 'lenovo-thinksystem-st50-v3', name: 'Lenovo ThinkSystem ST50 V3 Tower Server', category: 'Servers and Storage', brand: 'Lenovo', model: 'ThinkSystem ST50 V3',
+    specifications: 'Entry tower server platform; Intel Xeon E-2400 series / selected Intel Pentium processor options by configuration; ECC UDIMM memory options; SATA storage; RAID and drive-bay options depend on CTO configuration. Quote with exact CPU, RAM, disks and RAID.',
+    purchasePrice: 0, sellingPrice: 0, stockQuantity: 0, minStockAlert: 0, warrantyMonths: 0, imageUrl: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=600&h=450&fit=crop', createdAt: now,
+  },
+  {
+    id: 'lenovo-thinksystem-st250-v3', name: 'Lenovo ThinkSystem ST250 V3 Tower Server', category: 'Servers and Storage', brand: 'Lenovo', model: 'ThinkSystem ST250 V3',
+    specifications: 'Tower server platform for SMB workloads; Intel Xeon E-2400 family options; ECC memory; hot-swap / non-hot-swap drive-bay and RAID options depend on configuration. Confirm supported CPU, memory and drive kit by machine type.',
+    purchasePrice: 0, sellingPrice: 0, stockQuantity: 0, minStockAlert: 0, warrantyMonths: 0, imageUrl: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=600&h=450&fit=crop', createdAt: now,
+  },
+  {
+    id: 'lenovo-thinksystem-sr250-v3', name: 'Lenovo ThinkSystem SR250 V3 Rack Server', category: 'Servers and Storage', brand: 'Lenovo', model: 'ThinkSystem SR250 V3',
+    specifications: '1U rack server platform; Intel Xeon E-2400 family options; ECC memory; storage controller, drive-bay, RAID and power options depend on CTO configuration. Confirm machine type and supported components before quote.',
+    purchasePrice: 0, sellingPrice: 0, stockQuantity: 0, minStockAlert: 0, warrantyMonths: 0, imageUrl: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=600&h=450&fit=crop', createdAt: now,
+  },
+  {
+    id: 'lenovo-thinksystem-sr650-v3', name: 'Lenovo ThinkSystem SR650 V3 Rack Server', category: 'Servers and Storage', brand: 'Lenovo', model: 'ThinkSystem SR650 V3',
+    specifications: '2U enterprise rack server platform; dual-socket 4th/5th Gen Intel Xeon Scalable processor options (platform/SKU dependent); DDR5 memory; NVMe/SAS/SATA storage and RAID options. Configure CPU, RAM, disks, network and support to requirement.',
+    purchasePrice: 0, sellingPrice: 0, stockQuantity: 0, minStockAlert: 0, warrantyMonths: 0, imageUrl: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=600&h=450&fit=crop', createdAt: now,
+  },
 
 ];
 
