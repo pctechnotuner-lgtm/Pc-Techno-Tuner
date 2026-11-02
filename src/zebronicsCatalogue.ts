@@ -48,6 +48,7 @@ const entries: Array<[string, string, string, string, string]> = [
 ];
 
 
+const additionalProducts: Product[] = [
   // GIGABYTE motherboards — official model specifications / variants.
   {
     id: 'gigabyte-b760m-ds3h-ax-ddr5', name: 'GIGABYTE B760M DS3H AX DDR5 Motherboard',
@@ -112,11 +113,13 @@ const entries: Array<[string, string, string, string, string]> = [
     category: 'Firewall and Antivirus Software', brand: 'Sophos', model: 'XGS 87',
     specifications: 'Desktop next-generation firewall; 4 x Gigabit Ethernet copper ports and 1 x SFP; firewall throughput up to 3,850 Mbps and IPS throughput up to 1,200 Mbps (manufacturer datasheet).',
     purchasePrice: 0, sellingPrice: 0, stockQuantity: 0, minStockAlert: 0, warrantyMonths: 0,
-    imageUrl: 'https://assets.sophos.com/X24WTUEQ/at/p42v957zxf35vv45smkhhkbv/sophos-xg-series-hardware-br.pdf',
+    imageUrl: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=600&h=450&fit=crop',
     createdAt: now,
   },
 
-export const ZEBRONICS_CATALOGUE: Product[] = entries.map(([name, brand, model, specifications, category], index) => ({
+];
+
+export const ZEBRONICS_CATALOGUE: Product[] = [...entries.map(([name, brand, model, specifications, category], index) => ({
   id: `zebronics-${String(index + 1).padStart(3, '0')}`,
   name: `Zebronics ${name}`,
   category: category as Product['category'],
@@ -130,4 +133,4 @@ export const ZEBRONICS_CATALOGUE: Product[] = entries.map(([name, brand, model, 
   warrantyMonths: 0,
   imageUrl: image,
   createdAt: now,
-}));
+})), ...additionalProducts];
