@@ -1,7 +1,9 @@
 import React from 'react';
+import { CompanyProfile } from '../types';
 import { PlusCircle, Receipt, DollarSign, Database, Settings2 } from 'lucide-react';
 
 interface MoreViewProps {
+  profile: CompanyProfile;
   onOpenNewProduct: () => void;
   onOpenNewInvoice: () => void;
   onOpenNewTransaction: () => void;
@@ -9,6 +11,7 @@ interface MoreViewProps {
 }
 
 export const MoreView: React.FC<MoreViewProps> = ({
+  profile,
   onOpenNewProduct,
   onOpenNewInvoice,
   onOpenNewTransaction,
