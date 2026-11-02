@@ -44,6 +44,7 @@ import { AntivirusView } from './components/AntivirusView';
 import { InwardView } from './components/InwardView';
 import { OutwardView } from './components/OutwardView';
 import { MoreView } from './components/MoreView';
+import { QuoteRequestsView } from './components/QuoteRequestsView';
 
 export default function App() {
   const isNativeApp = Capacitor.isNativePlatform();
@@ -1081,6 +1082,14 @@ export default function App() {
           </div>
         )}
 
+
+        {activeTab === 'quote' && (
+          <QuoteRequestsView isAdmin={false} />
+        )}
+
+        {activeTab === 'quotes' && isAdmin && (
+          <QuoteRequestsView isAdmin={true} />
+        )}
 
         {activeTab === 'complaint' && (
           <ComplaintFormView
