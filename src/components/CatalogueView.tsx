@@ -49,10 +49,10 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
   const [quoteProduct, setQuoteProduct] = useState<Product | null>(null);
   const [heroSlide, setHeroSlide] = useState(0);
   const heroSlides = [
-    { title: 'Desktop Computers', subtitle: 'Powerful business desktops', image: 'https://images.unsplash.com/photo-1587831990711-23ca6441447b?auto=format&fit=crop&w=1100&q=85' },
-    { title: 'Business Laptops', subtitle: 'Work anywhere, stay productive', image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=1100&q=85' },
-    { title: 'CCTV Security', subtitle: 'Smart surveillance for your business', image: 'https://images.unsplash.com/photo-1557591315-4369e4d6f3a3?auto=format&fit=crop&w=1100&q=85' },
-    { title: 'Printers & Scanners', subtitle: 'Reliable office printing solutions', image: 'https://images.unsplash.com/photo-1612815154858-60aa4c59eaa6?auto=format&fit=crop&w=1100&q=85' },
+    { title: 'Desktop Computers', subtitle: 'Powerful business desktops', image: `${import.meta.env.BASE_URL}hero/desktop.svg` },
+    { title: 'Business Laptops', subtitle: 'Work anywhere, stay productive', image: `${import.meta.env.BASE_URL}hero/laptop.svg` },
+    { title: 'CCTV Security', subtitle: 'Smart surveillance for your business', image: `${import.meta.env.BASE_URL}hero/cctv.svg` },
+    { title: 'Printers & Scanners', subtitle: 'Reliable office printing solutions', image: `${import.meta.env.BASE_URL}hero/printer.svg` },
   ];
   useEffect(() => {
     const slideTimer = window.setInterval(() => setHeroSlide((current) => (current + 1) % heroSlides.length), 2000);
