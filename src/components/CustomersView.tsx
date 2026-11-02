@@ -465,7 +465,12 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
               const custAntivirus = antivirusLicenses.filter((license) => matchesParty(license.customerName, license.mobile));
               const totalBilled = custInvs.reduce((s, i) => s + i.totalAmount, 0);
               const totalPaid = custInvs.reduce((s, i) => s + i.amountPaid, 0);
-              const due = custInvs.reduce((s, i) => s + i.balanceDue, 0);
+              const serviceDue = custOutwards.reduce((sum, outward) => {
+                const inward = custInwards.find((record) => record.id === outward.inwardRecordId);
+                const estimate = Number(outward.estimateAmount || inward?.estimateAmount || 0);
+                return sum + Math.max(0, estimate - Number(outward.amountCollected || 0));
+              }, 0);
+              const due = custInvs.reduce((s, i) => s + i.balanceDue, 0) + serviceDue;
 
               return (
                 <div className="space-y-4">
@@ -505,7 +510,12 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
                       ...custInvs.map((x) => ({ key: 'inv-' + x.id, date: x.invoiceDate, type: 'Invoice', ref: x.invoiceNo, work: x.items.map(i => i.description + ' × ' + i.quantity).join(', '), amount: Number(x.totalAmount || 0), paid: Number(x.amountPaid || 0), due: Number(x.balanceDue || 0), status: x.paymentStatus, detail: x.items.map(i => ({ name: i.description, qty: i.quantity, rate: i.unitPrice, total: i.lineTotal })) })),
                       ...custEstimates.map((x) => ({ key: 'est-' + x.id, date: x.estimateDate, type: 'Estimate', ref: x.estimateNo, work: x.items.map(i => i.description + ' × ' + i.quantity).join(', '), amount: Number(x.totalAmount || 0), paid: 0, due: 0, status: 'Estimate', detail: x.items.map(i => ({ name: i.description, qty: i.quantity, rate: i.unitPrice, total: i.lineTotal })) })),
                       ...custInwards.map((x) => ({ key: 'in-' + x.id, date: x.inwardDate, type: 'Inward', ref: x.id, work: x.productName, amount: Number(x.estimateAmount || 0), paid: 0, due: 0, status: 'Received for service', detail: [{ name: 'Problem', value: x.problem }] })),
-                      ...custOutwards.map((x) => ({ key: 'out-' + x.id, date: x.outDate, type: 'Outward', ref: x.inwardRecordId, work: x.productName, amount: Number(x.amountCollected || 0), paid: Number(x.amountCollected || 0), due: 0, status: 'Delivered', detail: [{ name: 'Solution', value: x.solution }, { name: 'Payment', value: x.paymentMethod }] })),
+                      ...custOutwards.map((x) => {
+                         const linkedInward = custInwards.find((inward) => inward.id === x.inwardRecordId);
+                         const serviceEstimate = Number(x.estimateAmount || linkedInward?.estimateAmount || 0);
+                         const collected = Number(x.amountCollected || 0);
+                         return { key: 'out-' + x.id, date: x.outDate, type: 'Outward', ref: x.inwardRecordId, work: x.productName, amount: serviceEstimate || collected, paid: collected, due: Math.max(0, serviceEstimate - collected), status: 'Delivered', detail: [{ name: 'Original Estimate', value: '₹' + serviceEstimate.toLocaleString('en-IN') }, { name: 'Solution', value: x.solution }, { name: 'Payment Method', value: x.paymentMethod }, { name: 'Amount Collected', value: '₹' + collected.toLocaleString('en-IN') }, ...(serviceEstimate > collected ? [{ name: 'Pending Party Payment', value: '₹' + (serviceEstimate - collected).toLocaleString('en-IN') }] : [])] };
+                       }),
                       ...custComps.map((x) => ({ key: 'comp-' + x.id, date: x.createdAt?.slice(0,10), type: 'Complaint', ref: x.id, work: x.category + ' • ' + x.complaintType, amount: Number(x.serviceCharges || 0), paid: 0, due: 0, status: x.status, detail: [{ name: 'Description', value: x.description }, { name: 'Service location', value: x.serviceLocation }] })),
                       ...custTransactions.map((x) => ({ key: 'tx-' + x.id, date: x.date, type: x.type === 'INCOME' ? 'Payment received' : 'Payment / Expense', ref: x.referenceId || x.id, work: x.category, amount: Number(x.amount || 0), paid: x.type === 'INCOME' ? Number(x.amount || 0) : 0, due: 0, status: x.paymentMethod, detail: [{ name: 'Notes', value: x.notes || '—' }] })),
                       ...custAntivirus.map((x) => ({ key: 'av-' + x.id, date: x.purchaseDate, type: 'Antivirus', ref: x.id, work: x.antivirusCompany, amount: 0, paid: 0, due: 0, status: 'Expiry: ' + x.expiryDate, detail: [{ name: 'License key', value: x.licenseKey }] })),
