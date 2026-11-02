@@ -787,9 +787,18 @@ export default function App() {
 
   const handleSaveTransaction = (transaction: Transaction) => {
     const updated = [transaction, ...transactions];
-
     setTransactions(updated);
     storage.setTransactions(updated);
+    if (transaction.partyName?.trim()) {
+      handleSaveCustomer({
+        id: 'cust-' + Date.now(),
+        name: transaction.partyName.trim(),
+        mobile: '',
+        address: '',
+        notes: 'Linked from Accounts entry ' + transaction.id,
+        createdAt: new Date().toISOString(),
+      });
+    }
   };
 
   const handleDeleteTransaction = (id: string) => {
