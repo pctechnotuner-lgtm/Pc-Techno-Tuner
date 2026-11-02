@@ -133,3 +133,30 @@
   .invoice-sheet { width:100% !important; max-width:none !important; }
   .invoice-preview-close {display:none!important}
 }
+
+
+/* Print only the selected party ledger detail popup */
+@media print {
+  body * { visibility: hidden !important; }
+  .party-ledger-print, .party-ledger-print * { visibility: visible !important; }
+  .party-ledger-print {
+    position: absolute !important;
+    inset: 0 auto auto 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    overflow: visible !important;
+    color: #111 !important;
+    background: #fff !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+  .party-ledger-print header, .party-ledger-print div, .party-ledger-print section { 
+    color: #111 !important;
+    background: #fff !important;
+    border-color: #bbb !important;
+  }
+  .party-ledger-print button { display: none !important; }
+  .party-ledger-print p, .party-ledger-print h3, .party-ledger-print h4, .party-ledger-print span { color: #111 !important; }
+  @page { size: A4 portrait; margin: 12mm; }
+}
