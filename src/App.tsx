@@ -1001,7 +1001,7 @@ export default function App() {
         lowStockCount={lowStockCount}
       />
 
-      <main className={`max-w-7xl mx-auto w-full p-3 sm:p-6 lg:p-8 pb-24 md:pb-8 flex-1 ${isAdmin ? "md:ml-64 md:max-w-[calc(100%-16rem)]" : ""}`}>
+      <main className={`w-full pb-24 md:pb-8 flex-1 ${isAdmin ? "max-w-7xl mx-auto p-3 sm:p-6 lg:p-8 md:ml-64 md:max-w-[calc(100%-16rem)]" : "max-w-none mx-0 p-0"}`}>
         {isAdmin && activeTab !== 'dashboard' && (
           <div className="mb-4 flex items-center">
             <button
@@ -1016,11 +1016,11 @@ export default function App() {
           </div>
         )}
         {!isNativeApp && !isAdmin && activeTab === 'catalogue' && (
-          <section className="relative isolate -mx-3 sm:-mx-6 lg:-mx-8 -mt-3 sm:-mt-6 lg:-mt-8 mb-10 min-h-[calc(100svh-5rem)] overflow-hidden bg-[#030817]">
+          <section className="relative isolate w-full min-h-[calc(100svh-5rem)] overflow-hidden bg-[#030817]">
             <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_18%_20%,rgba(0,190,255,.24),transparent_38%),radial-gradient(ellipse_at_85%_75%,rgba(50,70,210,.28),transparent_42%),linear-gradient(135deg,#030817,#081a36_55%,#10113b)]" />
             <div className="absolute -top-28 -right-20 -z-10 h-96 w-96 rounded-full border border-cyan-400/20" />
             <div className="absolute -bottom-48 -left-20 -z-10 h-96 w-96 rounded-full border border-blue-400/20" />
-            <div className="mx-auto flex min-h-[calc(100svh-5rem)] max-w-7xl items-center px-6 py-16 sm:px-10 lg:px-16">
+            <div className="mx-auto flex min-h-[calc(100svh-5rem)] w-full max-w-screen-2xl items-center px-6 py-12 sm:px-10 lg:px-16">
               <div className="grid w-full items-center gap-12 lg:grid-cols-[1.15fr_.85fr]">
                 <div className="max-w-3xl">
                   <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-cyan-300/25 bg-cyan-300/10 px-4 py-2 text-sm font-semibold text-cyan-200">
