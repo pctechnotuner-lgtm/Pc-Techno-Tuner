@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
+import { ArrowLeft } from 'lucide-react';
 import { Capacitor } from '@capacitor/core';
 import { loadCloudData, saveCloudData } from './lib/cloudStorage';
 import { supabase } from './lib/supabaseClient';
@@ -83,7 +84,19 @@ export default function App() {
 
   const [lang, setLang] = useState<Language>(storage.getLanguage);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [activeTab, setActiveTab] = useState<AppTab>('catalogue');
+  const [activeTab, setActiveTabState] = useState<AppTab>('catalogue');
+  const tabHistory = useRef<AppTab[]>([]);
+  const setActiveTab = (next: React.SetStateAction<AppTab>) => {
+    setActiveTabState((current) => {
+      const resolved = typeof next === 'function' ? next(current) : next;
+      if (resolved !== current) tabHistory.current.push(current);
+      return resolved;
+    });
+  };
+  const goBack = () => {
+    const previous = tabHistory.current.pop();
+    setActiveTabState(previous || 'dashboard');
+  };
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [selectedComplaintForEdit, setSelectedComplaintForEdit] =
     useState<Complaint | null>(null);
@@ -989,6 +1002,19 @@ export default function App() {
       />
 
       <main className={`max-w-7xl mx-auto w-full p-3 sm:p-6 lg:p-8 pb-24 md:pb-8 flex-1 ${isAdmin ? "md:ml-64 md:max-w-[calc(100%-16rem)]" : ""}`}>
+        {isAdmin && activeTab !== 'dashboard' && (
+          <div className="mb-4 flex items-center">
+            <button
+              type="button"
+              onClick={goBack}
+              className="inline-flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-semibold text-slate-200 shadow-sm transition hover:border-blue-500 hover:bg-slate-800 hover:text-white"
+              aria-label="Go back to previous page"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              <span>Back</span>
+            </button>
+          </div>
+        )}
         {!isNativeApp && !isAdmin && activeTab === 'catalogue' && (
           <section className="relative isolate -mx-3 sm:-mx-6 lg:-mx-8 -mt-3 sm:-mt-6 lg:-mt-8 mb-10 min-h-[calc(100svh-5rem)] overflow-hidden bg-[#030817]">
             <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_18%_20%,rgba(0,190,255,.24),transparent_38%),radial-gradient(ellipse_at_85%_75%,rgba(50,70,210,.28),transparent_42%),linear-gradient(135deg,#030817,#081a36_55%,#10113b)]" />
