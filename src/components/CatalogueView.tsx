@@ -123,7 +123,7 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
 
             <button
               onClick={onNavigateToComplaint}
-              className="px-5 py-2.5 rounded-xl bg-gray-900 hover:bg-gray-800 text-gray-200 border border-gray-700 font-bold text-xs sm:text-sm transition flex items-center gap-2"
+              className="px-5 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 border border-cyan-300 font-black text-xs sm:text-sm transition flex items-center gap-2 shadow-lg shadow-cyan-500/30 animate-pulse"
             >
               <Wrench className="w-4 h-4 text-blue-400" />
               <span>{t.bookComplaint}</span>
