@@ -1185,6 +1185,7 @@ export default function App() {
         {activeTab === 'inward' && isAdmin && (
           <InwardView
             records={inwardRecords}
+            customers={customers}
             onSaveRecord={handleSaveInwardRecord}
             onDeleteRecord={handleDeleteInwardRecord}
           />
