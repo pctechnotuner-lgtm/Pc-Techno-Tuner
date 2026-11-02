@@ -21,11 +21,13 @@ import {
   Language,
   PaymentMethod,
   Transaction,
+  Invoice,
 } from '../types';
 import { getT } from '../i18n';
 
 interface AccountingViewProps {
   transactions: Transaction[];
+  invoices: Invoice[];
   lang: Language;
   onSaveTransaction: (transaction: Transaction) => void;
   onDeleteTransaction: (id: string) => void;
@@ -51,6 +53,7 @@ const EXPENSE_CATEGORIES: ExpenseCategory[] = [
 
 export const AccountingView: React.FC<AccountingViewProps> = ({
   transactions,
+  invoices,
   lang,
   onSaveTransaction,
   onDeleteTransaction,
@@ -180,45 +183,27 @@ export const AccountingView: React.FC<AccountingViewProps> = ({
         </div>
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      {/* Financial overview moved here from the dashboard */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-          <div className="flex items-center justify-between text-xs text-gray-400 mb-1">
-            <span>Total Realized Income</span>
-            <div className="p-1 rounded bg-emerald-500/10 text-emerald-400">
-              <TrendingUp className="w-4 h-4" />
-            </div>
-          </div>
-          <p className="text-2xl font-black text-emerald-400 font-mono">
-            ₹{totalIncome.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-          </p>
-          <span className="text-[10px] text-gray-500">Sales, Repairs, CCTV and IT service income</span>
+          <div className="flex items-center justify-between text-xs text-gray-400 mb-1"><span>Cash Inflow (Income)</span><TrendingUp className="w-4 h-4 text-emerald-400" /></div>
+          <p className="text-2xl font-black text-emerald-400 font-mono">₹{totalIncome.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</p>
+          <span className="text-[10px] text-gray-500">Total realized payments (UPI, Cash, Bank)</span>
         </div>
-
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-          <div className="flex items-center justify-between text-xs text-gray-400 mb-1">
-            <span>Total Recorded Expenses</span>
-            <div className="p-1 rounded bg-rose-500/10 text-rose-400">
-              <TrendingDown className="w-4 h-4" />
-            </div>
-          </div>
-          <p className="text-2xl font-black text-rose-400 font-mono">
-            ₹{totalExpense.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-          </p>
-          <span className="text-[10px] text-gray-500">Purchases, workshop rent, technician wages</span>
+          <div className="flex items-center justify-between text-xs text-gray-400 mb-1"><span>Cash Outflow (Expenses)</span><TrendingDown className="w-4 h-4 text-rose-400" /></div>
+          <p className="text-2xl font-black text-rose-400 font-mono">₹{totalExpense.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</p>
+          <span className="text-[10px] text-gray-500">Purchases, wages, shop rent & utilities</span>
         </div>
-
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-          <div className="flex items-center justify-between text-xs text-gray-400 mb-1">
-            <span>Net Operating Cash Flow</span>
-            <div className="p-1 rounded bg-blue-500/10 text-blue-400">
-              <DollarSign className="w-4 h-4" />
-            </div>
-          </div>
-          <p className={`text-2xl font-black font-mono ${netCashFlow >= 0 ? 'text-white' : 'text-rose-400'}`}>
-            ₹{netCashFlow.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-          </p>
-          <span className="text-[10px] text-gray-500">Net surplus after paid costs</span>
+          <div className="flex items-center justify-between text-xs text-gray-400 mb-1"><span>Outstanding Receivables</span><Info className="w-4 h-4 text-amber-400" /></div>
+          <p className="text-2xl font-black text-amber-400 font-mono">₹{invoices.reduce((sum, invoice) => sum + invoice.balanceDue, 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</p>
+          <span className="text-[10px] text-gray-500">Unpaid invoice balances from customers</span>
+        </div>
+        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
+          <div className="flex items-center justify-between text-xs text-gray-400 mb-1"><span>Net Cash Flow</span><DollarSign className="w-4 h-4 text-blue-400" /></div>
+          <p className={`text-2xl font-black font-mono ${netCashFlow >= 0 ? 'text-white' : 'text-rose-400'}`}>₹{netCashFlow.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</p>
+          <span className="text-[10px] text-gray-500">Cash In minus Cash Out; not accounting profit</span>
         </div>
       </div>
 
