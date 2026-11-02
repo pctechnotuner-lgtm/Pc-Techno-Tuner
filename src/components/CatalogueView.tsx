@@ -93,71 +93,61 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
 
   return (
     <div className="space-y-8 animate-fadeIn">
-      {/* High Impact Hero Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-blue-950 to-gray-950 border border-blue-900/50 shadow-2xl p-4 sm:p-5">
-        <div className="absolute -right-20 -top-20 w-80 h-80 bg-blue-600/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute right-10 bottom-0 opacity-10 pointer-events-none">
-          <Monitor className="w-64 h-64 text-blue-400" />
+      {/* Centered company name with right-side quick actions */}
+      <section className="relative overflow-hidden rounded-2xl border border-blue-900/60 bg-gradient-to-br from-slate-900 via-blue-950 to-slate-950 shadow-2xl">
+        <div className="absolute -left-16 -top-20 h-64 w-64 rounded-full bg-cyan-500/10 blur-3xl pointer-events-none" />
+        <div className="absolute right-24 bottom-0 opacity-[0.07] pointer-events-none">
+          <Monitor className="h-56 w-56 text-blue-300" />
         </div>
-
-        <div className="relative z-10 max-w-3xl space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-semibold">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Authorized IT Products & AMC Services • Ahmedabad</span>
+        <div className="relative z-10 grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_250px] items-center gap-6 p-5 sm:p-7 lg:p-8">
+          <div className="min-w-0 text-center">
+            <div className="mx-auto mb-4 inline-flex items-center gap-2 rounded-full border border-blue-400/30 bg-blue-500/10 px-3 py-1.5 text-xs font-semibold text-blue-200">
+              <Sparkles className="h-3.5 w-3.5" />
+              <span>Authorized IT Products & AMC Services • Ahmedabad</span>
+            </div>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-tight text-white">
+              {profile.name || 'PC TECHNO TUNER'}
+            </h1>
+            <p className="mt-3 text-base sm:text-lg font-bold text-cyan-300">
+              Premium IT Hardware & CCTV Security for Your Business
+            </p>
+            <p className="mx-auto mt-3 max-w-2xl text-sm sm:text-base leading-relaxed text-slate-300">
+              From high-speed custom office desktops, corporate laptops, and enterprise CCTV surveillance to reliable printers, routers, and servers — tuned and maintained by {profile.name}.
+            </p>
           </div>
 
-          <h1 className="text-lg sm:text-2xl md:text-3xl font-black text-white tracking-tight leading-tight">
-            Premium IT Hardware & CCTV Security for Your Business
-          </h1>
-
-          <p className="text-sm sm:text-base text-gray-300 leading-relaxed max-w-2xl">
-            From high-speed custom office desktops, corporate laptops, and enterprise CCTV surveillance to reliable printers, routers, and servers — tuned and maintained by {profile.name}.
-          </p>
-
-          <div className="flex flex-wrap gap-3 pt-2">
+          <div className="relative flex flex-col gap-3 md:border-l md:border-blue-800/70 md:pl-6">
+            <p className="mb-1 text-center text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Quick Actions</p>
             <button
               onClick={onNavigateToComplaint}
-              className="px-5 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 border border-cyan-300 font-black text-xs sm:text-sm transition flex items-center gap-2 shadow-lg shadow-cyan-400/40 animate-pulse shadow-lg shadow-cyan-500/30 animate-pulse"
+              className="w-full justify-center rounded-xl border border-cyan-300 bg-cyan-500 px-4 py-3 text-sm font-black text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:bg-cyan-400 flex items-center gap-2"
             >
-              <Wrench className="w-4 h-4 text-slate-900" />
+              <Wrench className="h-4 w-4" />
               <span>{t.bookComplaint}</span>
             </button>
             <button
               onClick={() => handleRequestQuoteWhatsApp()}
-              className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-blue-500/30 transition flex items-center gap-2"
+              className="w-full justify-center rounded-xl bg-blue-600 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-blue-500/20 transition hover:bg-blue-500 flex items-center gap-2"
             >
-              <MessageCircle className="w-4 h-4" />
+              <MessageCircle className="h-4 w-4" />
               <span>{t.requestQuote}</span>
             </button>
-
-
-
             <a
               href={`tel:${profile.mobile}`}
-              className="px-5 py-2.5 rounded-xl bg-gray-900 hover:bg-gray-800 text-gray-200 border border-gray-700 font-bold text-xs sm:text-sm transition flex items-center gap-2"
+              className="w-full justify-center rounded-xl border border-slate-700 bg-slate-900/90 px-4 py-3 text-sm font-bold text-slate-100 transition hover:bg-slate-800 flex items-center gap-2"
             >
-              <Phone className="w-4 h-4 text-emerald-400" />
+              <Phone className="h-4 w-4 text-emerald-400" />
               <span>Call: {profile.mobile}</span>
             </a>
           </div>
 
-          {/* Quick Business Credentials */}
-          <div className="pt-4 border-t border-gray-800/80 flex flex-wrap gap-4 text-xs text-gray-400">
-            <div className="flex items-center gap-1.5">
-              <ShieldCheck className="w-4 h-4 text-blue-400" />
-              <span>GSTIN: <strong className="text-gray-200 font-mono">{profile.gstin}</strong></span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-              <span>PAN: <strong className="text-gray-200 font-mono">{profile.pan}</strong></span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <MapPin className="w-4 h-4 text-rose-400" />
-              <span>Ahmedabad PIN: <strong className="text-gray-200 font-mono">{profile.pincode}</strong></span>
-            </div>
+          <div className="md:col-span-2 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 border-t border-slate-700/70 pt-4 text-[11px] text-slate-400">
+            <span className="inline-flex items-center gap-1.5"><ShieldCheck className="h-4 w-4 text-blue-400" /> GSTIN: <strong className="font-mono text-slate-200">{profile.gstin}</strong></span>
+            <span className="inline-flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-emerald-400" /> PAN: <strong className="font-mono text-slate-200">{profile.pan}</strong></span>
+            <span className="inline-flex items-center gap-1.5"><MapPin className="h-4 w-4 text-rose-400" /> Ahmedabad PIN: <strong className="font-mono text-slate-200">{profile.pincode}</strong></span>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Filter and Search Controls */}
       <div id="pt-products" className="space-y-4 scroll-mt-28">
