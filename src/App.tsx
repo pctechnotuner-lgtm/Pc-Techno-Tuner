@@ -45,6 +45,7 @@ import { InwardView } from './components/InwardView';
 import { OutwardView } from './components/OutwardView';
 import { MoreView } from './components/MoreView';
 import { QuoteRequestsView } from './components/QuoteRequestsView';
+import { sameParty, mergeParty } from './lib/party';
 
 export default function App() {
   const isNativeApp = Capacitor.isNativePlatform();
@@ -504,27 +505,15 @@ export default function App() {
     setInwardRecords(updated);
     storage.setInwardRecords(updated);
 
-    // Automatically create a Party when an inward is saved.
-    // Match by mobile first so existing party details are never overwritten.
-    const normalizedPhone = record.phoneNumber.replace(/\D/g, '');
-    const existingParty = customers.find((party) =>
-      party.mobile.replace(/\D/g, '') === normalizedPhone ||
-      party.name.trim().toLowerCase() === record.customerName.trim().toLowerCase()
-    );
-
-    if (!existingParty && normalizedPhone) {
-      const newParty: Customer = {
-        id: 'cust-' + Date.now(),
-        name: record.customerName.trim(),
-        mobile: record.phoneNumber.trim(),
-        address: '',
-        notes: 'Automatically added from Inward ' + record.id,
-        createdAt: new Date().toISOString(),
-      };
-      const updatedCustomers = [newParty, ...customers];
-      setCustomers(updatedCustomers);
-      storage.setCustomers(updatedCustomers);
-    }
+    // Link every inward entry to the single party record using mobile identity.
+    handleSaveCustomer({
+      id: 'cust-' + Date.now(),
+      name: record.customerName.trim(),
+      mobile: record.phoneNumber.trim(),
+      address: '',
+      notes: 'Automatically linked from Inward ' + record.id,
+      createdAt: new Date().toISOString(),
+    });
   };
 
   const handleSaveOutwardRecord = (record: OutwardRecord) => {
@@ -588,26 +577,15 @@ export default function App() {
     setComplaints(updatedComplaints);
     storage.setComplaints(updatedComplaints);
 
-    const existingCust = customers.find(
-      (c) => c.mobile === newComplaint.mobile
-    );
-
-    if (!existingCust) {
-      const newCust: Customer = {
-        id: `cust-${Date.now()}`,
-        name: newComplaint.customerName,
-        mobile: newComplaint.mobile,
-        businessName: newComplaint.businessName,
-        address: newComplaint.serviceLocation,
-        notes: `Registered via complaint ticket ${newComplaint.id}`,
-        createdAt: new Date().toISOString(),
-      };
-
-      const updatedCustomers = [newCust, ...customers];
-
-      setCustomers(updatedCustomers);
-      storage.setCustomers(updatedCustomers);
-    }
+    handleSaveCustomer({
+      id: 'cust-' + Date.now(),
+      name: newComplaint.customerName,
+      mobile: newComplaint.mobile,
+      businessName: newComplaint.businessName,
+      address: newComplaint.serviceLocation,
+      notes: `Registered via complaint ticket ${newComplaint.id}`,
+      createdAt: new Date().toISOString(),
+    });
   };
 
   const handleUpdateComplaint = (
@@ -693,12 +671,11 @@ export default function App() {
   };
 
   const handleSaveCustomer = (customer: Customer) => {
-    const exists = customers.some((c) => c.id === customer.id);
-
-    const updated = exists
-      ? customers.map((c) => (c.id === customer.id ? customer : c))
-      : [customer, ...customers];
-
+    const matched = customers.find((c) => c.id === customer.id || sameParty(c, customer));
+    const merged = mergeParty(matched, customer);
+    const updated = matched
+      ? customers.map((c) => c.id === matched.id ? merged : c)
+      : [merged, ...customers];
     setCustomers(updated);
     storage.setCustomers(updated);
   };
@@ -763,25 +740,16 @@ export default function App() {
       storage.setTransactions(updatedTransactions);
     }
 
-    const custExists = customers.some(
-      (customer) => customer.mobile === invoice.customerMobile ||
-        customer.name.toLowerCase() === invoice.customerName.toLowerCase()
-    );
-    if (!custExists) {
-      const newCust: Customer = {
-        id: `cust-${Date.now()}`,
-        name: invoice.customerName,
-        mobile: invoice.customerMobile,
-        businessName: invoice.customerBusiness,
-        address: invoice.customerAddress,
-        gstin: invoice.customerGstin,
-        notes: `Created via invoice ${invoice.invoiceNo}`,
-        createdAt: new Date().toISOString(),
-      };
-      const updatedCustomers = [newCust, ...customers];
-      setCustomers(updatedCustomers);
-      storage.setCustomers(updatedCustomers);
-    }
+    handleSaveCustomer({
+      id: 'cust-' + Date.now(),
+      name: invoice.customerName,
+      mobile: invoice.customerMobile,
+      businessName: invoice.customerBusiness,
+      address: invoice.customerAddress,
+      gstin: invoice.customerGstin,
+      notes: `Linked via invoice ${invoice.invoiceNo}`,
+      createdAt: new Date().toISOString(),
+    });
   };
 
   const handleDeleteInvoice = (invoiceId: string) => {
@@ -811,6 +779,7 @@ export default function App() {
   const handleSaveAntivirusLicense = (item: AntivirusLicense) => {
     const updated = antivirusLicenses.some(x => x.id === item.id) ? antivirusLicenses.map(x => x.id === item.id ? item : x) : [item, ...antivirusLicenses];
     setAntivirusLicenses(updated); storage.setAntivirusLicenses(updated);
+    handleSaveCustomer({ id: 'cust-' + Date.now(), name: item.customerName, mobile: item.mobile, address: item.address || '', notes: 'Linked via Antivirus License ' + item.id, createdAt: new Date().toISOString() });
   };
   const handleDeleteAntivirusLicense = (id: string) => {
     const updated = antivirusLicenses.filter(x => x.id !== id); setAntivirusLicenses(updated); storage.setAntivirusLicenses(updated);
@@ -1207,7 +1176,7 @@ export default function App() {
         )}
 
         {activeTab === 'profit' && isAdmin && (
-          <EstimatedProfitView invoices={invoices} products={products} estimates={estimates} customers={customers} profile={profile} onSaveCustomer={handleSaveCustomer} onDeleteEstimate={(estimateId) => { const updated = estimates.filter((item) => item.id !== estimateId); setEstimates(updated); storage.setEstimates(updated); }} onSaveEstimate={(estimate) => { const exists = estimates.some((item) => item.id === estimate.id); const updated = exists ? estimates.map((item) => item.id === estimate.id ? estimate : item) : [estimate, ...estimates]; setEstimates(updated); storage.setEstimates(updated); }} />
+          <EstimatedProfitView invoices={invoices} products={products} estimates={estimates} customers={customers} profile={profile} onSaveCustomer={handleSaveCustomer} onDeleteEstimate={(estimateId) => { const updated = estimates.filter((item) => item.id !== estimateId); setEstimates(updated); storage.setEstimates(updated); }} onSaveEstimate={(estimate) => { const exists = estimates.some((item) => item.id === estimate.id); const updated = exists ? estimates.map((item) => item.id === estimate.id ? estimate : item) : [estimate, ...estimates]; setEstimates(updated); storage.setEstimates(updated); handleSaveCustomer({ id: 'cust-' + Date.now(), name: estimate.customerName, mobile: estimate.customerMobile, businessName: estimate.customerBusiness, address: estimate.customerAddress || '', gstin: estimate.customerGstin, notes: 'Linked via Estimate ' + estimate.estimateNo, createdAt: new Date().toISOString() }); }} />
         )}
 
         {activeTab === 'inward' && isAdmin && (
