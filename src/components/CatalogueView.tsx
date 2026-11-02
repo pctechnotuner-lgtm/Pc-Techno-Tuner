@@ -291,16 +291,12 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
 
                   {/* Pricing and Action Buttons */}
                   <div className="pt-3 border-t border-gray-800 space-y-2.5">
-                    <div className="flex items-baseline justify-between">
+                    <div className="flex items-center justify-between gap-2">
                       <div>
-                        <span className="text-[10px] text-gray-500 block uppercase font-medium">
-                          {t.sellingPrice}
+                        <span className="text-[10px] text-cyan-300 block uppercase font-bold tracking-wide">
+                          Ask to Price
                         </span>
-                        <div className="flex items-baseline gap-1">
-                          <span className="text-lg font-black text-white tracking-tight">
-                            ₹{product.sellingPrice.toLocaleString('en-IN')}
-                          </span>
-                        </div>
+                        <span className="text-xs text-gray-400">Get latest price & quotation</span>
                       </div>
 
                       <div className="text-right">
