@@ -107,8 +107,8 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
       {/* Brand left, rotating product showcase center, quick actions right */}
       <section className="relative overflow-hidden rounded-2xl border border-blue-900/60 bg-gradient-to-br from-slate-900 via-blue-950 to-slate-950 shadow-2xl">
         <div className="absolute -left-16 -top-20 h-64 w-64 rounded-full bg-cyan-500/10 blur-3xl pointer-events-none" />
-        <div className="relative z-10 grid grid-cols-1 items-center gap-6 p-5 sm:p-7 lg:grid-cols-[minmax(0,1fr)_minmax(280px,1.15fr)_250px] lg:gap-7 lg:p-8">
-          <div className="min-w-0 text-center lg:text-left">
+        <div className="relative z-10 grid grid-cols-1 items-center gap-6 p-5 sm:p-7 lg:grid-cols-[minmax(280px,0.95fr)_minmax(420px,1.5fr)_235px] lg:gap-7 lg:p-8">
+          <div className="min-w-0 text-center lg:text-left lg:pr-2">
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-400/30 bg-blue-500/10 px-3 py-1.5 text-xs font-semibold text-blue-200">
               <Sparkles className="h-3.5 w-3.5" />
               <span>Authorized IT Products & AMC Services • Ahmedabad</span>
@@ -125,7 +125,7 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
           </div>
 
           <div className="relative mx-auto w-full max-w-xl">
-            <div className="relative h-48 overflow-hidden rounded-2xl border border-blue-400/30 bg-slate-900 shadow-[0_18px_55px_rgba(0,0,0,.4)] sm:h-56 lg:h-64">
+            <div className="relative h-56 overflow-hidden rounded-2xl border border-blue-400/30 bg-slate-900 shadow-[0_18px_55px_rgba(0,0,0,.4)] sm:h-64 lg:h-[290px]">
               {heroSlides.map((slide, index) => (
                 <div key={slide.title} className={`absolute inset-0 transition-all duration-700 ${index === heroSlide ? 'opacity-100 scale-100' : 'pointer-events-none opacity-0 scale-105'}`}>
                   <img src={slide.image} alt={slide.title} className="h-full w-full object-cover" loading={index === 0 ? 'eager' : 'lazy'} />
