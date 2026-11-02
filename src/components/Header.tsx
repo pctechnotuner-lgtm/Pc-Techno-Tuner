@@ -22,6 +22,7 @@ import {
   BarChart3,
   TrendingUp,
   Settings,
+  MoreHorizontal,
   ShoppingBag,
   Wrench,
   ShieldCheck,
@@ -333,6 +334,14 @@ export const Header: React.FC<HeaderProps> = ({
                 </button>
 
                 <button
+                  onClick={() => handleNavClick('more')}
+                  className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition w-full text-left ${activeTab === 'more' ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-300 hover:text-white hover:bg-gray-800'}`}
+                >
+                  <MoreHorizontal className="w-3.5 h-3.5" />
+                  <span>More / Options</span>
+                </button>
+
+                <button
                   onClick={() => handleNavClick('settings')}
                   className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition w-full text-left ${
                     activeTab === 'settings'
@@ -533,6 +542,14 @@ export const Header: React.FC<HeaderProps> = ({
               >
                 <ShieldCheck className="w-4 h-4 text-violet-300" />
                 <span>Antivirus Licenses</span>
+              </button>
+
+              <button
+                onClick={() => handleNavClick('more')}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-semibold transition ${activeTab === 'more' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-900'}`}
+              >
+                <MoreHorizontal className="w-4 h-4" />
+                <span>More / Options</span>
               </button>
 
               <button
