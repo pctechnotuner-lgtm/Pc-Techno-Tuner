@@ -65,10 +65,21 @@ export default function App() {
     ...storage.getProfile(),
     email: BUSINESS_EMAIL,
   }));
-  const mergeZebronicsCatalogue = (items: Product[]) => {
-    const merged = [...INITIAL_PRODUCTS, ...items];
+  const mergeZebronicsCatalogue = (items: Product[] | null | undefined) => {
+    // Older browser/cloud snapshots may contain empty or malformed rows.
+    // Ignore invalid entries so one bad record cannot crash the public website.
+    const safeItems = Array.isArray(items)
+      ? items.filter((item): item is Product => Boolean(
+          item &&
+          typeof item === 'object' &&
+          typeof item.id === 'string' &&
+          item.id.trim()
+        ))
+      : [];
+    const merged = [...INITIAL_PRODUCTS, ...safeItems, ...ZEBRONICS_CATALOGUE];
     const seen = new Set<string>();
-    return [...merged, ...ZEBRONICS_CATALOGUE].filter((item) => {
+    return merged.filter((item): item is Product => {
+      if (!item || typeof item.id !== 'string' || !item.id.trim()) return false;
       if (seen.has(item.id)) return false;
       seen.add(item.id);
       return true;
