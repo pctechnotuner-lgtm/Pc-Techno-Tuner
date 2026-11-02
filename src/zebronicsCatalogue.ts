@@ -63,7 +63,7 @@ const additionalProducts: Product[] = [
     category: 'Desktop Computers', brand: 'GIGABYTE', model: 'B760M DS3H AX DDR4',
     specifications: 'Intel B760 chipset and LGA1700 socket; supports compatible 14th, 13th and 12th Gen Intel Core processors. DDR4 memory (4 DIMM slots), dual-channel; PCIe 4.0 M.2 storage; Wi-Fi 6E and 2.5GbE LAN. Confirm board revision, BIOS and CPU compatibility before order.',
     purchasePrice: 0, sellingPrice: 0, stockQuantity: 0, minStockAlert: 0, warrantyMonths: 0,
-    imageUrl: 'https://static.gigabyte.com/StaticFile/Image/Global/38746857c457e1b5197902af9cdd1ba8/ProductRemoveBg/33475',
+    imageUrl: 'https://pisces.bbystatic.com/image2/BestBuy_US/images/products/817ff8be-c933-4c34-a3e1-a69f4a9e890a.jpg',
     createdAt: now,
   },
   // Biometric attendance devices — official manufacturer specifications.
