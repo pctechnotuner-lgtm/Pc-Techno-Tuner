@@ -122,6 +122,23 @@ export const SalesBillingView: React.FC<SalesBillingViewProps> = ({
     setCreateModalOpen(true);
   };
 
+  const handleCustomerNameInput = (value: string) => {
+    setCustName(value);
+    const normalized = value.trim().toLowerCase();
+    if (!normalized) return;
+    const existing = customers.find((c) =>
+      c.name.trim().toLowerCase() === normalized ||
+      (c.businessName || '').trim().toLowerCase() === normalized
+    );
+    if (existing) {
+      setCustName(existing.name || value);
+      setCustMobile(existing.mobile || '');
+      setCustBusiness(existing.businessName || '');
+      setCustAddress(existing.address || '');
+      setCustGstin(existing.gstin || '');
+    }
+  };
+
   const handleSelectCustomer = (cName: string) => {
     setCustName(cName);
     const existing = customers.find((c) => c.name.toLowerCase() === cName.toLowerCase());
@@ -490,10 +507,16 @@ export const SalesBillingView: React.FC<SalesBillingViewProps> = ({
                       type="text"
                       required
                       value={custName}
-                      onChange={(e) => setCustName(e.target.value)}
-                      placeholder="e.g. Ramesh Patel"
+                      onChange={(e) => handleCustomerNameInput(e.target.value)}
+                      list="sales-invoice-customer-list"
+                      placeholder="Type customer or firm name"
+
                       className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-1.5 text-white"
                     />
+                    <datalist id="sales-invoice-customer-list">
+                      {customers.map((c) => <option key={c.id} value={c.name}>{c.businessName ? c.businessName + ' • ' : ''}{c.mobile}</option>)}
+                      {customers.filter(c=>c.businessName).map((c) => <option key={c.id+'-firm'} value={c.businessName!}>{c.name+' • '+c.mobile}</option>)}
+                    </datalist>
                   </div>
 
                   <div>
