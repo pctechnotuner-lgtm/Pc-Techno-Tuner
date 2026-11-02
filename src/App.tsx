@@ -1241,17 +1241,21 @@ export default function App() {
           <AntivirusView licenses={antivirusLicenses} onSave={handleSaveAntivirusLicense} onDelete={handleDeleteAntivirusLicense} />
         )}
 
-        {activeTab === 'accounts' && isAdmin && (
+        {(activeTab === 'accounts' || activeTab === 'payment-in' || activeTab === 'payment-out') && isAdmin && (
           <AccountingView
+            key={activeTab}
             transactions={transactions}
             invoices={invoices}
             outwardRecords={outwardRecords}
+            customers={customers}
             lang={lang}
             onSaveTransaction={handleSaveTransaction}
             onSaveOutwardRecord={handleSaveOutwardRecord}
             onSaveInvoice={handleSaveInvoice}
             onDeleteTransaction={handleDeleteTransaction}
             onExportCsv={exportAccountingCsv}
+            initialEntryType={activeTab === 'payment-out' ? 'EXPENSE' : 'INCOME'}
+            openEntryOnMount={activeTab !== 'accounts'}
           />
         )}
 
