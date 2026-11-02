@@ -46,6 +46,7 @@ import { OutwardView } from './components/OutwardView';
 import { MoreView } from './components/MoreView';
 import { QuoteRequestsView } from './components/QuoteRequestsView';
 import { sameParty, mergeParty } from './lib/party';
+import { ZEBRONICS_CATALOGUE } from './zebronicsCatalogue';
 
 export default function App() {
   const isNativeApp = Capacitor.isNativePlatform();
@@ -64,9 +65,11 @@ export default function App() {
     ...storage.getProfile(),
     email: BUSINESS_EMAIL,
   }));
-  const [products, setProducts] = useState<Product[]>(
-    storage.getProducts
-  );
+  const mergeZebronicsCatalogue = (items: Product[]) => {
+    const existingIds = new Set(items.map((item) => item.id));
+    return [...items, ...ZEBRONICS_CATALOGUE.filter((item) => !existingIds.has(item.id))];
+  };
+  const [products, setProducts] = useState<Product[]>(() => mergeZebronicsCatalogue(storage.getProducts()));
   const [complaints, setComplaints] = useState<Complaint[]>(
     storage.getComplaints
   );
@@ -254,10 +257,17 @@ export default function App() {
 
         // Products
         if (cloudProducts !== null) {
-          setProducts(cloudProducts);
-          storage.setProducts(cloudProducts);
+          const productsWithZebronics = mergeZebronicsCatalogue(cloudProducts);
+          setProducts(productsWithZebronics);
+          storage.setProducts(productsWithZebronics);
+          if (productsWithZebronics.length !== cloudProducts.length) {
+            await saveCloudData('products', productsWithZebronics);
+          }
         } else {
-          await saveCloudData('products', localProducts);
+          const productsWithZebronics = mergeZebronicsCatalogue(localProducts);
+          setProducts(productsWithZebronics);
+          storage.setProducts(productsWithZebronics);
+          await saveCloudData('products', productsWithZebronics);
         }
 
         // Cloud complaints are authoritative. Do not merge stale browser
