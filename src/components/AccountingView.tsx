@@ -40,6 +40,7 @@ interface AccountingViewProps {
   onExportCsv: () => void;
   initialEntryType?: 'INCOME' | 'EXPENSE';
   openEntryOnMount?: boolean;
+  partyPickerMode?: boolean;
 }
 
 const INCOME_CATEGORIES: IncomeCategory[] = [
@@ -72,6 +73,7 @@ export const AccountingView: React.FC<AccountingViewProps> = ({
   onExportCsv,
   initialEntryType,
   openEntryOnMount = false,
+  partyPickerMode = false,
 }) => {
   const t = getT(lang);
   const [modalOpen, setModalOpen] = useState(false);
@@ -97,13 +99,13 @@ export const AccountingView: React.FC<AccountingViewProps> = ({
   const [customerPaymentKind, setCustomerPaymentKind] = useState<'ADVANCE' | 'OLD_BILL'>('ADVANCE');
   const [selectedBillId, setSelectedBillId] = useState('');
 
-  const openAddModal = (type: 'INCOME' | 'EXPENSE' = 'INCOME') => {
+  const openAddModal = (type: 'INCOME' | 'EXPENSE' = 'INCOME', partyName = '') => {
     setFormType(type);
     setFormCategory(type === 'INCOME' ? INCOME_CATEGORIES[0] : EXPENSE_CATEGORIES[0]);
     setFormAmount(0);
     setFormDate(new Date().toISOString().split('T')[0]);
     setFormMethod('UPI');
-    setFormParty('');
+    setFormParty(partyName);
     setFormNotes('');
     setFormRef('');
     setCustomerPaymentKind('ADVANCE');
@@ -326,6 +328,27 @@ export const AccountingView: React.FC<AccountingViewProps> = ({
           </button>
         </div>
       </div>
+
+      {partyPickerMode && (
+        <section className="rounded-2xl border border-gray-800 bg-gray-900 p-4 space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div><h2 className="text-base font-bold text-white">Party Payment</h2><p className="text-xs text-gray-400">Party ke naam ke saamne Payment In ya Payment Out chunein</p></div>
+            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Party naam / mobile search..." className="w-full sm:w-72 rounded-xl border border-gray-700 bg-gray-950 px-3 py-2 text-sm text-white"/>
+          </div>
+          <div className="divide-y divide-gray-800">
+            {customers.filter((customer) => [customer.name, customer.businessName, customer.mobile].some((v) => String(v || '').toLowerCase().includes(search.trim().toLowerCase()))).map((customer) => (
+              <div key={customer.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
+                <div className="min-w-0"><p className="font-semibold text-white">{customer.name}</p><p className="text-xs text-gray-400">{customer.businessName || 'Individual'} {customer.mobile ? '• ' + customer.mobile : ''}</p></div>
+                <div className="flex gap-2">
+                  <button type="button" onClick={() => openAddModal('INCOME', customer.name)} className="rounded-lg bg-emerald-600 px-3 py-2 text-xs font-bold text-white">Payment In</button>
+                  <button type="button" onClick={() => openAddModal('EXPENSE', customer.name)} className="rounded-lg bg-rose-600 px-3 py-2 text-xs font-bold text-white">Payment Out</button>
+                </div>
+              </div>
+            ))}
+            {customers.length === 0 && <p className="py-4 text-sm text-gray-400">Abhi koi party saved nahi hai.</p>}
+          </div>
+        </section>
+      )}
 
       {/* Financial overview moved here from the dashboard */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
