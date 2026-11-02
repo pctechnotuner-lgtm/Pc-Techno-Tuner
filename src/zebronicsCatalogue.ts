@@ -53,7 +53,7 @@ const additionalProducts: Product[] = [
   {
     id: 'gigabyte-b760m-ds3h-ax-ddr5', name: 'GIGABYTE B760M DS3H AX DDR5 Motherboard',
     category: 'Desktop Computers', brand: 'GIGABYTE', model: 'B760M DS3H AX (DDR5)',
-    specifications: 'Intel B760 chipset, LGA1700 socket; supports 14th/13th/12th Gen Intel Core processors; 4 DDR5 DIMM slots, dual-channel; 2 PCIe 4.0 M.2 connectors; Wi-Fi 6E and 2.5GbE LAN. Check revision and CPU/RAM compatibility before order.',
+    specifications: 'Intel B760 chipset and LGA1700 socket; supports compatible 14th, 13th and 12th Gen Intel Core processors. DDR5 memory (4 DIMM slots), dual-channel; dual PCIe 4.0 M.2; Wi-Fi 6E and 2.5GbE LAN. Confirm board revision, BIOS and CPU compatibility before order.',
     purchasePrice: 0, sellingPrice: 0, stockQuantity: 0, minStockAlert: 0, warrantyMonths: 0,
     imageUrl: 'https://static.gigabyte.com/StaticFile/Image/Global/38746857c457e1b5197902af9cdd1ba8/ProductRemoveBg/33475',
     createdAt: now,
@@ -61,7 +61,7 @@ const additionalProducts: Product[] = [
   {
     id: 'gigabyte-b760m-ds3h-ax-ddr4', name: 'GIGABYTE B760M DS3H AX DDR4 Motherboard',
     category: 'Desktop Computers', brand: 'GIGABYTE', model: 'B760M DS3H AX DDR4',
-    specifications: 'Intel B760 chipset, LGA1700 socket; supports 14th/13th/12th Gen Intel Core processors; 4 DDR4 DIMM slots, dual-channel; PCIe 4.0 M.2 storage; Wi-Fi 6E and 2.5GbE LAN. Check revision and CPU/RAM compatibility before order.',
+    specifications: 'Intel B760 chipset and LGA1700 socket; supports compatible 14th, 13th and 12th Gen Intel Core processors. DDR4 memory (4 DIMM slots), dual-channel; PCIe 4.0 M.2 storage; Wi-Fi 6E and 2.5GbE LAN. Confirm board revision, BIOS and CPU compatibility before order.',
     purchasePrice: 0, sellingPrice: 0, stockQuantity: 0, minStockAlert: 0, warrantyMonths: 0,
     imageUrl: 'https://static.gigabyte.com/StaticFile/Image/Global/38746857c457e1b5197902af9cdd1ba8/ProductRemoveBg/33475',
     createdAt: now,
@@ -72,7 +72,7 @@ const additionalProducts: Product[] = [
     category: 'Biometric and Attendance Machines', brand: 'ZKTeco', model: 'MB20',
     specifications: 'Face, fingerprint, RFID card and password verification; up to 500 fingerprints, 1,000 cards/users and 50,000 records; 2.8-inch TFT display; TCP/IP, USB Host and optional Wi-Fi; access-control relay.',
     purchasePrice: 0, sellingPrice: 0, stockQuantity: 0, minStockAlert: 0, warrantyMonths: 0,
-    imageUrl: 'https://zktecoua.com/files/MB20.png',
+    imageUrl: 'https://images.openai.com/static-rsc-4/zf1VjO3dfq1C8KERaM0mIcwd8589dZ6xzoBvlk7bhaXyGMb4orfYmKlb4iv5EVu_6tv26Svt86UkiYyCzBFEvHCp_Bjizli890yB5zXbu5STOVXAqyRooGlMjiMplyUXUr7X6PDPYSJnjaWcb0MmSZaJqIUUcvu5wUCaD791D6k?purpose=inline',
     createdAt: now,
   },
   {
@@ -86,7 +86,7 @@ const additionalProducts: Product[] = [
   {
     id: 'essl-f22-id-wifi', name: 'eSSL F22 ID Wi-Fi Attendance & Access Control',
     category: 'Biometric and Attendance Machines', brand: 'eSSL', model: 'F22 ID Wi-Fi',
-    specifications: 'Fingerprint time-attendance and access-control terminal with Wi-Fi; verify exact card, capacity and firmware variant with supplier.',
+    specifications: 'Fingerprint-based time-attendance and access-control terminal with Wi-Fi connectivity; supports attendance management and door access functions on supported configurations. Confirm fingerprint/card capacity, RFID format, communication options and firmware by exact F22 ID Wi-Fi variant.',
     purchasePrice: 0, sellingPrice: 0, stockQuantity: 0, minStockAlert: 0, warrantyMonths: 0,
     imageUrl: 'https://www.esslsecurity.com/storage/app/media/fingerprint/K90-Pro.jpg',
     createdAt: now,
@@ -95,15 +95,15 @@ const additionalProducts: Product[] = [
   {
     id: 'fortinet-fortigate-40f', name: 'Fortinet FortiGate 40F Next-Generation Firewall',
     category: 'Firewall and Antivirus Software', brand: 'Fortinet', model: 'FG-40F',
-    specifications: 'Next-generation firewall with integrated SD-WAN and FortiOS security; branch-office appliance; 1 Gbps firewall throughput, 800 Mbps IPS and 600 Mbps threat protection (datasheet figures; subscription/services sold separately).',
+    specifications: 'Next-generation firewall with FortiOS security, VPN (IPsec/SSL VPN subject to model/licensing), security policies, SD-WAN and network protection. Datasheet performance figures: up to 1 Gbps firewall throughput, 800 Mbps IPS and 600 Mbps threat protection. FortiGuard subscriptions and services are separate; confirm exact FG-40F variant.',
     purchasePrice: 0, sellingPrice: 0, stockQuantity: 0, minStockAlert: 0, warrantyMonths: 0,
-    imageUrl: 'https://www.fortinet.com/content/dam/fortinet/assets/images/products/fortigate-40f.png',
+    imageUrl: 'https://images.openai.com/static-rsc-4/-AC13FgfP6D1D339Hg3FR5oy-30NZGKMd0ZO2hbafEZkyQm7tQHd7GiNga1iJSGfxskv47d9H6DtWtTEPIB1uO3iPX7ePSssGB8q8gr6BI74oMs_GXA-kFIdDT_7GbHB1g4Mj2kXL5ukP38XPfFQbq-Rn4Hq1ezsGBqY55l--T0?purpose=inline',
     createdAt: now,
   },
   {
     id: 'fortinet-fortigate-60f', name: 'Fortinet FortiGate 60F Next-Generation Firewall',
     category: 'Firewall and Antivirus Software', brand: 'Fortinet', model: 'FG-60F',
-    specifications: 'Next-generation firewall appliance for business networks; security policies, VPN and network protection through FortiOS; FortiGuard subscriptions are separate and configuration-dependent.',
+    specifications: 'Next-generation firewall for business networks with FortiOS security policies, VPN, routing, SD-WAN and network protection features. Throughput and interfaces depend on exact hardware variant; FortiGuard subscriptions/services are separate. Confirm FG-60F SKU.',
     purchasePrice: 0, sellingPrice: 0, stockQuantity: 0, minStockAlert: 0, warrantyMonths: 0,
     imageUrl: 'https://www.fortinet.com/content/dam/fortinet/assets/images/products/fortigate-40f.png',
     createdAt: now,
@@ -111,7 +111,7 @@ const additionalProducts: Product[] = [
   {
     id: 'sophos-xgs-87', name: 'Sophos XGS 87 Firewall Appliance',
     category: 'Firewall and Antivirus Software', brand: 'Sophos', model: 'XGS 87',
-    specifications: 'Desktop next-generation firewall; 4 x Gigabit Ethernet copper ports and 1 x SFP; firewall throughput up to 3,850 Mbps and IPS throughput up to 1,200 Mbps (manufacturer datasheet).',
+    specifications: 'Desktop next-generation firewall; 4 x Gigabit Ethernet copper ports and 1 x SFP; firewall throughput up to 3,850 Mbps and IPS throughput up to 1,200 Mbps (manufacturer datasheet). Supports firewall policies, VPN and network security features; confirm subscription bundle and lifecycle/availability before order.',
     purchasePrice: 0, sellingPrice: 0, stockQuantity: 0, minStockAlert: 0, warrantyMonths: 0,
     imageUrl: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=600&h=450&fit=crop',
     createdAt: now,
