@@ -17,13 +17,15 @@ type QuoteRow = {
   items?: QuoteItem[] | null; subtotal?: number | null;
   status: 'New' | 'Contacted' | 'Quoted' | 'Closed'; created_at: string;
 };
-interface QuoteRequestsViewProps { isAdmin: boolean; products?: Product[]; profile: CompanyProfile; }
+interface QuoteRequestsViewProps { isAdmin: boolean; products?: Product[]; profile: CompanyProfile; engineerMode?: boolean; }
 
 const money = (value: number) => '₹' + value.toLocaleString('en-IN', { maximumFractionDigits: 2 });
 
-export const QuoteRequestsView: React.FC<QuoteRequestsViewProps> = ({ isAdmin, products = [], profile }) => {
+export const QuoteRequestsView: React.FC<QuoteRequestsViewProps> = ({ isAdmin, products = [], profile, engineerMode = false }) => {
   const [catalogue,setCatalogue]=useState<Product[]>(products);
-  useEffect(()=>{ if(!isAdmin) void supabase.from('quote_catalogue').select('id,name').eq('active',true).order('name').then(({data,error})=>{ if(!error&&data) setCatalogue(data.map((p:any)=>({id:p.id,name:p.name,sellingPrice:0} as Product))); }); },[isAdmin]);
+  const [gstRate,setGstRate]=useState(0);
+  const [savedQuote,setSavedQuote]=useState<QuoteRow|null>(null);
+  useEffect(()=>{ if(!isAdmin) void supabase.from('quote_catalogue').select('id,name,selling_price').eq('active',true).order('name').then(({data,error})=>{ if(!error&&data) setCatalogue(data.map((p:any)=>({id:p.id,name:p.name,sellingPrice:Number(p.selling_price)||0} as Product))); }); },[isAdmin]);
   const [name,setName]=useState(''); const [mobile,setMobile]=useState('');
   const [business,setBusiness]=useState(''); const [email,setEmail]=useState('');
   const [details,setDetails]=useState('');
@@ -50,17 +52,18 @@ export const QuoteRequestsView: React.FC<QuoteRequestsViewProps> = ({ isAdmin, p
     if(!product) return;
     setCart(old=>{
       const existing=old.find(item=>item.productId===product.id);
-      if(existing) return old.map(item=>item.productId===product.id?{...item,quantity:item.quantity+quantity}:item);
-      return [...old,{productId:product.id,name:product.name,quantity,unitPrice:null,lineTotal:null,custom:false}];
+      if(existing) return old.map(item=>item.productId===product.id?{...item,quantity:item.quantity+quantity,lineTotal:item.unitPrice===null?null:item.unitPrice*(item.quantity+quantity)}:item);
+      return [...old,{productId:product.id,name:product.name,quantity,unitPrice:engineerMode?Number(product.sellingPrice)||0:null,lineTotal:engineerMode?(Number(product.sellingPrice)||0)*quantity:null,custom:false}];
     });
     setSelectedProduct(''); setQuantity(1);
   };
   const addCustom = () => {
     if(!customName.trim()) return;
-    setCart(old=>[...old,{name:customName.trim(),quantity:customQuantity,unitPrice:null,lineTotal:null,custom:true}]);
+    setCart(old=>[...old,{name:customName.trim(),quantity:customQuantity,unitPrice:engineerMode?0:null,lineTotal:engineerMode?0:null,custom:true}]);
     setCustomName(''); setCustomQuantity(1);
   };
   const changeQuantity = (index:number,next:number) => setCart(old=>old.map((item,i)=>i===index?{...item,quantity:next,lineTotal:item.unitPrice===null?null:item.unitPrice*next}:item));
+  const changePrice=(index:number,value:string)=>setCart(old=>old.map((item,i)=>i===index?{...item,unitPrice:value===''?null:Math.max(0,Number(value)||0),lineTotal:value===''?null:Math.max(0,Number(value)||0)*item.quantity}:item));
   const submit = async (e: React.FormEvent) => {
     e.preventDefault(); setError('');
     if(!name.trim()||!mobile.trim()||cart.length===0){setError('Name, mobile number aur kam se kam ek item add karna zaroori hai.');return;}
@@ -69,12 +72,12 @@ export const QuoteRequestsView: React.FC<QuoteRequestsViewProps> = ({ isAdmin, p
     const itemSummary=cart.map(item=>item.name).join(', ');
     const {error}=await supabase.from('quote_requests').insert({
       id,customer_name:name.trim(),mobile:mobile.trim(),business_name:business.trim()||null,
-      email:email.trim()||null,item_or_service:itemSummary,details:details.trim()||null,
-      items:cart,subtotal
+      email:email.trim()||null,item_or_service:itemSummary,
+      items:cart,subtotal,details: [details.trim(),engineerMode?'GST Rate: '+gstRate+'%':''].filter(Boolean).join('\n')||null
     });
     setBusy(false);
     if(error){setError('Quote request save nahi hui. Internet check karke dobara try karein.');return;}
-    setSaved(true);
+    setSavedQuote({id,customer_name:name,mobile,business_name:business||null,email:email||null,item_or_service:itemSummary,details:'GST Rate: '+gstRate+'%',items:cart,subtotal,status:'New',created_at:new Date().toISOString()});setSaved(true);
   };
 
   const startEdit=(row:QuoteRow)=>{setEditingQuoteId(row.id);setEditDraft({...row,items:(row.items||[]).map(item=>({...item}))});};
@@ -87,7 +90,7 @@ export const QuoteRequestsView: React.FC<QuoteRequestsViewProps> = ({ isAdmin, p
     const esc=(value:unknown)=>String(value??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
     const dateText=(value:string)=>value?new Date(value).toLocaleDateString('en-GB'):'-';
     const companyAddress=[profile.address,profile.location,profile.pincode].filter(Boolean).join(', ');
-    const taxRate=Number(profile.defaultGstRate||0);
+    const taxRate=Number(draft.details?.match(/GST Rate:\s*(\d+(?:\.\d+)?)%/)?.[1] ?? profile.defaultGstRate ?? 0);
     const pricedItems=(draft.items||[]);
     const subtotal=pricedItems.reduce((sum,item)=>sum+(Number(item.lineTotal)||0),0);
     const tax=subtotal*taxRate/100;
@@ -189,8 +192,8 @@ export const QuoteRequestsView: React.FC<QuoteRequestsViewProps> = ({ isAdmin, p
     </div>;
   }
 
-  if(saved) return <div className="mx-auto max-w-xl rounded-2xl border border-emerald-700 bg-slate-900 p-8 text-center space-y-3"><CheckCircle2 className="mx-auto h-12 w-12 text-emerald-400"/><h1 className="text-xl font-black text-white">Quote Request Saved!</h1><p className="text-sm text-slate-300">Thank you. PC TECHNO TUNER will contact you soon.</p></div>;
-  return <div className="mx-auto max-w-2xl space-y-5"><div className="rounded-2xl border border-cyan-900 bg-slate-900 p-5"><div className="flex items-center gap-3"><FileText className="h-7 w-7 text-cyan-300"/><div><h1 className="text-xl font-black text-white">Request a Quote</h1><p className="text-xs text-slate-400">Products select karein. Price customer ko nahi dikhegi; PC TECHNO TUNER team quotation bhejegi.</p></div></div></div>
+  if(saved && savedQuote) return <div className="mx-auto max-w-xl rounded-2xl border border-emerald-700 bg-slate-900 p-8 text-center space-y-4"><CheckCircle2 className="mx-auto h-12 w-12 text-emerald-400"/><h1 className="text-xl font-black text-white">Quotation Saved in Portal</h1><p className="text-sm text-slate-300">{savedQuote.id}</p><button type="button" onClick={()=>printQuoteDocument(savedQuote,savedQuote)} className="rounded-lg bg-blue-600 px-5 py-3 text-white font-bold">Print / Save PDF</button><button type="button" onClick={()=>{setSaved(false);setSavedQuote(null);setCart([]);setName('');setMobile('');setBusiness('');setEmail('');setDetails('');}} className="block w-full text-cyan-300">Create Another Quote</button></div>;
+  return <div className="mx-auto max-w-2xl space-y-5"><div className="rounded-2xl border border-cyan-900 bg-slate-900 p-5"><div className="flex items-center gap-3"><FileText className="h-7 w-7 text-cyan-300"/><div><h1 className="text-xl font-black text-white">{engineerMode?'Engineer Quotation':'Request a Quote'}</h1><p className="text-xs text-slate-400">{engineerMode?'Select products, edit rates, choose GST, save and print.':'Products select karein. Price customer ko nahi dikhegi; PC TECHNO TUNER team quotation bhejegi.'}</p></div></div></div>
     <form onSubmit={submit} className="grid grid-cols-1 sm:grid-cols-2 gap-4 rounded-2xl border border-slate-800 bg-slate-900 p-5">
       <label className="space-y-1 text-xs text-slate-300">Customer Name *<input required value={name} onChange={e=>setName(e.target.value)} className="w-full rounded-lg border border-slate-700 bg-slate-950 p-3 text-sm text-white"/></label>
       <label className="space-y-1 text-xs text-slate-300">Mobile Number *<input required inputMode="tel" value={mobile} onChange={e=>setMobile(e.target.value)} className="w-full rounded-lg border border-slate-700 bg-slate-950 p-3 text-sm text-white"/></label>
@@ -204,20 +207,20 @@ export const QuoteRequestsView: React.FC<QuoteRequestsViewProps> = ({ isAdmin, p
           <button type="button" onClick={addProduct} disabled={!selectedProduct} className="inline-flex items-center justify-center gap-1 rounded-lg bg-blue-600 px-4 py-3 text-sm font-bold text-white disabled:opacity-40"><Plus className="h-4 w-4"/> Add</button>
         </div>
         <div className="border-t border-slate-800 pt-3 space-y-2">
-          <p className="text-xs font-semibold text-amber-300">Item not listed? Add it without a price</p>
+          <p className="text-xs font-semibold text-amber-300">Item not listed? Add custom item</p>
           <div className="grid grid-cols-1 sm:grid-cols-[1fr_100px_auto] gap-2">
             <input value={customName} onChange={e=>setCustomName(e.target.value)} placeholder="Enter item / service name" className="min-w-0 rounded-lg border border-slate-700 bg-slate-950 p-3 text-sm text-white"/>
             <input type="number" min="1" value={customQuantity} onChange={e=>setCustomQuantity(Math.max(1,Number(e.target.value)||1))} className="rounded-lg border border-slate-700 bg-slate-950 p-3 text-sm text-white" aria-label="Custom item quantity"/>
             <button type="button" onClick={addCustom} disabled={!customName.trim()} className="inline-flex items-center justify-center gap-1 rounded-lg border border-amber-700 px-4 py-3 text-sm font-bold text-amber-200 disabled:opacity-40"><Plus className="h-4 w-4"/> Add Other</button>
           </div>
         </div>
-        {cart.length>0&&<div className="space-y-2 pt-2">{cart.map((item,index)=><div key={index} className="flex flex-wrap items-center gap-2 rounded-lg bg-slate-950 p-3"><div className="min-w-0 flex-1"><p className="text-sm font-semibold text-white">{item.name}</p><p className="text-[11px] text-slate-400">Price will be provided by our team</p></div><input type="number" min="1" value={item.quantity} onChange={e=>changeQuantity(index,Math.max(1,Number(e.target.value)||1))} className="w-20 rounded-lg border border-slate-700 bg-slate-900 p-2 text-sm text-white" aria-label="Item quantity"/><strong className="w-24 text-right text-sm text-cyan-300">{item.lineTotal===null?'Pending':money(item.lineTotal)}</strong><button type="button" onClick={()=>setCart(old=>old.filter((_,i)=>i!==index))} aria-label="Remove item" className="rounded p-2 text-rose-300"><Trash2 className="h-4 w-4"/></button></div>)}
+        {cart.length>0&&<div className="space-y-2 pt-2">{cart.map((item,index)=><div key={index} className="flex flex-wrap items-center gap-2 rounded-lg bg-slate-950 p-3"><div className="min-w-0 flex-1"><p className="text-sm font-semibold text-white">{item.name}</p>{!engineerMode&&<p className="text-[11px] text-slate-400">Price will be provided by our team</p>}</div><input type="number" min="1" value={item.quantity} onChange={e=>changeQuantity(index,Math.max(1,Number(e.target.value)||1))} className="w-20 rounded-lg border border-slate-700 bg-slate-900 p-2 text-sm text-white" aria-label="Item quantity"/>{engineerMode&&<input type="number" min="0" step="0.01" value={item.unitPrice??''} onChange={e=>changePrice(index,e.target.value)} aria-label="Unit price" className="w-28 rounded-lg border border-slate-700 bg-slate-900 p-2 text-sm text-white"/>}<strong className="w-24 text-right text-sm text-cyan-300">{item.lineTotal===null?'Pending':money(item.lineTotal)}</strong><button type="button" onClick={()=>setCart(old=>old.filter((_,i)=>i!==index))} aria-label="Remove item" className="rounded p-2 text-rose-300"><Trash2 className="h-4 w-4"/></button></div>)}
           <div className="text-right text-base font-black text-white">Grand Total: {money(subtotal)}{cart.some(item=>item.unitPrice===null)&&<p className="text-[11px] font-normal text-amber-300">Other item(s) price will be quoted separately.</p>}</div>
         </div>}
       </div>
-      <label className="sm:col-span-2 space-y-1 text-xs text-slate-300">Additional Details<textarea rows={3} value={details} onChange={e=>setDetails(e.target.value)} placeholder="Model, requirement, location or other details..." className="w-full rounded-lg border border-slate-700 bg-slate-950 p-3 text-sm text-white"/></label>
+      {engineerMode&&<div className="sm:col-span-2 rounded-xl border border-slate-700 p-4"><label className="text-sm text-white">GST Rate <select value={gstRate} onChange={e=>setGstRate(Number(e.target.value))} className="ml-3 rounded bg-slate-950 p-2">{[0,5,12,18,28].map(v=><option key={v} value={v}>{v}%</option>)}</select></label><p className="mt-2 text-sm text-cyan-300">Subtotal: {money(subtotal)} | GST: {money(subtotal*gstRate/100)} | Total: {money(subtotal*(1+gstRate/100))}</p></div>}<label className="sm:col-span-2 space-y-1 text-xs text-slate-300">Additional Details<textarea rows={3} value={details} onChange={e=>setDetails(e.target.value)} placeholder="Model, requirement, location or other details..." className="w-full rounded-lg border border-slate-700 bg-slate-950 p-3 text-sm text-white"/></label>
       {error&&<p className="sm:col-span-2 text-xs text-rose-300">{error}</p>}
-      <button disabled={busy||cart.length===0} className="sm:col-span-2 inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white disabled:opacity-60"><Send className="h-4 w-4"/>{busy?'Saving...':'Save Quote Request'}</button>
+      <button disabled={busy||cart.length===0} className="sm:col-span-2 inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white disabled:opacity-60"><Send className="h-4 w-4"/>{busy?'Saving...':engineerMode?'Save Quotation':'Save Quote Request'}</button>
     </form>
   </div>;
 };
