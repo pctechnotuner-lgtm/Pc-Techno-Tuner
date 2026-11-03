@@ -105,7 +105,7 @@ export default function App() {
 
   const [lang, setLang] = useState<Language>(storage.getLanguage);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [activeTab, setActiveTabState] = useState<AppTab>('catalogue');
+  const [activeTab, setActiveTabState] = useState<AppTab>(() => window.location.hash === '#engineer-quote' ? 'quote' : 'catalogue');
   const tabHistory = useRef<AppTab[]>([]);
   const setActiveTab = (next: React.SetStateAction<AppTab>) => {
     setActiveTabState((current) => {
@@ -1118,7 +1118,7 @@ export default function App() {
 
 
         {activeTab === 'quote' && (
-          <QuoteRequestsView isAdmin={false} products={products} profile={profile} />
+          <QuoteRequestsView isAdmin={false} engineerMode={window.location.hash === '#engineer-quote'} products={products} profile={profile} />
         )}
 
         {activeTab === 'quotes' && isAdmin && (
