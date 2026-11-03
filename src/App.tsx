@@ -128,6 +128,8 @@ export default function App() {
 
   // Public customer complaint page, opened with ?page=complaint.
   const isClientComplaintPage = new URLSearchParams(window.location.search).get('page') === 'complaint';
+  // Public engineer quotation page: no admin login or dashboard required.
+  const isEngineerQuotePage = window.location.hash === '#engineer-quote';
 
   // Prevent saving local data while the cloud is still loading.
   const loadingCloudRef = useRef(false);
@@ -135,7 +137,7 @@ export default function App() {
 
   // Check the actual Supabase login session.
   useEffect(() => {
-    if (isClientComplaintPage) return;
+    if (isClientComplaintPage || isEngineerQuotePage) return;
     let mounted = true;
 
     const checkSession = async () => {
@@ -184,7 +186,7 @@ export default function App() {
   // Load cloud data after login.
   // If a cloud record does not exist yet, migrate local data once.
   useEffect(() => {
-    if (isClientComplaintPage) return;
+    if (isClientComplaintPage || isEngineerQuotePage) return;
     if (!isAdmin) {
       loadingCloudRef.current = false;
       setSyncReady(false);
@@ -421,7 +423,7 @@ export default function App() {
   // Save changes to Supabase after cloud loading is complete.
   // Saves are queued so they do not intentionally overlap.
   useEffect(() => {
-    if (isClientComplaintPage) return;
+    if (isClientComplaintPage || isEngineerQuotePage) return;
     if (
       !isAdmin ||
       !syncReady ||
@@ -987,7 +989,7 @@ export default function App() {
     (p) => p.stockQuantity <= p.minStockAlert
   ).length;
 
-  if (isClientComplaintPage) {
+  if (isClientComplaintPage || isEngineerQuotePage) {
     return (
       <div className="min-h-screen bg-gray-950 text-gray-100 px-4 py-6 sm:py-10">
         <div className="max-w-3xl mx-auto mb-6 text-center">
