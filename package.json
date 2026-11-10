@@ -1,5 +1,5 @@
 {
-  "name": "react-example",
+  "name": "pc-techno-tuner",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -8,7 +8,9 @@
     "build": "vite build",
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "desktop:build": "vite build --base=./ && electron-builder --win nsis",
+    "desktop:dir": "vite build --base=./ && electron-builder --win dir"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
@@ -35,6 +37,41 @@
     "typescript": "^7.0.2",
     "@types/express": "^4.17.21",
     "@capacitor/cli": "^7.4.3",
-    "@capacitor/android": "^7.4.3"
+    "@capacitor/android": "^7.4.3",
+    "electron": "^41.0.0",
+    "electron-builder": "^26.0.12"
+  },
+  "productName": "PC TECHNO TUNER",
+  "main": "electron/main.cjs",
+  "build": {
+    "appId": "com.pctechnotuner.desktop",
+    "productName": "PC TECHNO TUNER",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "PC TECHNO TUNER",
+      "deleteAppDataOnUninstall": false
+    }
   }
 }
