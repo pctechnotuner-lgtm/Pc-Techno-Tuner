@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
-    "desktop:build": "vite build --base=./ && electron-builder --win nsis",
+    "desktop:build": "vite build --base=./ && electron-builder --win nsis --publish never",
     "desktop:dir": "vite build --base=./ && electron-builder --win dir"
   },
   "dependencies": {
