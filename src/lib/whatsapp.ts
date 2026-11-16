@@ -25,18 +25,23 @@ export const getCompanyWhatsAppFooter = (): string => {
   return lines.join('\n');
 };
 
-/** Builds a WhatsApp Business Android intent with a safe HTTPS fallback. */
+/**
+ * Opens WhatsApp Business directly on Android when installed.
+ * If Business is unavailable, Android/browser falls back to the official
+ * WhatsApp click-to-chat page with the complete pre-filled message.
+ */
 export const getWhatsAppBusinessUrl = (value: string, message = '', includeFooter = true): string => {
   const digits = String(value || '').replace(/\D/g, '');
   const phone = digits.length === 10 ? '91' + digits : digits;
   if (!phone) return '';
+
   const text = message ? message + (includeFooter ? getCompanyWhatsAppFooter() : '') : '';
-  const query = text ? '?text=' + encodeURIComponent(text) : '';
-  const webUrl = 'https://wa.me/' + phone + query;
+  const encodedText = text ? encodeURIComponent(text) : '';
+  const webUrl = 'https://wa.me/' + phone + (encodedText ? '?text=' + encodedText : '');
 
   if (/Android/i.test(navigator.userAgent)) {
-    const intentQuery = '?phone=' + phone + (text ? '&text=' + encodeURIComponent(text) : '');
-    return 'intent://send/' + intentQuery +
+    const intentQuery = 'phone=' + phone + (encodedText ? '&text=' + encodedText : '');
+    return 'intent://send?' + intentQuery +
       '#Intent;scheme=whatsapp;package=com.whatsapp.w4b;S.browser_fallback_url=' +
       encodeURIComponent(webUrl) + ';end';
   }
@@ -46,5 +51,10 @@ export const getWhatsAppBusinessUrl = (value: string, message = '', includeFoote
 
 export const openWhatsAppBusiness = (value: string, message = '', includeFooter = true): void => {
   const url = getWhatsAppBusinessUrl(value, message, includeFooter);
-  if (url) window.location.href = url;
+  if (!url) {
+    window.alert('WhatsApp Business number is not configured. Please check Settings.');
+    return;
+  }
+  // Navigate in the same tab so Android can hand off the intent to WhatsApp Business.
+  window.location.assign(url);
 };
