@@ -156,7 +156,7 @@ PC TECHNO TUNER | Ahmedabad
 ━━━━━━━━━━━━━━━━━━━━`;
   };
 
-  const handleOpenWhatsApp = (_c: Complaint) => openWhatsAppBusiness(profile.whatsapp, getWhatsAppMessageText(_c));
+  const handleOpenWhatsApp = (_c: Complaint) => openWhatsAppBusiness(profile.whatsapp || profile.mobile || '7383871195', getWhatsAppMessageText(_c));
 
   const handleCopyMessage = (c: Complaint) => {
     const text = getWhatsAppMessageText(c);
@@ -248,6 +248,7 @@ PC TECHNO TUNER | Ahmedabad
 
             <div className="flex flex-col sm:flex-row gap-3">
               <button
+                type="button"
                 onClick={() => handleOpenWhatsApp(submittedComplaint)}
                 className="flex-1 py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/25"
               >
@@ -256,6 +257,7 @@ PC TECHNO TUNER | Ahmedabad
               </button>
 
               <button
+                type="button"
                 onClick={() => handleCopyMessage(submittedComplaint)}
                 className="py-3 px-4 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-200 border border-gray-700 font-semibold text-xs transition flex items-center justify-center gap-2"
               >
