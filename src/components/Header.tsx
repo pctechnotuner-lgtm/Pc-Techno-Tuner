@@ -14,6 +14,7 @@ import {
   LayoutDashboard,
   Package,
   ClipboardList,
+  CheckSquare,
   PackageCheck,
   Users,
   AlertCircle,
@@ -269,6 +270,14 @@ export const Header: React.FC<HeaderProps> = ({
                   <PackageCheck className="w-3.5 h-3.5 text-emerald-300" />
                   <span>Outward Register</span>
                 </button>
+                <button
+                  onClick={() => handleNavClick('tasks')}
+                  className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition w-full text-left ${activeTab === 'tasks' ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-300 hover:text-white hover:bg-gray-800'}`}
+                >
+                  <CheckSquare className="w-3.5 h-3.5 text-emerald-300" />
+                  <span>Task Manager</span>
+                </button>
+
 
                 <button
                   onClick={() => handleNavClick('customers')}
@@ -497,6 +506,14 @@ export const Header: React.FC<HeaderProps> = ({
                 <PackageCheck className="w-4 h-4 text-emerald-300" />
                 <span>Outward Register</span>
               </button>
+                <button
+                  onClick={() => handleNavClick('tasks')}
+                  className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition w-full text-left ${activeTab === 'tasks' ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-300 hover:text-white hover:bg-gray-800'}`}
+                >
+                  <CheckSquare className="w-3.5 h-3.5 text-emerald-300" />
+                  <span>Task Manager</span>
+                </button>
+
 
               <button
                 onClick={() => handleNavClick('customers')}
