@@ -1,3 +1,5 @@
+import { Capacitor } from '@capacitor/core';
+import { AppLauncher } from '@capacitor/app-launcher';
 import type { CompanyProfile } from '../types';
 
 const getCompanyProfile = (): Partial<CompanyProfile> => {
@@ -49,12 +51,32 @@ export const getWhatsAppBusinessUrl = (value: string, message = '', includeFoote
   return webUrl;
 };
 
-export const openWhatsAppBusiness = (value: string, message = '', includeFooter = true): void => {
-  const url = getWhatsAppBusinessUrl(value, message, includeFooter);
-  if (!url) {
+export const openWhatsAppBusiness = async (value: string, message = '', includeFooter = true): Promise<void> => {
+  const digits = String(value || '').replace(/\\D/g, '');
+  const phone = digits.length === 10 ? '91' + digits : digits;
+  if (!phone) {
     window.alert('WhatsApp Business number is not configured. Please check Settings.');
     return;
   }
-  // Navigate in the same tab so Android can hand off the intent to WhatsApp Business.
-  window.location.assign(url);
+
+  const text = message ? message + (includeFooter ? getCompanyWhatsAppFooter() : '') : '';
+  const encodedText = text ? encodeURIComponent(text) : '';
+  const webUrl = 'https://wa.me/' + phone + (encodedText ? '?text=' + encodedText : '');
+
+  // In the Capacitor APK, hand the Android intent to the native OS.
+  // WebView location.assign() does not reliably dispatch custom intent schemes.
+  if (Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'android') {
+    const intentQuery = 'phone=' + phone + (encodedText ? '&text=' + encodedText : '');
+    const intentUrl = 'intent://send?' + intentQuery +
+      '#Intent;scheme=whatsapp;package=com.whatsapp.w4b;end';
+    try {
+      await AppLauncher.openUrl({ url: intentUrl });
+      return;
+    } catch (error) {
+      console.warn('WhatsApp Business intent failed; opening WhatsApp web fallback.', error);
+    }
+  }
+
+  // Browser fallback: Android App Links can open the installed WhatsApp app.
+  window.location.assign(webUrl);
 };
