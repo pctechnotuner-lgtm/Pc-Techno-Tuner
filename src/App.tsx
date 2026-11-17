@@ -262,9 +262,13 @@ export default function App() {
           .order('created_at', { ascending: false });
         if (publicComplaintError) throw publicComplaintError;
         const publicComplaints = (publicComplaintRows || []).map((row: { payload: Complaint }) => row.payload);
+        // The authenticated cloud list contains the latest admin edits.
+        // Public intake rows are only a fallback for tickets not yet in that list.
+        // Put cloud rows first so an old public payload can never overwrite a
+        // newer Resolved/Closed status during reload.
         const cloudComplaintsWithPublic = cloudComplaints === null
           ? publicComplaints
-          : [...publicComplaints, ...cloudComplaints.filter((item) => !publicComplaints.some((publicItem) => publicItem.id === item.id))];
+          : [...cloudComplaints, ...publicComplaints.filter((publicItem) => !cloudComplaints.some((item) => item.id === publicItem.id))];
 
         if (cancelled) return;
 
