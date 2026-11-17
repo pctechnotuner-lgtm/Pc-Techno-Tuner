@@ -24,7 +24,8 @@
     "express": "^4.21.2",
     "dotenv": "^17.2.3",
     "motion": "^12.23.24",
-    "@capacitor/core": "^7.4.3"
+    "@capacitor/core": "^7.4.3",
+    "@capacitor/app-launcher": "^7.0.0"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
