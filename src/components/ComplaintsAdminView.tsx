@@ -108,10 +108,65 @@ export const ComplaintsAdminView: React.FC<ComplaintsAdminViewProps> = ({
     };
 
     onUpdateComplaint(updated);
+
+    // Send a dedicated completion report when a ticket is resolved or closed.
+    // Keep the original problem as context, but clearly state the final outcome.
+    if (status === 'Resolved' || status === 'Closed') {
+      const completionMessage = [
+        '✅ *PC TECHNO TUNER | SERVICE ' + (status === 'Resolved' ? 'RESOLVED' : 'CLOSED') + ' REPORT*',
+        '',
+        '🆔 Ticket ID: ' + updated.id,
+        '👤 Customer: ' + updated.customerName,
+        '🖥️ Product: ' + updated.category + (updated.brandModel ? ' (' + updated.brandModel + ')' : ''),
+        '⚠️ Reported Problem: ' + updated.description,
+        '🛠️ Work / Parts Used: ' + (updated.partsUsed || 'Not specified'),
+        '👨‍🔧 Technician: ' + (updated.assignedTechnician || 'PC TECHNO TUNER Service Team'),
+        '📅 Visit Date: ' + (updated.visitDate || 'N/A'),
+        '💰 Service Charges: ₹' + (Number(updated.serviceCharges) || 0).toLocaleString('en-IN'),
+        '📌 Final Status: ' + status,
+        '🗓️ Report Date: ' + new Date(updated.updatedAt).toLocaleDateString('en-IN'),
+        '',
+        status === 'Resolved'
+          ? 'Your service complaint has been resolved. Please contact us if you need any further assistance.'
+          : 'Your service ticket has been closed. Thank you for choosing PC TECHNO TUNER.'
+      ].join('\\n');
+      openWhatsAppBusiness(updated.mobile, completionMessage);
+    }
+
     closeEditModal();
   };
 
-  const handleWhatsAppCustomer = (c: Complaint) => openWhatsAppBusiness(c.mobile, 'PC TECHNO TUNER - Service Complaint Update\\nTicket ID: ' + c.id + '\\nCustomer: ' + c.customerName + '\\nEquipment: ' + c.category + ' (' + (c.brandModel || 'General') + ')\\nStatus: ' + c.status + '\\nComplaint: ' + c.description);
+  const handleWhatsAppCustomer = (c: Complaint) => {
+    const isComplete = c.status === 'Resolved' || c.status === 'Closed';
+    const message = isComplete
+      ? [
+          '✅ *PC TECHNO TUNER | SERVICE ' + (c.status === 'Resolved' ? 'RESOLVED' : 'CLOSED') + ' REPORT*',
+          '',
+          '🆔 Ticket ID: ' + c.id,
+          '👤 Customer: ' + c.customerName,
+          '🖥️ Product: ' + c.category + (c.brandModel ? ' (' + c.brandModel + ')' : ''),
+          '⚠️ Reported Problem: ' + c.description,
+          '🛠️ Work / Parts Used: ' + (c.partsUsed || 'Not specified'),
+          '👨‍🔧 Technician: ' + (c.assignedTechnician || 'PC TECHNO TUNER Service Team'),
+          '📅 Visit Date: ' + (c.visitDate || 'N/A'),
+          '💰 Service Charges: ₹' + (Number(c.serviceCharges) || 0).toLocaleString('en-IN'),
+          '📌 Final Status: ' + c.status,
+          '🗓️ Report Date: ' + new Date(c.updatedAt || c.createdAt).toLocaleDateString('en-IN'),
+          '',
+          c.status === 'Resolved'
+            ? 'Your service complaint has been resolved. Please contact us if you need any further assistance.'
+            : 'Your service ticket has been closed. Thank you for choosing PC TECHNO TUNER.'
+        ].join('\\n')
+      : [
+          'PC TECHNO TUNER - Service Complaint Update',
+          'Ticket ID: ' + c.id,
+          'Customer: ' + c.customerName,
+          'Equipment: ' + c.category + ' (' + (c.brandModel || 'General') + ')',
+          'Status: ' + c.status,
+          'Complaint: ' + c.description
+        ].join('\\n');
+    openWhatsAppBusiness(c.mobile, message);
+  };
 
   // Filter complaints
   const filtered = complaints.filter((c) => {
