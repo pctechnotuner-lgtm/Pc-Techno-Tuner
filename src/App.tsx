@@ -44,6 +44,7 @@ import { AntivirusView } from './components/AntivirusView';
 import { InwardView } from './components/InwardView';
 import { OutwardView } from './components/OutwardView';
 import { MoreView } from './components/MoreView';
+import { TaskView, WorkTask } from './components/TaskView';
 import { QuoteRequestsView } from './components/QuoteRequestsView';
 import { sameParty, mergeParty } from './lib/party';
 import { ZEBRONICS_CATALOGUE } from './zebronicsCatalogue';
@@ -102,6 +103,7 @@ export default function App() {
   const [antivirusLicenses, setAntivirusLicenses] = useState<AntivirusLicense[]>(storage.getAntivirusLicenses);
   const [inwardRecords, setInwardRecords] = useState<InwardRecord[]>(storage.getInwardRecords);
   const [outwardRecords, setOutwardRecords] = useState<OutwardRecord[]>(storage.getOutwardRecords);
+  const [tasks, setTasks] = useState<WorkTask[]>([]);
 
   const [lang, setLang] = useState<Language>(storage.getLanguage);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -235,6 +237,7 @@ export default function App() {
           cloudAntivirusLicenses,
           cloudInwardRecords,
           cloudOutwardRecords,
+          cloudTasks,
           cloudLanguage,
         ] = await Promise.all([
           loadCloudData<CompanyProfile>('profile'),
@@ -247,6 +250,7 @@ export default function App() {
           loadCloudData<AntivirusLicense[]>('antivirus_licenses'),
           loadCloudData<InwardRecord[]>('inward_records'),
           loadCloudData<OutwardRecord[]>('outward_records'),
+          loadCloudData<WorkTask[]>('tasks'),
           loadCloudData<Language>('language'),
         ]);
 
@@ -354,6 +358,11 @@ export default function App() {
           await saveCloudData('outward_records', localOutwardRecords);
         }
 
+        // Tasks
+        const initialTasks = cloudTasks ?? [];
+        setTasks(initialTasks);
+        if (cloudTasks === null) await saveCloudData('tasks', initialTasks);
+
         // Language
         if (cloudLanguage !== null) {
           setLang(cloudLanguage);
@@ -453,6 +462,7 @@ export default function App() {
           saveCloudData('antivirus_licenses', antivirusLicenses),
           saveCloudData('inward_records', inwardRecords),
           saveCloudData('outward_records', outwardRecords),
+          saveCloudData('tasks', tasks),
           saveCloudData('language', lang),
         ]);
       };
@@ -493,6 +503,7 @@ export default function App() {
     antivirusLicenses,
     inwardRecords,
     outwardRecords,
+    tasks,
     lang,
   ]);
 
@@ -543,6 +554,10 @@ export default function App() {
       notes: 'Automatically linked from Inward ' + record.id,
       createdAt: new Date().toISOString(),
     });
+  };
+
+  const handleSaveTask = (task: WorkTask) => {
+    setTasks(current => current.some(item => item.id === task.id) ? current.map(item => item.id === task.id ? task : item) : [task, ...current]);
   };
 
   const handleSaveOutwardRecord = (record: OutwardRecord) => {
@@ -1229,6 +1244,8 @@ export default function App() {
             onDeleteRecord={handleDeleteInwardRecord}
           />
         )}
+
+        {activeTab === 'tasks' && isAdmin && <TaskView tasks={tasks} onSaveTask={handleSaveTask} />}
 
         {activeTab === 'outward' && isAdmin && (
           <OutwardView
